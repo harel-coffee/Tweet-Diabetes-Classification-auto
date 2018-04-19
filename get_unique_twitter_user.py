@@ -1,7 +1,8 @@
 """
 Get names and ids of the persons who are tweeting and are mentioned
 and save them in a collection of MongoDB
-(Excluding persons who are retweeting)
+(Excluding persons who are retweeting /
+ including quotes (not the link) )
 
 Example document being saved to MongoDB:
 
