@@ -43,7 +43,7 @@ unique_users = db.unique_users
 already_inserted_persons = []
 
 # only english tweets
-for tweet in tweets.find({'lang': 'en'}):
+for tweet in tweets.find({'lang': 'en'}, no_cursor_timeout=True): 
 
     # consider only persons of non-retweets
     if 'retweeted_status' not in tweet.keys():
