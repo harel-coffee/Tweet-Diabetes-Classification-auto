@@ -15,6 +15,7 @@ import nltk
 from nltk import word_tokenize
 from nltk.tokenize import TweetTokenizer
 from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
 
 
 #from emoticons_emoji import preprocess_emot
@@ -37,6 +38,8 @@ class Preprocess:
         self.Constant_words = [attr for attr in dir(Constants) if not callable(getattr(Constants, attr)) \
                             and not attr.startswith("__")]+Emotions.EMOTION_CATEGORIES
 
+        self.WN_Lemmatizer = WordNetLemmatizer()
+
     def get_text(self, raw_tweet):
         """ get text of tweet object in json format """
         return raw_tweet["text"]
@@ -57,11 +60,17 @@ class Preprocess:
         """
         return contractions.fix(tweet)
 
-    def replace_hashtags_URL_USER(self, tweet):
+    def replace_hashtags_URL_USER(self, tweet, mode="replace"):
         """
-            Replaces hashtags by its words
-            Replaces URLs by the "URL"
-            Replace user mentions by "USER"
+            if mode == "replace"
+                Replaces hashtags by its words
+                Replaces URLs by the "URL"
+                Replace user mentions by "USER"
+
+            if mode == "delete"
+                Delete hasthags 
+                Delete URLs
+                Delete USERs
 
             https://github.com/yogeshg/Twitter-Sentiment
 
@@ -73,16 +82,30 @@ class Preprocess:
 
             TODO: maybe replace @Obama with Obama -> to be checked!
         """
-        # replace URLs
-        tweet = Patterns.URL_PATTERN.sub(Constants.URL, tweet)
 
-        # replace mentions : @Obama
-        tweet = Patterns.MENTION_PATTERN.sub(Constants.USER, tweet)
+        if mode == "replace":
+            # replace URLs
+            tweet = Patterns.URL_PATTERN.sub(Constants.URL, tweet)
 
-        # replace hashtags by its words
-        hashtags = Patterns.HASHTAG_PATTERN.findall(tweet)
-        for hashtag in hashtags:
-            tweet = tweet.replace("#"+hashtag, hashtag)
+            # replace mentions : @Obama
+            tweet = Patterns.MENTION_PATTERN.sub(Constants.USER, tweet)
+
+            # replace hashtags by its words
+            hashtags = Patterns.HASHTAG_PATTERN.findall(tweet)
+            for hashtag in hashtags:
+                tweet = tweet.replace("#"+hashtag, hashtag)
+
+        elif mode == "delete":
+            # replace URLs
+            tweet = Patterns.URL_PATTERN.sub("", tweet)
+
+            # replace mentions : @Obama
+            tweet = Patterns.MENTION_PATTERN.sub("", tweet)
+
+            # replace hashtags by its words
+            hashtags = Patterns.HASHTAG_PATTERN.findall(tweet)
+            for hashtag in hashtags:
+                tweet = tweet.replace("#"+hashtag, "")
 
         return tweet
 
@@ -190,7 +213,7 @@ class Preprocess:
 
         return tweet
 
-    def replace_numbers(self, tweet):
+    def replace_numbers(self, tweet, mode="replace"):
         """
             Replace all interger occurrences in list of tokenized words with textual representation
 
@@ -198,11 +221,18 @@ class Preprocess:
             >>> text = ['June', '2017', 'McDougall', '10', 'Day']
             >>> replace_numbers(text)
             >>> ['June', 'two thousand and seventeen', 'McDougall', 'ten', 'Day']
+
+            REMARK: Maybe better to delete numbers of leave them as string: '2017'
         """
-        p = inflect.engine()
-        for ind, word in enumerate(tweet):
-            if word.isdigit():
-                tweet[ind] = p.number_to_words(word)
+
+        if mode == "replace": 
+            p = inflect.engine()
+            for ind, word in enumerate(tweet):
+                if word.isdigit():
+                    tweet[ind] = p.number_to_words(word)
+
+        elif mode == "delete":
+            tweet = [word for word in tweet if not word.isdigit() ]
 
         return tweet
 
@@ -230,7 +260,8 @@ class Preprocess:
             >>> ['americans', 'stop', 'drink']
         """
         for ind, word in enumerate(tweet):
-            tweet[ind] = Grammar.LEMMATIZER.lemmatize(word, pos='v')
+            #tweet[ind] = Grammar.LEMMATIZER.lemmatize(word, pos='v')
+            tweet[ind] = self.WN_Lemmatizer.lemmatize(word, pos='v')
         return tweet
 
     def stem_words(self, tweet, stemmer=Grammar.STEMMER_SNOWBALL):
