@@ -68,7 +68,7 @@ class Preprocess:
                 Replace user mentions by "USER"
 
             if mode == "delete"
-                Delete hasthags 
+                Delete hasthags
                 Delete URLs
                 Delete USERs
 
@@ -135,7 +135,8 @@ class Preprocess:
         """
         cleaned_tweet = []
         for word in tweet:
-            if word not in string.punctuation and word != '...' and word != '…' and word != '..':
+            #if word not in string.punctuation and word != '...' and word != '…' and word != '..':
+            if word not in string.punctuation and word not in ['...', '…', '..', "\n", "\t", " "] :
                 cleaned_tweet.append(word)
 
         return cleaned_tweet
@@ -176,14 +177,17 @@ class Preprocess:
         cleaned_tweet = []
         for word in tweet:
             match_emoticon = Patterns.EMOTICONS_PATTERN.findall(word)
-            if not match_emoticon: # if no emoticon found
+            if not match_emoticon : # if no emoticon found
                 cleaned_tweet.append(word)
             else:
-                try:
-                    cleaned_tweet.append(EMOTICONS[word])
-                except:
-                    print("INFO: Could not replace emoticon: {} of the word: {}".format(match_emoticon[0], word), sys.exc_info())
-
+                if match_emoticon[0] is not ':':
+                    if match_emoticon[0] is not word:
+                        cleaned_tweet.append(word)
+                    else:
+                        try:
+                            cleaned_tweet.append(EMOTICONS[word])
+                        except:
+                            print("INFO: Could not replace emoticon: {} of the word: {}".format(match_emoticon[0], word), sys.exc_info())
         return cleaned_tweet
 
     def to_lowercase(self, tweet):
@@ -225,7 +229,7 @@ class Preprocess:
             REMARK: Maybe better to delete numbers of leave them as string: '2017'
         """
 
-        if mode == "replace": 
+        if mode == "replace":
             p = inflect.engine()
             for ind, word in enumerate(tweet):
                 if word.isdigit():
