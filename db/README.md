@@ -20,3 +20,12 @@ Creates the collection *english_tweets*, which consists only of english tweets (
                       Start date is 01-05-2017 00:00:00
 
 The field *number_of_weeks* will allow more precise analyses in a later step.
+
+
+## english_noRetweets_tweets.py 
+Creates the collection *english_noRetweet_tweets* which consists takes the tweets of the collection *english_tweets* and excludes all retweets and duplicates/identical tweets by following steps:
+- adds all non-retweet tweets to the collection
+- for all the retweets, adds their original tweet to the collection
+- Removes all duplicates / identical tweets 
+
+This gives us a collection with unique tweets, so each tweet occurs only one time

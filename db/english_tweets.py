@@ -1,4 +1,9 @@
 """
+
+Author: Adrian Ahne
+Date: 27-06-2018
+
+
 Creates a collection consisting only of english tweets
 Furthermore two fields are added to each tweet-document:
   - 'created_at_orig' : if tweet-document is no retweet -> insert date of the field 'created_at'
