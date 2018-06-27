@@ -18,6 +18,7 @@ nltk.download('stopwords')
 nltk.download('wordnet')
 
 from emotion_codes import EMOTICONS_UNICODE
+from stopword_def import *
 
 class Constants:
     URL = "URL"
@@ -35,21 +36,10 @@ class Patterns:
 
 class Grammar:
     STOPWORDS = stopwords.words('english')
+    STOPWORDS_NO_PERSONAL = stopwords_no_personal_list # excludes personal words like "I", "me", "my" to keep them when filtering personal from institutional tweets
+    WHITELIST_EN = ["n't", "not", "no", "nor", "never", "nothing", "nowhere", "noone", "none"]
     STEMMER_LANCASTER = LancasterStemmer() # aggressive, fast, sometimes confusing
     STEMMER_PORTER = PorterStemmer(mode='NLTK_EXTENSIONS') # mode that includes further improvements
     STEMMER_SNOWBALL = SnowballStemmer('english') # improved porter
 
     LEMMATIZER = WordNetLemmatizer()
-
-# class Emotions:
-#     EMOT_SMILE = "EMOT_SMILE"
-#     EMOT_LAUGH = "EMOT_LAUGH"
-#     EMOT_LOVE = "EMOT_LOVE"
-#     EMOT_WINK = "EMOT_WINK"
-#     EMOT_SAD_ANGRY = "EMOT_SAD_ANGRY"
-#     EMOT_SURPRISED = "EMOT_SURPRISED"
-#     EMOT_CRY = "EMOT_CRY"
-#
-#
-#     EMOTION_CATEGORIES = [EMOT_SMILE, EMOT_LAUGH, EMOT_LOVE, EMOT_WINK, EMOT_SAD_ANGRY,
-#                             EMOT_SURPRISED, EMOT_CRY]

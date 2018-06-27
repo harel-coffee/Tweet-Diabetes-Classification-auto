@@ -27,7 +27,7 @@ from emotion_codes import EMOTICONS
 from emotion_codes import EMOJI_TO_CATEGORY
 from emotion_codes import Emotions
 from defines import *
-
+from contractions_def import *
 
 
 class Preprocess:
@@ -58,7 +58,8 @@ class Preprocess:
               - "are the main cause of obeisty" -> "are the main because of obesity"
               - "in the U.S are" -> "in the you.S. are"
         """
-        return contractions.fix(tweet)
+        #return contractions.fix(tweet)
+        return  contractions_fix(tweet)
 
     def replace_hashtags_URL_USER(self, tweet, mode="replace"):
         """
@@ -136,7 +137,7 @@ class Preprocess:
         cleaned_tweet = []
         for word in tweet:
             #if word not in string.punctuation and word != '...' and word != '…' and word != '..':
-            if word not in string.punctuation and word not in ['...', '…', '..', "\n", "\t", " "] :
+            if word not in string.punctuation and word not in ['...', '…', '..', "\n", "\t", " ", ""] :
                 cleaned_tweet.append(word)
 
         return cleaned_tweet
@@ -211,11 +212,17 @@ class Preprocess:
 
     def remove_non_ascii(self, tweet):
         """Remove non-ASCII characters from list of tokenized words"""
-        for ind, word in enumerate(tweet):
+#        for ind, word in enumerate(tweet):
             # normalize returns the normal fom 'NFKD' of the word
-            tweet[ind] = unicodedata.normalize('NFKD', word).encode('ascii', 'ignore').decode('utf-8', 'ignore')
+#            tweet[ind] = unicodedata.normalize('NFKD', word).encode('ascii', 'ignore').decode('utf-8', 'ignore')
 
-        return tweet
+        new_tweet = []
+        for word in tweet:
+            non_ascii_word = unicodedata.normalize('NFKD', word).encode('ascii', 'ignore').decode('utf-8', 'ignore')
+            if non_ascii_word is not '':
+                new_tweet.append(non_ascii_word)
+
+        return new_tweet
 
     def replace_numbers(self, tweet, mode="replace"):
         """
@@ -240,9 +247,20 @@ class Preprocess:
 
         return tweet
 
-    def remove_stopwords(self, tweet):
+    def remove_stopwords(self, tweet, include_personal_words=False, include_negations=False):
         """
             Remove stop words from list of tokenized words
+
+            Parameter:
+                tweet : tokenised list of strings
+                include_personal_words : [True, False]
+                                        if True, personal stopwords like
+                                        "I", "me", "my" are not considered as
+                                        stopwords
+                include_negations: [True, False]
+                                    if True, negation words like "no", "not" ,"nothing"
+                                    are included and not considered as stopwords
+                ignore_whitelist : whitelist containing words
 
             Example:
             >>> text = ['five', 'reasons', 'to', 'eat', 'like', 'a', 'hunter']
@@ -251,8 +269,21 @@ class Preprocess:
         """
         new_tweet = []
         for word in tweet:
-            if word not in Grammar.STOPWORDS: # TODO maybe add manually more stopwords
-                new_tweet.append(word)
+            if include_personal_words:
+                if include_negations:
+                    if word not in Grammar.STOPWORDS_NO_PERSONAL or word in Grammar.WHITELIST_EN: # TODO maybe add manually more stopwords
+                        new_tweet.append(word)
+                else:
+                    if word not in Grammar.STOPWORDS_NO_PERSONAL: # TODO maybe add manually more stopwords
+                        new_tweet.append(word)
+            else:
+                if include_negations:
+                    if word not in Grammar.STOPWORDS or word in Grammar.WHITELIST_EN: # TODO maybe add manually more stopwords
+                        new_tweet.append(word)
+                else:
+                    if word not in Grammar.STOPWORDS: # TODO maybe add manually more stopwords
+                        new_tweet.append(word)
+
         return new_tweet
 
     def lemmatize_verbs(self, tweet):
