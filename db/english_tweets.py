@@ -97,8 +97,11 @@ if __name__ == '__main__':
     # get database with all tweets
     db = client.tweets_database
 
+    print("All collections in the database:")
+    print(db.collection_names())
+
     # get collection containing tweets
-    tweets = db.tweets
+    tweets = db.raw_tweets
 
     # temporary collection with the additional field 'created_at_orig' to be able to
     # calculate the field 'number_of_weeks' in a second step and store it to english_tweets
