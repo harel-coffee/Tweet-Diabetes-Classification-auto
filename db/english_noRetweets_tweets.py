@@ -104,8 +104,9 @@ def delete_duplicates(duplicates, english_noRetweet_tweets):
         # delete each duplicate
         i=1
         while i < n:
-            result = client.tweets_database.filtered_tweets_noRetweets_english.delete_one({'_id': ObjectId(duplicate['docs'][i])})
-            print(result.deleted_count)
+
+            result = client.tweets_database.english_noRetweet_tweets.delete_one({'_id': ObjectId(duplicate['docs'][i])})
+            #print(result.deleted_count)
             i += 1
 
 
@@ -125,6 +126,8 @@ if __name__ == '__main__':
     # new database with cleaned tweets (without Retweets, in english)
     english_tweets = db.english_tweets
 
+    #db.english_noRetweet_tweets.drop()
+
     english_noRetweet_tweets = db.english_noRetweet_tweets
 
     #print("All collections in the database:")
@@ -138,9 +141,11 @@ if __name__ == '__main__':
 
     # add original tweet of retweeted tweet to collection
     add_originalOfRetweet_to_collection(english_tweets, english_noRetweet_tweets)
+    print("Number of english, noRetweet but its original tweets:", english_noRetweet_tweets.count())
 
     # get all duplicate tweets (copies of tweets)
     duplicates = get_duplicates(english_noRetweet_tweets)
 
     # delete duplicates
     delete_duplicates(duplicates, english_noRetweet_tweets)
+    print("Number of english, noRetweet but its original, no duplicate tweets:", english_noRetweet_tweets.count())
