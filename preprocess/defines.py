@@ -23,8 +23,8 @@ from stopword_def import *
 class Constants:
     URL = "URL"
     USER = "USER"
-    TYPE1 = "type1"
-    TYPE2 = "type2"
+    TYPE1 = "TYPEONE"
+    TYPE2 = "TYPETWO"
 
 class Patterns:
     URL_PATTERN=re.compile(r"http\S+") # or re.compile(r'(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:\'".,<>?\xab\xbb\u201c\u201d\u2018\u2019]))')
@@ -49,10 +49,10 @@ class Grammar:
 
 
 class WordLists:
-    type1 = ["#type1", "type1", "Type1", "type 1", "Type 1", "t1d", "T1D", "#t1d",
-             "#T1D", "typeI", "TypeI", "type I", "Type I", "#type1diabetes"]
-    type2 = ["#type2", "type2", "Type2", "type 2", "Type 2", "t2d", "T2D", "#t2d",
-             "#T2D", "typeII", "TypeII", "type II", "Type II", "#type2diabetes"]
+    type1 = ["#type1diabetes", "type one", "#type1", "type1", "Type1", "type 1",
+             "Type 1", "t1d", "T1D", "#t1d", "#T1D", "typeI", "TypeI", "type I", "Type I"]
+    type2 = ["#type2diabetes", "type two", "#type2", "type2", "Type2", "type 2",
+             "Type 2", "t2d", "T2D", "#t2d", "#T2D", "typeII", "TypeII", "type II", "Type II"]
 
     TYPE1_WORDS = re.compile(u"|".join(type1))
     TYPE2_WORDS = re.compile(u"|".join(type2))

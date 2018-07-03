@@ -35,8 +35,9 @@ class Preprocess:
     def __init__(self):
         self.TweetTokenizer = TweetTokenizer()
         # Constant words like URL, USER, EMOT_SMILE, etc. that we want to keep in uppercase
-        self.Constant_words = [attr for attr in dir(Constants) if not callable(getattr(Constants, attr)) \
-                            and not attr.startswith("__")]+Emotions.EMOTION_CATEGORIES
+        self.Constant_words = [value for attr, value in Constants.__dict__.items()
+                               if not callable(getattr(Constants, attr)) and
+                               not attr.startswith("__")]+Emotions.EMOTION_CATEGORIES
 
         self.WN_Lemmatizer = WordNetLemmatizer()
 
@@ -126,7 +127,7 @@ class Preprocess:
         # replace type 2 words
         tweet = WordLists.TYPE2_WORDS.sub(Constants.TYPE2, tweet)
 
-        return tweet 
+        return tweet
 
 
     def tokenize(self, tweet):
