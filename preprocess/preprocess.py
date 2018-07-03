@@ -110,6 +110,25 @@ class Preprocess:
 
         return tweet
 
+
+    def replace_special_words(self, tweet):
+        """
+            Replace special words
+
+            For ex.: all the type 1 related words like "#type1", "Type 1", "t1d", etc.
+                     are transformed to "type1"
+
+        """
+
+        # replace type 1 words
+        tweet = WordLists.TYPE1_WORDS.sub(Constants.TYPE1, tweet)
+
+        # replace type 2 words
+        tweet = WordLists.TYPE2_WORDS.sub(Constants.TYPE2, tweet)
+
+        return tweet 
+
+
     def tokenize(self, tweet):
         """
             Tokenizes tweet in its single components (words, emojis, emoticons)
