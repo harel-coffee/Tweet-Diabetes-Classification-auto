@@ -18,25 +18,56 @@ import numpy as np
 
 class TextAndMetaDataFeatureExtractor(BaseEstimator, TransformerMixin):
     """ Combine tweets (label tweet) and meta-data (label metadata)
-        such as number of followers, number of friends, etc. """
+        such as number of followers, number of friends, etc. and the description of the user
 
-    def __init__(self, meta_data, add_metadata=True):
+        Parameters
+        ------------------------------------------------------
+
+        Optional:
+            meta_data : array table containing meta-data information (nFollowers, nFriends, etc.)
+            user_description : Preprocessed text tokens of the user description of the user's metadata
+
+        Return
+        -----------------------------------------------------
+        Numpy's recarray containing up to three different types (tweet, metadata, userDescription)
+    """
+
+    def __init__(self, meta_data=[], user_description=[]):
         self.meta_data = meta_data
-        self.add_metadata = add_metadata
+        self.user_description = user_description
 
     def fit(self, tweets, y=None):
         return self
 
     def transform(self, tweets):
 
-        # add metadata if true
-        if self.add_metadata:
+        # add metadata if true and not user description
+        if self.meta_data != [] and self.user_description == []:
             features = np.recarray(shape=(len(tweets),),
                                    dtype=[('tweet', object), ('metadata', object)])
 
             for i, tweet in enumerate(tweets):
                 features['tweet'][i] = tweet
                 features['metadata'][i] = np.array(self.meta_data[i].tolist())#.iloc[[i]]
+
+        # add metadata if true and user description
+        elif self.meta_data != [] and self.user_description != []:
+            features = np.recarray(shape=(len(tweets),),
+                                   dtype=[('tweet', object), ('metadata', object), ('userDescription', object)])
+
+            for i, tweet in enumerate(tweets):
+                features['tweet'][i] = tweet
+                features['metadata'][i] = np.array(self.meta_data[i].tolist())#.iloc[[i]]
+                features['userDescription'][i] = self.user_description[i]
+
+        # add no metadata but user description
+        elif self.meta_data == [] and self.user_description != []:
+            features = np.recarray(shape=(len(tweets),),
+                                   dtype=[('tweet', object), ('userDescription', object)])
+
+            for i, tweet in enumerate(tweets):
+                features['tweet'][i] = tweet
+                features['userDescription'][i] = self.user_description[i]
 
         # only work with tweets
         else:
@@ -97,6 +128,7 @@ class Debug(BaseEstimator, TransformerMixin):
     def transform(self, X):
         print("{}".format(self.message))
         print("shape:", X.shape, " type:", type(X))
+        import ipdb; ipdb.set_trace()
         #print(X[0])
         return X
 
