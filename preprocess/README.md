@@ -12,6 +12,7 @@ Definitions and conversions for the emoticons and emojis
 # preprocess.py
 Following functions: 
 - replace contractions (can't -> can not)
+- replace special words ("#type1", "t1d", "type one" -> TYPEONE)
 - replace hashtags (#diabetes -> diabetes), url's (https://protonmail.com/ -> URL), Users (@McKennan -> USER)
 - tokenize ("I like diabetes research" -> "I", "like", "diabetes", "research")
 - remove punctuations (ex. ;:,?"!)
