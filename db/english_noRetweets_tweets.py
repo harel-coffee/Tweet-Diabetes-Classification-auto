@@ -15,6 +15,7 @@ import scipy
 import pandas as pd
 import sys
 import pymongo
+import re
 from bson.objectid import ObjectId
 
 
@@ -62,6 +63,40 @@ def add_originalOfRetweet_to_collection(english_tweets, english_noRetweet_tweets
 
 
 
+def add_field_to_collection(english_noRetweet_tweets, URL_PATTERN=False):
+    """
+        Function adding a new field to each element of the collection
+        The new field will contain the tweet text where the url's are replaced
+        by the keyword URL
+
+        This is done to recognise duplicates
+
+        Ex.:   "I like apples https://t.co/y2fI43"
+          and  "I like apples https://t.co/3Kk4fq"
+
+          are the same tweets but not recognised as the same ones
+
+        For this reason the url's are replaced by the keyword URL and the new
+        field "text_URL" is added. This yields:
+
+        "I like apples URL"
+        "I like apples URL"
+
+        Now they can be recognised as duplicates.
+
+    """
+
+    for i, tweet in enumerate(english_noRetweet_tweets.find()):
+        text = tweet["text"]
+        text = URL_PATTERN.sub("URL", text)
+
+        try:
+            english_noRetweet_tweets.update_one({'_id':tweet["_id"]}, {"$set": {"text_URL" : text}}, upsert=False)
+        except Exception as e:
+            print("Could not update tweet {}: '{}' to MongoDB!".format(tweet["_id"], tweet["text"]), str(e))
+
+
+
 def get_duplicates(english_noRetweet_tweets):
     """
         Get all tweets that are duplicates (identic)
@@ -71,7 +106,7 @@ def get_duplicates(english_noRetweet_tweets):
     duplicates = english_noRetweet_tweets.aggregate( [
         { "$group": {
             # Group by fields to match on (a,b)
-            "_id": { "id_str": "$id_str" },
+            "_id": { "text_URL": "$text_URL" },
 
             # Count number of matching docs for the group
             "count": { "$sum":  1 },
@@ -89,13 +124,13 @@ def get_duplicates(english_noRetweet_tweets):
     return duplicates
 
 
-def delete_duplicates(duplicates, english_noRetweet_tweets):
+def delete_duplicates(duplicates, database_collection):
     """
         Deletes all duplicates / identic tweets
 
         Parameters:
           - duplicates : dict of lists of copies / identical tweets
-          - english_noRetweet_tweets : collection from which duplicates are deleted
+          - database_collection : collection from which duplicates are deleted
     """
 
     for duplicate in duplicates:
@@ -105,7 +140,7 @@ def delete_duplicates(duplicates, english_noRetweet_tweets):
         i=1
         while i < n:
 
-            result = client.tweets_database.english_noRetweet_tweets.delete_one({'_id': ObjectId(duplicate['docs'][i])})
+            result = database_collection.delete_one({'_id': ObjectId(duplicate['docs'][i])})
             #print(result.deleted_count)
             i += 1
 
@@ -128,10 +163,9 @@ if __name__ == '__main__':
 
     #db.english_noRetweet_tweets.drop()
 
-    english_noRetweet_tweets = db.english_noRetweet_tweets
+    #english_noRetweet_tweets = db.english_noRetweet_tweets
+    english_noRetweet_tweets = db.temp
 
-    #print("All collections in the database:")
-    #print(db.collection_names())
 
     print("Number of english tweets:", english_tweets.count())
 
@@ -143,9 +177,14 @@ if __name__ == '__main__':
     add_originalOfRetweet_to_collection(english_tweets, english_noRetweet_tweets)
     print("Number of english, noRetweet but its original tweets:", english_noRetweet_tweets.count())
 
+    # replace URL's with keyword URL: so
+    URL_PATTERN=re.compile(r"http\S+")
+    add_field_to_collection(english_noRetweet_tweets, URL_PATTERN)
+
     # get all duplicate tweets (copies of tweets)
     duplicates = get_duplicates(english_noRetweet_tweets)
 
     # delete duplicates
+    #delete_duplicates(duplicates, client.tweets_database.english_noRetweet_tweets)
     delete_duplicates(duplicates, english_noRetweet_tweets)
     print("Number of english, noRetweet but its original, no duplicate tweets:", english_noRetweet_tweets.count())
