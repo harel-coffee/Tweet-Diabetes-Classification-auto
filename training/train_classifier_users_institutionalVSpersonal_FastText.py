@@ -2,11 +2,16 @@
 Author: Adrian Ahne
 Date: 27-06-2018
 
-Classification model of personal vs institutional (advertising, health information, spam) tweets
+Finding and training best model to classify personal users vs
+institutional (advertising, health information, spam) users based
+on their tweets
 
-- Get manually labeled tweets from csv *
+
+- Get manually labeled tweets from csv
 - either train word embeddings (fastText) or load already trained word embeddings (fastText)
--
+- Two options:
+                1) Grid search to find best model
+                2) Train best model and save to disk
 
 """
 
@@ -154,9 +159,6 @@ if __name__ == '__main__':
     tweets_csv = pd.read_csv(path_tweets, sep=";",
                              converters={"tweet_proc": lambda x: x.strip("[]").replace("'", "").split(", ")})
 
-    # get matrix of metadata of the tweets that are added to the classification
-    # as further features
-    #meta_data = get_meta_data_features(tweets_csv, manually_labelled_tweets)
 
     # get labels and tweet matrix
     labels = tweets_csv["personal (0=no, 1=yes)"]

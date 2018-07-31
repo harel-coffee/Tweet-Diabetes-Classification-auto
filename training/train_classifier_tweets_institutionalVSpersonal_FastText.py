@@ -2,7 +2,16 @@
 Author: Adrian Ahne
 Date: 27-06-2018
 
-Classification model of personal vs institutional tweets
+Finding and training best model to classify personal tweets vs
+institutional (advertising, health information, spam) tweets
+
+
+- Get manually labeled tweets from csv
+- either train word embeddings (fastText) or load already trained word embeddings (fastText)
+- Two options:
+                1) Grid search to find best model
+                2) Train best model and save to disk
+
 """
 
 from pymongo import MongoClient
@@ -77,8 +86,8 @@ def get_preprocessed_tweets(collection):
 
 def tweet_vectorizer(tweet, model):
     """
-        Gets FastText vector for each word and calculates word embedding for
-        each tweet
+        Gets FastText vector for each word in the tweet and calculates word embedding
+        for the whole tweet by taking the mean of all word - vectors
 
         Parameters
         -------------------------------------------------------------------
@@ -107,6 +116,20 @@ def tweet_vectorizer(tweet, model):
 
 
 def create_model(loss, optimizer, dropout, reccurent_dropout):
+    """
+        Create Keras model
+
+        Parameters (to use a grid search) for the LSTM:
+        -----------------------------------------------------------------
+        loss:       list of loss functions
+        optimizer:  list of optimizers
+        dropout:    list of dropout rates
+        reccurent_dropout: list of reccurent_dropouts
+
+        Return
+        -----------------------------------------------------------------
+        Model
+    """
 
     model = Sequential()
     #model.add(Embedding(2000, embed_dim,input_length = X.shape[1], dropout = 0.2))
@@ -122,7 +145,7 @@ def create_model(loss, optimizer, dropout, reccurent_dropout):
 
 
 
-
+# path to the FastText word embeddings
 PATH_TRAINED_FASTTEXT = "Trained_FastText_2018-07-24_18-17-00.model"
 
 
@@ -145,15 +168,6 @@ if __name__ == '__main__':
     from preprocess import Preprocess
     prep = Preprocess()
 
-    client = connect_to_database()
-
-
-    # get database with all tweets
-    db = client.tweets_database
-
-    # get collections
-    english_noRetweet_tweets = db.english_noRetweet_tweets
-    tweets_manual_label = db.tweets_manual_label
 
     # load csv in which we manually labelled the tweets
     path_tweets = "D:\A_AHNE1\Tweet-Classification-Diabetes-Distress\\manually_labeled_tweets_instVSpers_25072018.csv"
@@ -194,6 +208,9 @@ if __name__ == '__main__':
     print("Get word embeddings for each tweet..")
     V = np.array([tweet_vectorizer(tweet, model_ft) for tweet in tweets_proc])
 
+
+    # choose algo:
+    #---------------------------------------------------------------------------
 
     #model = MultinomialNB()
     model = SVC()
@@ -253,13 +270,18 @@ if __name__ == '__main__':
 
     }
 
+    # Two options:
+    #   1) Grid search to find best model
+    #   2) Train best model and save to disk
 
+    # Option 1) Grid search to find best model
 #    grid = GridSearchCV(pipeline, parameters, cv=10, n_jobs=-1, verbose=2)
 #    grid = grid.fit(V, labels.values)
 
     #print(grid.cv_results_)
 #    print("\nBest: %f using %s" % (grid.best_score_, grid.best_params_))
 
+    # Option 2) Train best model and save to disk
 
     # Best accuracy with 92.25 % SVC
     best_params = {
