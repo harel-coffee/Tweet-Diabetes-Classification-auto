@@ -2,7 +2,12 @@
 Author: Adrian Ahne
 Date: 27-06-2018
 
-Classification model of personal vs institutional tweets
+Classification model of personal vs institutional (advertising, health information, spam) tweets
+
+- Get manually labeled tweets from csv *
+- either train word embeddings (fastText) or load already trained word embeddings (fastText)
+-
+
 """
 
 from pymongo import MongoClient
@@ -37,8 +42,8 @@ DATE_FORMAT = "%Y-%m-%d_%H-%M-%S"
 
 def tweet_vectorizer(tweet, model):
     """
-        Gets FastText vector for each word and calculates word embedding for
-        each tweet
+        Gets FastText vector for each word in the tweet and calculates word embedding
+        for the whole tweet by taking the mean of all word - vectors
 
         Parameters
         -------------------------------------------------------------------
@@ -67,6 +72,20 @@ def tweet_vectorizer(tweet, model):
 
 
 def create_model(loss, optimizer, dropout, reccurent_dropout):
+    """
+        Create Keras model
+
+        Parameters (to use a grid search) for the LSTM:
+        -----------------------------------------------------------------
+        loss:       list of loss functions
+        optimizer:  list of optimizers
+        dropout:    list of dropout rates
+        reccurent_dropout: list of reccurent_dropouts
+
+        Return
+        -----------------------------------------------------------------
+        Model
+    """
 
     model = Sequential()
     #model.add(Embedding(2000, embed_dim,input_length = X.shape[1], dropout = 0.2))
@@ -82,6 +101,9 @@ def create_model(loss, optimizer, dropout, reccurent_dropout):
 
 
 def preprocess_tweet(tweet):
+    """
+        Preprocess tweets in the same way the word embeddings (FastText) are trained
+    """
 #    tweet = prep.replace_contractions(tweet)
 #    tweet = prep.replace_special_words(tweet)
     tweet = prep.replace_hashtags_URL_USER(tweet, mode_URL="delete", mode_Mentions="replace",
@@ -100,6 +122,8 @@ def preprocess_tweet(tweet):
     return tweet
 
 
+
+# path to the FastText word embeddings
 PATH_TRAINED_FASTTEXT = "Trained_FastText_2018-07-24_18-17-00.model"
 
 
@@ -124,14 +148,6 @@ if __name__ == '__main__':
     from preprocess import Preprocess
     prep = Preprocess()
 
-    client = connect_to_database()
-
-    # get database with all tweets
-    db = client.tweets_database
-
-    # get collections
-    #english_noRetweet_tweets = db.english_noRetweet_tweets
-    #users_manual_label = db.users_manual_label
 
     # load csv in which we manually labelled the users
     path_tweets = "D:\A_AHNE1\Tweet-Classification-Diabetes-Distress\manually_labeled_users_instVSpers_MoreInstTweets_30072018.csv"
@@ -171,14 +187,14 @@ if __name__ == '__main__':
     else:
         model_ft = FastText.load(PATH_TRAINED_FASTTEXT)
 
+
     print("Get word embeddings for each tweet..")
-    #V = np.array([tweet_vectorizer(tweet, model_ft) for tweet in tweets_proc])
     V = np.array([tweet_vectorizer(preprocess_tweet(tweet), model_ft) for tweet in tweets_raw])
 
 
+    # choose algo:
+    #---------------------------------------------------------------------------
 
-
-    # choose algo
     #model = MultinomialNB()
     model = SVC()
     #model = LogisticRegression()
@@ -204,9 +220,9 @@ if __name__ == '__main__':
                   #'model__tol' : [1e-10, 1e-9],
 
                   # param for SVC
-                  #'model__kernel' : ["linear", "poly", "rbf"],
-                  #'model__C' : [15.0,12.0,10.0,],
-                  #'model__tol' : [1e-2, 1e-3],
+                  'model__kernel' : ["linear", "poly", "rbf"],
+                  'model__C' : [15.0,12.0,10.0,],
+                  'model__tol' : [1e-2, 1e-3],
 
                   # param for RandomForestClassifier
                   #'model__n_estimators' : [50, 60, 80],
@@ -230,31 +246,35 @@ if __name__ == '__main__':
                   #'model__learning_rate' : ['constant', 'invscaling'],
                   #'model__tol' : [1e-3, 1e-4, 1e-5],
 
-                  'model__hidden_layer_sizes' :  [(64), (32), (16,16)],#[(64), (16, 16), (32, 16)],
-                  'model__activation' : ['relu'],# ['relu', 'tanh'],
-                  'model__solver' : ['adam'],#['adam', 'sgd'],
-                  'model__learning_rate' : ['constant', 'invscaling'],
-                  'model__tol' : [1e-2, 1e-3, 1e-4],
-                  'model__alpha' : [ 1e-4, 1e-5, 1e-6],
-                  'model__max_iter' : [200, 300],
+                  #'model__hidden_layer_sizes' :  [(64), (32), (16,16)],#[(64), (16, 16), (32, 16)],
+                  #'model__activation' : ['relu'],# ['relu', 'tanh'],
+                  #'model__solver' : ['adam'],#['adam', 'sgd'],
+                  #'model__learning_rate' : ['constant', 'invscaling'],
+                  #'model__tol' : [1e-2, 1e-3, 1e-4],
+                  #'model__alpha' : [ 1e-4, 1e-5, 1e-6],
+                  #'model__max_iter' : [200, 300],
                   #'model__beta_1' : [0.990, 0.999],
                   #'model__beta_2' : [1e-7, 1e-8, 1e-9]
 
     }
 
-    # GridSearchCV gets stuck for n_jobs != 1 when executed in jupyter notebook.
-    # https://github.com/scikit-learn/scikit-learn/issues/5115
-    # To fix bug set environment variable: export JOBLIB_START_METHOD="forkserver"
-    #%env JOBLIB_START_METHOD="forkserver"
+
+    # Two options:
+    #   1) Grid search to find best model
+    #   2) Train best model and save to disk
+
+    # Option 1) Grid search to find best model
+    # print("Start Grid search...")
     #grid = GridSearchCV(pipeline, parameters_ft, cv=10, n_jobs=-1, verbose=2)
 
     #grid = grid.fit(V, labels.values)
-    #pp = pipeline.fit_transform(tweets, labels)
 
     #print(grid.cv_results_)
     #print("\nBest: %f using %s" % (grid.best_score_, grid.best_params_))
 
 
+    # Option 2) Train best model and save to disk
+    print("Train best model:")
     # train best model
     best_model = SVC()
     best_params = {
