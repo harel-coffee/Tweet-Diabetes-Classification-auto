@@ -23,34 +23,12 @@ from sklearn.feature_selection import SelectKBest, f_classif
 from sklearn.externals import joblib
 from xgboost import XGBClassifier
 import datetime
-
-from utils import *
+from gensim.models import FastText
+import multiprocessing
 
 DATE_FORMAT = "%Y-%m-%d_%H-%M-%S"
 
 
-
-def connect_to_database(host='localhost', port=27017):
-    """
-        Connect to MongoDB database
-    """
-
-    try:
-        client = MongoClient(host, port)
-    except ConnectionFailure as e:
-        sys.stderr.write("Could not connect to MongoDB: %s" % e)
-        sys.exit(1)
-
-    return client
-
-
-def load_preprocess_library(path='D:\A_AHNE1\Tweet-Classification-Diabetes-Distress\preprocess'):
-    """
-        load library of the given path
-    """
-
-    if path not in sys.path:
-        sys.path.insert(0, path)
 
 
 def get_meta_data_features(tweets_csv, manually_labelled_tweets):
@@ -219,23 +197,42 @@ def create_pipeline(model, meta_data=[], user_description=[]):
     return pipeline
 
 
+
+
+
+
+PATH_TRAINED_FASTTEXT = "Trained_FastText_2018-07-24_18-17-00.model"
+
+
+
 if __name__ == '__main__':
 
 
-    client = connect_to_database()
+    # add path to utils directory to system path
+    path = 'D:\A_AHNE1\Tweet-Classification-Diabetes-Distress\\utils'
+    if path not in sys.path:
+        sys.path.insert(0, path)
+
+    from sys_utils import *
+
 
     # load preprocessing library
-    load_preprocess_library()
+    load_library('D:\A_AHNE1\Tweet-Classification-Diabetes-Distress\preprocess')
+
+    from sklearn_utils import *
+    from mongoDB_utils import *
 
     from preprocess import Preprocess
     prep = Preprocess()
+
+    client = connect_to_database()
 
     # get database with all tweets
     db = client.tweets_database
 
     # get collections
     english_noRetweet_tweets = db.english_noRetweet_tweets
-    manually_labelled_tweets = db.manually_labelled_tweets
+    users_manual_label = db.users_manual_label
 
     # load csv in which we manually labelled the tweets
     path_tweets = "D:\A_AHNE1\Tweet-Classification-Diabetes-Distress\manually_labeled_users_instVSpers_withDescription_10072018.csv"

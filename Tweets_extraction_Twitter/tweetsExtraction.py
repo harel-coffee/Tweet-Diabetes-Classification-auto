@@ -32,7 +32,39 @@ keywords = ['glucose', '#glucose', 'blood glucose', '#bloodglucose', 'insulin', 
             'continuous glucose monitoring', '#continuousglucosemonitoring', '#thisisdiabetes',
             '#lifewithdiabetes', '#stopdiabetes', '#diabetesadvocate', '#diabadass',
             '#diabetesawareness', '#diabeticproblems', '#diaversary', '#justdiabeticthings',
-            '#diabetestest', '#t1dlookslikeme', '#t2dlookslikeme']
+            '#diabetestest', '#t1dlookslikeme', '#t2dlookslikeme', '#duckfiabetes' ,
+            '#kissmyassdiabetes', '#GBDoc',
+
+            'glycémie', 'glycemie', "#glycémie", '#glycemie', 'insuline', '#insuline',
+            'pompe à insuline', 'pompe a insuline', '#pompeàinsuline', '#pompeainsuline',
+            'diabete', 'diabète', 'DT1', '#DT1', '#diabetetype1', '#diabètetype1',
+            '#type1', 'DT2', '#DT2', '#diabetetype2', '#diabètetype2', '#type2',
+            'diabète sucre', 'diabete sucre', '#diabètesucré', '#diabètesucre',
+            '#diabetesucré', '#diabetesucre', 'diabétique', 'diabetique',
+            '#diabétique', '#diabetique', '#changingdiabetes', 'hba1c', '#hba1c',
+            'freestyle libre', '#freestylelibre', '#cgm', 'diabète gestationnel',
+            '#diabetegestationnel', '#diabètegestationnel',
+
+            'Glucose', 'glukose', 'Glukose', '#Glucose', '#glukose', '#Glukose',
+            'Blutzucker', 'blutzucker', 'Glykämie', 'glykämie' , '#Blutzucker',
+            '#blutzucker', '#Glykämie', '#Insulin', '#insulin', 'Insulin', 'insulin',
+            'Insulinpumpe', 'insulinpumpe', '#Insulinpumpe', '#insulinpumpe', 'diabetes',
+            'Diabetes', '#diabetes', '#Diabetes', 'Diabetiker', 'diabetiker',
+            '#Diabetiker', '#diabetiker', '#Diabetikern', '#diabetikern', 't1d',
+            '#t1d', '#T1diabetes', '#T2D', '#T1D', '#Diabetespatienten',
+            '#diabetespatienten', '#Diabetespatient', '#diabetespatient', '#TD1',
+            '#TD2', '#dedoc', '#diabetestyp1', '#diabetestyp2', "#DiabetesTyp1",
+            "#Diabetestyp1", "#DiabetesTyp2",
+            "#Diabetestyp2", "#Glukosekontrolle", "#glukosekontrolle", "#Unterzuckerungen",
+            "#unterzuckerungen", "#Unterzuckerung", "#unterzuckerung", "#Hypoglykämie",
+            "#hypoglykämie", "#Glukosemonitoring", "#glukosemonitoring", "#Blutzuckerwerte",
+            "#blutzuckerwerte", "#menschmitdiabetes", "#Duckfiabetes", "#kindermittyp1",
+            "Freestyle libre", "freestyle libre", "#freestylelibre", "#Freestylelire",
+            "#FreeStyleLibre", "#FreestyleLibre", "#diabeteskids", "#Diabeteskids",
+            "#DiabetesKids", "#Antidiabetika", "#antidiabetika", "Antidiabetika",
+            "antidiabetika", "diabetisch", "#diabetisch", "hba1c", "Hba1c", "#hba1c",
+            "Hba1c"
+            ]
 
 
 #This is a basic listener that just prints received tweets to stdout.
