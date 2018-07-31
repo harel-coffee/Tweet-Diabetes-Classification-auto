@@ -62,17 +62,32 @@ class Preprocess:
         #return contractions.fix(tweet)
         return  contractions_fix(tweet)
 
-    def replace_hashtags_URL_USER(self, tweet, mode="replace"):
+    def replace_hashtags_URL_USER(self, tweet, mode_URL="replace",
+                                  mode_Mentions="replace", mode_Hashtag="replace" ):
         """
-            if mode == "replace"
-                Replaces hashtags by its words
-                Replaces URLs by the "URL"
-                Replace user mentions by "USER"
+            Function handling the preprocessing of the hashtags, User mentions
+            and URL patterns
 
-            if mode == "delete"
-                Delete hasthags
-                Delete URLs
-                Delete USERs
+            Parameters
+            -------------------------------------------------------
+
+            mode_URL : ("replace", "delete")
+                       if "replace" : all url's in tweet are replaced with the value of Constants.URL
+                       if "delete" : all url's are deleted
+
+            mode_Mentions : ("replace", "delete", "screen_name")
+                       if "replace" : all user mentions in tweet are replaced
+                                      with the value of Constants.USER
+                       if "delete" : all user mentions are deleted
+                       if "screen_name" : delete '@' of all user mentions
+
+            mode_Hashtag : ("replace", "delete")
+                       if "replace" : all '#' from the hashtags are deleted
+                       if "delete" : all hashtags are deleted
+
+            Return
+            -------------------------------------------------------------
+            List of preprocessed tweet tokens
 
             https://github.com/yogeshg/Twitter-Sentiment
 
@@ -84,30 +99,37 @@ class Preprocess:
 
             TODO: maybe replace @Obama with Obama -> to be checked!
         """
-
-        if mode == "replace":
-            # replace URLs
+        if mode_URL == "replace":
             tweet = Patterns.URL_PATTERN.sub(Constants.URL, tweet)
+        elif mode_URL == "delete":
+            tweet = Patterns.URL_PATTERN.sub("", tweet)
+        else:
+            print("ERROR: mode_URL {} not defined!".format(mode_URL))
+            exit()
 
-            # replace mentions : @Obama
+        if mode_Mentions == "replace":
             tweet = Patterns.MENTION_PATTERN.sub(Constants.USER, tweet)
+        elif mode_Mentions == "delete":
+            tweet = Patterns.MENTION_PATTERN.sub("", tweet)
+        elif mode_Mentions == "screen_name":
+            mentions = Patterns.MENTION_PATTERN.findall(tweet)
+            for mention in mentions:
+                tweet = tweet.replace("@"+mention, mention)
+        else:
+            print("ERROR: mode_Mentions {} not defined!".format(mode_Mentions))
+            exit()
 
-            # replace hashtags by its words
+        if mode_Hashtag == "replace":
             hashtags = Patterns.HASHTAG_PATTERN.findall(tweet)
             for hashtag in hashtags:
                 tweet = tweet.replace("#"+hashtag, hashtag)
-
-        elif mode == "delete":
-            # replace URLs
-            tweet = Patterns.URL_PATTERN.sub("", tweet)
-
-            # replace mentions : @Obama
-            tweet = Patterns.MENTION_PATTERN.sub("", tweet)
-
-            # replace hashtags by its words
+        elif mode_Hashtag == "delete":
             hashtags = Patterns.HASHTAG_PATTERN.findall(tweet)
             for hashtag in hashtags:
                 tweet = tweet.replace("#"+hashtag, "")
+        else:
+            print("ERROR: mode_Hashtag {} not defined!".format(mode_Hashtag))
+            exit()
 
         return tweet
 

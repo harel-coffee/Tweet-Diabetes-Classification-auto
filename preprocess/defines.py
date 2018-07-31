@@ -49,9 +49,9 @@ class Grammar:
 
 
 class WordLists:
-    type1 = ["#type1diabetes", "type one", "#type1", "type1", "Type1", "type 1",
+    type1 = ["#type1diabetes", "type one", "#type1", "type1", "Type1", "type 1", "T1", "t1",
              "Type 1", "t1d", "T1D", "#t1d", "#T1D", "typeI", "TypeI", "type I", "Type I"]
-    type2 = ["#type2diabetes", "type two", "#type2", "type2", "Type2", "type 2",
+    type2 = ["#type2diabetes", "type two", "#type2", "type2", "Type2", "type 2", "T2", "t2",
              "Type 2", "t2d", "T2D", "#t2d", "#T2D", "typeII", "TypeII", "type II", "Type II"]
 
     TYPE1_WORDS = re.compile(u"|".join(type1))
