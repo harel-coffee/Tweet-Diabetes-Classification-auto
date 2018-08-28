@@ -5,6 +5,8 @@ Author: Adrian Ahne
 Creation date: 23/04/2018
 
 Inspired by https://github.com/s/preprocessor/tree/master/preprocessor
+
+- 24/08/2018 : Added Emotion terms
 """
 
 

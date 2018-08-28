@@ -25,7 +25,7 @@ from emotion_codes import UNICODE_EMOJI
 #from emotion_codes import EMOTICONS_UNICODE
 from emotion_codes import EMOTICONS
 from emotion_codes import EMOJI_TO_CATEGORY
-from emotion_codes import Emotions
+from emotion_codes import Emotions_positive, Emotions_negative, EMOTION_CATEGORIES
 from defines import *
 from contractions_def import *
 
@@ -37,7 +37,7 @@ class Preprocess:
         # Constant words like URL, USER, EMOT_SMILE, etc. that we want to keep in uppercase
         self.Constant_words = [value for attr, value in Constants.__dict__.items()
                                if not callable(getattr(Constants, attr)) and
-                               not attr.startswith("__")]+Emotions.EMOTION_CATEGORIES
+                               not attr.startswith("__")]+EMOTION_CATEGORIES
 
         self.WN_Lemmatizer = WordNetLemmatizer()
 
