@@ -1,6 +1,6 @@
 """
 Author: Adrian Ahne
-Date: 27-06-2018
+Date: 13-08-2018
 
 Finding and training best model to classify personal users vs
 institutional (advertising, health information, spam) users based
@@ -8,7 +8,7 @@ on their tweets
 
 
 - Get manually labeled tweets from csv
-- either train word embeddings (fastText) or load already trained word embeddings (fastText)
+- either train word embeddings (Word2Vec) or load already trained word embeddings (Word2Vec)
 - Two options:
                 1) Grid search to find best model
                 2) Train best model and save to disk
@@ -35,25 +35,27 @@ from sklearn.externals import joblib
 from xgboost import XGBClassifier
 import datetime
 import gensim
-from gensim.models import FastText
-#from gensim.models.wrappers import FastText
+from gensim.models import Word2Vec, KeyedVectors
 import multiprocessing
 from keras.wrappers.scikit_learn import KerasClassifier
 from keras.layers import LSTM, Dense, Flatten
 from keras.models import Sequential
+from gensim.test.utils import datapath, get_tmpfile
+from gensim.scripts.glove2word2vec import glove2word2vec
 
 
 # CONSTANTS
 DATE_FORMAT = "%Y-%m-%d_%H-%M-%S"
 
-# path to the word embeddings
+# Paths to the word embeddings
 base = "D:\\A_AHNE1\\Tweet-Classification-Diabetes-Distress\\training\\trained_wordEmbeddings_10-08-2018\\"
-ft_fullPrep = "FastText\\fullPreprocessing_09-08-2018\\ft_fullPrep_10-08-2018.model"
-ft_partialPrep = "FastText\\partialPreprocessing_09-08-2018\\partialPreprocessing_09-08-2018.model"
-ft_noPrep = "FastText\\noPreprocessing_09-08-2018\\noPreprocessing_09-08-2018.model"
-ft_pretrained_wiki = "D:\\A_AHNE1\\Data\\FastText_Wikipedia_300\\wiki.en.bin"
+w2v_fullPrep = "Word2Vec\\fullPreprocessing_10-08-2018\\w2v_fullPrep_10-08-2018.model"
+w2v_partialPrep = "Word2Vec\\partialPreprocessing_10-08-2018\\w2v_partialPrep_10-08-2018.model"
+w2v_noPrep = "Word2Vec\\noPreprocessing_10-08-2018\\w2v_noPrep_10-08-2018.model"
+#w2v_pretrained_twitter = "D:\\A_AHNE1\\Data\\W2V_glove_twitter_200d\\glove-twitter-200.txt"
+w2v_pretrained_twitter = "D:\\A_AHNE1\\Data\\W2V_glove_twitter_200d\\glove.twitter.27B.200d.txt"
 
-# --------------------------------------------------------------------
+
 
 
 def create_model(loss, optimizer, dropout, reccurent_dropout):
@@ -88,7 +90,6 @@ def create_model(loss, optimizer, dropout, reccurent_dropout):
 
 
 
-
 if __name__ == '__main__':
 
 
@@ -100,19 +101,23 @@ if __name__ == '__main__':
     MODE = "no_preprocessing"
 
     if MODE == "full_preprocessing":
-        PATH_TRAINED_FASTTEXT = base+ft_fullPrep
+        PATH_TRAINED_WORD2VEC = base+w2v_fullPrep
     elif MODE == "partial_preprocessing":
-        PATH_TRAINED_FASTTEXT = base+ft_partialPrep
+        PATH_TRAINED_WORD2VEC = base+w2v_partialPrep
     elif MODE == "no_preprocessing":
-        PATH_TRAINED_FASTTEXT = base+ft_noPrep
+        PATH_TRAINED_WORD2VEC = base+w2v_noPrep
     elif MODE == "pretrained":
-        PATH_TRAINED_FASTTEXT = ft_pretrained_wiki
+        glove_file = datapath("D:\A_AHNE1\Data\glove.twitter.27B.200d.txt")
+        tmp_file = get_tmpfile("test_word2vec.txt")
+        glove2word2vec(glove_file, tmp_file)
+
+        PATH_TRAINED_WORD2VEC = tmp_file#w2v_pretrained_twitter
+
     else:
         print("ERROR: Given mode {} not an option. Choose between ['full_preprocessing', 'partial_preprocessing', 'no_preprocessing', 'pretrained']".format(MODE))
         sys.exit(1)
 
-
-    # add path to utils directory to system path
+    # add path to utils directory to load helping functions
     path = 'D:\A_AHNE1\Tweet-Classification-Diabetes-Distress\\utils'
     if path not in sys.path:
         sys.path.insert(0, path)
@@ -121,7 +126,7 @@ if __name__ == '__main__':
 
 
     # load csv in which we manually labelled the users
-    path_tweets = "D:\A_AHNE1\Tweet-Classification-Diabetes-Distress\\data\\manual_labeled_tweets\\manually_labeled_users_instVSpers_MoreInstTweets_30072018.csv"
+    path_tweets = "D:\A_AHNE1\Tweet-Classification-Diabetes-Distress\manually_labeled_users_instVSpers_MoreInstTweets_30072018.csv"
     tweets_csv = pd.read_csv(path_tweets, sep=";",
                              converters={"tweet_proc": lambda x: x.strip("[]").replace("'", "").split(", ")})
 
@@ -133,49 +138,57 @@ if __name__ == '__main__':
 
 
 
-    # Train new FastText model
-    if PATH_TRAINED_FASTTEXT == []:
+    # Train new Word2Vec model
+    if PATH_TRAINED_WORD2VEC == []:
 
         # list with preprocessed tweets
         #list_tweets = tweets_proc
         print("Preprocess tweets...")
         list_tweets = get_preprocessed_tweets(english_noRetweet_tweets)
 
-        # word embedding Fasttext
-        print("Train Fasttext...")
-        model_ft = FastText(list_tweets, size=200, window=5, min_count=1,
-                            workers=multiprocessing.cpu_count() ,sg=1, hs=0, iter=20,
-                            word_ngrams=1, min_n=3, max_n=6)
+        # word embedding Word2Vec
+        print("Train Word2Vec...")
+        n_dim = 200
+        w2v_model = Word2Vec(size=n_dim, min_count=1,
+                             workers=multiprocessing.cpu_count()-6,
+                             iter=20)
+        w2v_model.build_vocab([x for x in list_tweets])
+        w2v_model.train([x for x in list_tweets], total_examples=w2v_model.corpus_count, epochs=w2v_model.iter)
 
         print("Save model to disk...")
-        file_name = "Trained_FastText_{}.model".format(datetime.datetime.now().strftime(DATE_FORMAT))
-        model_ft.save(file_name)
+        file_name = "Trained_Word2Vec_{}.model".format(datetime.datetime.now().strftime(DATE_FORMAT))
+        w2v_model.save(file_name)
+
 
     # load trained model
     else:
-        print("Load FastText model...")
+        print("Load Word2Vec model...")
 
         if MODE == "pretrained" :
-            model_ft = gensim.models.wrappers.FastText.load_fasttext_format(PATH_TRAINED_FASTTEXT)
+            w2v_model = gensim.models.KeyedVectors.load_word2vec_format(PATH_TRAINED_WORD2VEC, binary=False)
+
         else:
-            model_ft = FastText.load(PATH_TRAINED_FASTTEXT)
+            w2v_model = Word2Vec.load(PATH_TRAINED_WORD2VEC)
+
+
 
 
     # Adapt preprocessing function depending on which preprocessed word embeddings you use!
     print("Get word embeddings for each tweet..")
-    if MODE == "full_preprocessing":
-        V = np.array([tweet_vectorizer(preprocess_tweet(tweet, mode="full_preprocessing"), model_ft) for tweet in tweets_raw])
-    elif MODE == "partial_preprocessing" :
-        V = np.array([tweet_vectorizer(preprocess_tweet(tweet, mode="partial_preprocessing"), model_ft) for tweet in tweets_raw])
-    else:
-        V = np.array([tweet_vectorizer(preprocess_tweet(tweet, mode="no_preprocessing"), model_ft) for tweet in tweets_raw])
 
+    if MODE == "full_preprocessing":
+        V = np.array([tweet_vectorizer(preprocess_tweet(tweet, mode="full_preprocessing"), w2v_model) for tweet in tweets_raw])
+    elif MODE == "partial_preprocessing" :
+        V = np.array([tweet_vectorizer(preprocess_tweet(tweet, mode="partial_preprocessing"), w2v_model) for tweet in tweets_raw])
+    else:
+        V = np.array([tweet_vectorizer(preprocess_tweet(tweet, mode="no_preprocessing"), w2v_model) for tweet in tweets_raw])
 
     # remove the tweets that are empty because there is no word embedding
     VV = [(tweet, label) for tweet, label in zip(V, labels) if len(tweet) > 0]
 
     labels = pd.DataFrame([tup[1] for tup in VV])
     V = [tup[0] for tup in VV]
+
 
 
     # choose algo:
@@ -194,25 +207,25 @@ if __name__ == '__main__':
                 ])
 
 
-    # parameter grid for grid search by using fastText embeddings
+    # parameter grid for grid search by using Word2Vec embeddings
     parameters_ft = {
                   # param for MultinomialNB
                   #'model__alpha': (10, 5, 1, 0.5, 0.1),
 
                   # param for LogisticRegression
-                  #'model__C' : [5, 3, 1.0, 0.8, 0.5, 0.1],
+                  #'model__C' : [15.0, 10.0, 5.0, 1.0, 0.1],
                   #'model__tol' : [1e-10, 1e-9],
 
                   # param for SVC
                   'model__kernel' : ["linear", "poly", "rbf"],
-                  'model__C' : [ 12.0, 10.0, 8.0, 6.0, 4.0, 1.0],
+                  'model__C' : [ 6.0, 4.0, 1.0, 0.1],
                   'model__tol' : [1e-1, 1e-2, 1e-3],
 
                   # param for RandomForestClassifier
-                  #'model__n_estimators' : [70, 80, 100, 120],
+                  #'model__n_estimators' : [40, 60, 80],
                   #'model__criterion' : ['gini', 'entropy'],
                   #'model__max_features' : ['auto', 'log2'],
-                  #'model__max_depth' : [ 8, 10, 20]
+                  #'model__max_depth' : [ 5, 10, 20, 30]
 
                   # param for XGBoost Best: 0.910828 using {'model__learning_rate': 0.05, 'model__reg_alpha': 0, 'model__max_depth': 3, 'model__reg_lambda': 1.5, 'model__n_estimators': 300}
                   #'model__max_depth' : [3,4],
@@ -224,11 +237,11 @@ if __name__ == '__main__':
                   #'model__reg_lambda' : [0.5, 1.0, 1.5]
 
                   # param for Multi layer perceptron
-                  #'model__hidden_layer_sizes' : [(64,64), (64,32)],#[(64), (64, 32), (32, 32)],
+                  #'model__hidden_layer_sizes' : [(64), (64, 32), (32, 32)],
                   #'model__activation' : ['relu', 'tanh', 'logistic'],
                   #'model__solver' : ['adam', 'sgd'],
                   #'model__learning_rate' : ['constant', 'invscaling'],
-                  #'model__tol' : [1e-2, 1e-3],#[1e-2, 1e-3, 1e-4],
+                  #'model__tol' : [1e-3, 1e-4, 1e-5],
 
                   #'model__hidden_layer_sizes' :  [(64), (32), (16,16)],#[(64), (16, 16), (32, 16)],
                   #'model__activation' : ['relu'],# ['relu', 'tanh'],
@@ -248,7 +261,6 @@ if __name__ == '__main__':
     #   2) Train best model and save to disk
 
     # Option 1) Grid search to find best model
-    """
     print("Start Grid search...")
     grid = GridSearchCV(pipeline, parameters_ft, cv=10, n_jobs=14, verbose=2)
 
@@ -256,15 +268,15 @@ if __name__ == '__main__':
 
     #print(grid.cv_results_)
     print("\nBest: %f using %s" % (grid.best_score_, grid.best_params_))
-    """
 
+"""
     # Option 2) Train best model and save to disk
     print("Train best model:")
     # train best model
-    best_model = SVC()  # training acc of 90.20%; no preprocessing
+    best_model = SVC()
     best_params = {
-                  'model__tol': 0.01,
-                  'model__C' : 6.0,
+                  'model__tol': 1e-2,
+                  'model__C' : 12.0,
                   'model__kernel':'rbf'
     }
 
@@ -280,113 +292,54 @@ if __name__ == '__main__':
     file_name = "best_model_user_classif_{}.sav".format(datetime.datetime.now().strftime(DATE_FORMAT))
     joblib.dump(best_pipeline_trained, file_name)
 
-
+    #import ipdb; ipdb.set_trace()
+"""
 
 """
-NEW ####################################################
-SVC full preprocessing embeddings
-Best: 0.883516 using
-{'model__C': 15.0, 'model__tol': 0.01, 'model__kernel': 'rbf'}
+SVC full preprocessing
+Best: 0.882198 using
+{'model__kernel': 'rbf', 'model__C': 1.0, 'model__tol': 0.1}
 
+SVC partial preprocessing
+Best: 0.883956 using
+{'model__tol': 0.1, 'model__C': 1.0, 'model__kernel': 'rbf'}
 
-SVC partial preprocessing embeddings
-Best: 0.896703 using
-{'model__tol': 0.1, 'model__kernel': 'rbf', 'model__C': 12.0}
+SVC no preprocessing
+Best: 0.889670 using
+{'model__C': 1.0, 'model__kernel': 'rbf', 'model__tol': 0.01}
 
+SVC pretraind Twitter embedding corpus
+Best: 0.889670 using
+{'model__tol': 0.01, 'model__C': 1.0, 'model__kernel': 'rbf'}
+----------------------------------------------------------------
 
-SVC no preprocessing embeddings
-Best: 0.901978 using
-{'model__C': 6.0, 'model__tol': 0.01, 'model__kernel': 'rbf'}
+Logistic Regression no preprocessing
+Best: 0.887473 using {'model__tol': 1e-10, 'model__C': 0.01}
 
+Logistic Regression partial preprocessing
+Best: 0.880879 using {'model__C': 0.01, 'model__tol': 1e-10}
 
-SVC pretrained Wikipedia corpus
-Best: 0.865495 using
-{'model__tol': 0.1, 'model__C': 10.0, 'model__kernel': 'rbf'}
-------------------------------------------------------------------------
+Logistic Regression full preprocessing
+Best: 0.884396 using {'model__C': 0.01, 'model__tol': 1e-10}
 
-Logistic Regression full preprocessing embeddings
-Best: 0.883956
-using {'model__tol': 1e-10, 'model__C': 0.1}
+Logistic Regression pretrained Twitter embedding corpus
+Best: 0.857206 using {'model__C': 1.0, 'model__tol': 1e-10}
+------------------------------------------------------------------
 
-Logistic Regression partial preprocessing embeddings
-Best: 0.891868 using
-{'model__tol': 1e-10, 'model__C': 0.8}
-
-Logistic Regression no preprocessing embeddings
-Best: 0.894505 using
-{'model__tol': 1e-10, 'model__C': 0.8}
-
-Logistic Regression pretrained Wikipedia corpus
-Best: 0.870330 using {'model__C': 3, 'model__tol': 1e-10}
----------------------------------------------------------------------------
-
-RandomForest full preprocessing
-Best: 0.876484 using
-{'model__criterion': 'entropy', 'model__max_features': 'auto',
- 'model__max_depth': 40, 'model__n_estimators': 60}
+RandomForest no preprocessing
+Best: 0.887473 using {'model__max_features': 'log2', 'model__n_estimators': 80,
+'model__criterion': 'entropy', 'model__max_depth': 10}
 
 RandomForest partial preprocessing
-Best: 0.886154
-{'model__n_estimators': 80, 'model__max_depth': 8, 'model__max_features': 'auto',
- 'model__criterion': 'entropy'}
+Best: 0.872967 using {'model__criterion': 'gini', 'model__max_features': 'auto',
+ 'model__n_estimators': 80, 'model__max_depth': 30}
 
-RandomForest noPreprocessing
-Best: 0.884835 using
-{'model__n_estimators': 120, 'model__criterion': 'gini', 'm
-odel__max_features': 'log2', 'model__max_depth': 10}
+RandomForest full preprocessing
+Best: 0.874286 using {'model__n_estimators': 80, 'model__criterion': 'gini', 'mo
+del__max_features': 'log2', 'model__max_depth': 20}
 
-RandomForest pretrained Wikipedia corpus
-Best: 0.845714 using
-{'model__max_features': 'auto', 'model__max_depth': 8, 'mod
-el__criterion': 'entropy', 'model__n_estimators': 70}
---------------------------------------------------------
+RandomForest pretrained Twitter embedding corpus
+Best: 0.848832 using {'model__max_features': 'auto', 'model__n_estimators': 60,
+'model__max_depth': 10, 'model__criterion': 'gini'}
 
-
-MultiLayerPerceptron no preprocessing
-Best: 0.894505 using
- {'model__tol': 0.01, 'model__activation': 'relu', 'model__learning_rate': 'constant',
-  'model__hidden_layer_sizes': (64, 64), 'model__solver': 'adam'}
-
-
-"""
-
-
-
-
-
-"""
-OLD  ##############################################################
-
-
-LogisticRegression
-With more institutional tweets to train
-Best: 0.887033 using {'model__tol': 1e-10, 'model__C': 1.0}
-
-SVC
-old:
-Best: 0.862378 using
-{'model__kernel': 'rbf', 'model__C': 10.0, 'model__tol': 0.01}
-
-With more insitutional tweets to train:
-Best: 0.894066 using {'model__C': 12.0, 'model__tol': 0.01, 'model__kernel': 'rb
-f'}
-
-
-
-MultiLayerPerceptron
-Best: 0.868078 using
-{'model__learning_rate': 'constant', 'model__alpha': 1e-06,  'model__solver': 'adam',
- 'model__tol': 0.0001, 'model__hidden_layer_sizes': (16, 16), 'model__activation': 'tanh'}
-
-With more insitutional tweets to train:
-Best: 0.895385 using
-{'model__solver': 'adam', 'model__learning_rate': 'constant
-', 'model__activation': 'relu', 'model__max_iter': 300, 'model__alpha': 1e-06, '
-model__tol': 0.001, 'model__hidden_layer_sizes': 64}
-
-
-RandomForest
-Best: 0.860749 using
-{'model__max_depth': 40, 'model__criterion': 'gini', 'model
-__max_features': 'log2', 'model__n_estimators': 60}
 """

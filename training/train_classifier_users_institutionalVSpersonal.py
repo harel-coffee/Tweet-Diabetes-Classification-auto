@@ -30,181 +30,6 @@ DATE_FORMAT = "%Y-%m-%d_%H-%M-%S"
 
 
 
-
-def get_meta_data_features(tweets_csv, manually_labelled_tweets):
-    """
-        Get some meta-data of the labeled tweets
-
-        Parameter:
-          - tweets_csv : DataFrame with labeled tweets
-          - manually_labelled_tweets : Collection in which all raw tweet information
-                                       of the labeled tweets are stored
-    """
-
-    # define DataFrame
-    meta_data_pd = pd.DataFrame(columns=["n_hashtags", "n_urls", "n_user_mentions",
-                                         "followers_count", "friends_count"])
-
-    for i, user_name in enumerate(tweets_csv["user_name"]):
-        for user in manually_labelled_tweets.find({'user.screen_name' : user_name}):
-            meta_data_pd.loc[i] = [len(user["entities"]['hashtags']),
-                                   len(user["entities"]['urls']),
-                                   len(user["entities"]['user_mentions']),
-                                   user["user"]['followers_count'],
-                                   user["user"]['friends_count']]
-
-    return meta_data_pd
-
-
-def create_pipeline(model, meta_data=[], user_description=[]):
-    """
-        Create Pipeline
-
-        Parameters
-        -------------------------------------------------------
-        - model : algorithm for classification to be used
-        - meta_data : meta_data information like number of followers / friends etc.
-        - user_description : preprocessed tokens of user's description in Twitter
-
-        Return
-        --------------------------------------------------------
-        pipeline object
-    """
-
-    # meta data given but no user description
-    if meta_data != [] and user_description == []:
-        print("Create pipeline using meta-data...")
-        pipeline  = Pipeline([
-            # combine tweets and meta-data with their labels
-            ('textMetaDataFeatureExtractor', TextAndMetaDataFeatureExtractor(meta_data=meta_data)),
-
-            ('union', FeatureUnion(
-                transformer_list = [
-
-                    # Pipeline handling the tweets
-                    ('tweets', Pipeline([
-                        ('tweetsSelector', ItemSelector(key='tweet')),
-                        ('tfidfvect', TfidfVectorizer(lowercase=False))
-                    ])),
-
-                    # Pipeline handling meta data
-                    ('metadata', Pipeline([
-                        ('metadataSelector', ItemSelector(key='metadata')),
-                        ('tosparse', ArrayCaster()),
-                        ('scale', StandardScaler(with_mean=False)),
-                        ('selectKbest', SelectKBest(f_classif)),
-                    ]))
-                ]
-            )),
-
-            ('model', model),
-        ])
-
-    # meta data and user description given
-    elif meta_data != [] and user_description != []:
-        print("Create pipeline using meta-data and Twitter's user description...")
-
-        pipeline  = Pipeline([
-            # combine tweets and meta-data with their labels
-            ('textMetaDataFeatureExtractor', TextAndMetaDataFeatureExtractor(meta_data=meta_data,
-                                                                             user_description=user_description)),
-
-            ('union', FeatureUnion(
-                transformer_list = [
-
-                    # Pipeline handling the tweets
-                    ('tweets', Pipeline([
-                        ('tweetsSelector', ItemSelector(key='tweet')),
-                        ('tfidfvect', TfidfVectorizer(lowercase=False))
-                    ])),
-
-                    # Pipeline handling meta data
-                    ('metadata', Pipeline([
-                        ('metadataSelector', ItemSelector(key='metadata')),
-                        ('tosparse', ArrayCaster()),
-                        ('scale', StandardScaler(with_mean=False)),
-                        ('selectKbest', SelectKBest(f_classif)),
-                    ])),
-
-                    # Pipeline handling the description
-                    ('desc', Pipeline([
-                        ('descSelector', ItemSelector(key='userDescription')),
-                        ('tfidfvect', TfidfVectorizer(lowercase=False)),
-                        #('Debug1', Debug("desc*****")),
-
-                    ]))
-                ]
-            )),
-
-            ('model', model),
-        ])
-
-    # no meta data given but user description given
-    elif meta_data == [] and user_description != []:
-        print("Create pipeline using Twitter's user description...")
-
-        pipeline  = Pipeline([
-            # combine tweets and meta-data with their labels
-            ('textMetaDataFeatureExtractor', TextAndMetaDataFeatureExtractor(user_description=user_description)),
-
-            ('union', FeatureUnion(
-                transformer_list = [
-
-                    # Pipeline handling the tweets
-                    ('tweets', Pipeline([
-                        ('tweetsSelector', ItemSelector(key='tweet')),
-                        ('Debug1', Debug("tweet_before")),
-                        ('tfidfvect', TfidfVectorizer(lowercase=False)),
-                        ('Debug2', Debug("tweet_after")),
-
-                    ])),
-
-                    # Pipeline handling the description
-                    ('desc', Pipeline([
-                        ('descSelector', ItemSelector(key='userDescription')),
-                        ('tfidfvect', TfidfVectorizer(lowercase=False)),
-                        #('Debug1', Debug("desc*****")),
-
-                    ]))
-                ]
-            )),
-
-            ('model', model),
-        ])
-
-    # no meta data and no user description
-    else:
-        print("Create pipeline...")
-
-        pipeline  = Pipeline([
-            # combine tweets and meta-data with their labels
-            ('textMetaDataFeatureExtractor', TextAndMetaDataFeatureExtractor()),
-
-            ('union', FeatureUnion(
-                transformer_list = [
-
-                    # Pipeline handling the tweets
-                    ('tweets', Pipeline([
-                        ('tweetsSelector', ItemSelector(key='tweet')),
-                        ('tfidfvect', TfidfVectorizer(lowercase=False)),
-                    ]))
-                ]
-            )),
-
-            ('model', model),
-        ])
-
-    return pipeline
-
-
-
-
-
-
-PATH_TRAINED_FASTTEXT = "Trained_FastText_2018-07-24_18-17-00.model"
-
-
-
 if __name__ == '__main__':
 
 
@@ -214,16 +39,9 @@ if __name__ == '__main__':
         sys.path.insert(0, path)
 
     from sys_utils import *
-
-
-    # load preprocessing library
-    load_library('D:\A_AHNE1\Tweet-Classification-Diabetes-Distress\preprocess')
-
-    from sklearn_utils import *
+    from tweet_utils import *
     from mongoDB_utils import *
 
-    from preprocess import Preprocess
-    prep = Preprocess()
 
     client = connect_to_database()
 
@@ -232,15 +50,19 @@ if __name__ == '__main__':
 
     # get collections
     english_noRetweet_tweets = db.english_noRetweet_tweets
-    users_manual_label = db.users_manual_label
+    users_manual_label_all_tweets = db.users_manual_label_all_tweets
 
-    # load csv in which we manually labelled the tweets
-    path_tweets = "D:\A_AHNE1\Tweet-Classification-Diabetes-Distress\manually_labeled_users_instVSpers_withDescription_10072018.csv"
-    tweets_csv = pd.read_csv(path_tweets, sep=";")
+
+    # load csv in which we manually labelled the users
+    path_tweets = "D:\A_AHNE1\Tweet-Classification-Diabetes-Distress\manually_labeled_users_instVSpers_MoreInstTweets_30072018_withDescription.csv"
+    tweets_csv = pd.read_csv(path_tweets, sep=";",
+                             converters={"tweet_proc": lambda x: x.strip("[]").replace("'", "").split(", "),
+                                         "desc_proc": lambda x: x.strip("[]").replace("'", "").split(", ")})
+
 
     # get matrix of metadata of the tweets that are added to the classification
     # as further features
-    meta_data = get_meta_data_features(tweets_csv, manually_labelled_tweets)
+    #meta_data = get_meta_data_features(tweets_csv, users_manual_label_all_tweets)
 
     # get labels and tweet matrix
     labels = tweets_csv["personal (0=no, 1=yes)"]
@@ -248,14 +70,16 @@ if __name__ == '__main__':
     desc = tweets_csv["desc_proc"]
 
     # choose algo
-    model = MultinomialNB()
-    #model = SVC()
-    #model = RandomForestClassifier()
-    #model = XGBClassifier()
+    #model = MultinomialNB(random_state=0)
+    #model = SVC(random_state=0)
+    #model = RandomForestClassifier(random_state=0)
+    #model = XGBClassifier(random_state=0)
+    model = LogisticRegression(random_state=0)
 
 
-    #pipeline = create_pipeline(model, meta_data=[], user_description=desc.values)
-    #pipeline = create_pipeline(model, meta_data=meta_data.values, user_description=desc.values)
+    #pipeline = create_pipeline_BoW(model, meta_data=[], user_description=desc.values)
+    pipeline = create_pipeline_BoW(model, meta_data=[], user_description=[])
+    #pipeline = create_pipeline_BoW(model, meta_data=meta_data.values, user_description=desc.values)
 
     # parameter grid for grid search
     parameters = {'union__tweets__tfidfvect__ngram_range': [(1, 1), (1, 2)],
@@ -263,41 +87,41 @@ if __name__ == '__main__':
                   'union__tweets__tfidfvect__min_df' : [1, 5],
                   'union__tweets__tfidfvect__max_df' : [0.9],#[0.9, 1.0],
                   'union__tweets__tfidfvect__use_idf': (True, False),
-                  'union__tweets__tfidfvect__smooth_idf': [True],#(True, False),
-                  'union__tweets__tfidfvect__sublinear_tf':  [True],#(True, False),
+                  'union__tweets__tfidfvect__smooth_idf': (True, False),
+                  'union__tweets__tfidfvect__sublinear_tf': (True, False),
 
-                  'union__desc__tfidfvect__ngram_range': [(1, 1), (1, 2)],
-                  'union__desc__tfidfvect__analyzer' : ['word'],#['word', 'char'],
-                  'union__desc__tfidfvect__min_df' : [1], # [1, 5],
-                  'union__desc__tfidfvect__max_df' : [0.9],#[0.9, 1.0],
-                  'union__desc__tfidfvect__use_idf': (True, False),
-                  'union__desc__tfidfvect__smooth_idf': [False], #(True, False),
-                  'union__desc__tfidfvect__sublinear_tf': [True], #(True, False),
+                  # 'union__desc__tfidfvect__ngram_range': [(1, 1), (1, 2)],
+                  # 'union__desc__tfidfvect__analyzer' : ["word"],#['word', 'char'],
+                  # 'union__desc__tfidfvect__min_df' : [1, 5],
+                  # 'union__desc__tfidfvect__max_df' : [0.9],#[0.9, 1.0],
+                  # 'union__desc__tfidfvect__use_idf': (True, False),
+                  # 'union__desc__tfidfvect__smooth_idf': (True, False),
+                  # 'union__desc__tfidfvect__sublinear_tf': (True, False),
 
-                  #'union__metadata__scale__with_std': (True, False),
-                  #'union__metadata__selectKbest__k': [0, 2, 'all'],
+#                  'union__metadata__scale__with_std': (True, False),
+#                  'union__metadata__selectKbest__k': [0, 2, 'all'],
 
-                  'union__transformer_weights': [#{"tweets":1, "desc":1},
-                                                 {"tweets":1, "desc":0.5},
-                                                 {"tweets":1, "desc":0.2},
-                                                 {"tweets":1, "desc":0.0},
+#                  'union__transformer_weights': [{"tweets":1, "desc":1},
+#                                                 {"tweets":1, "desc":0.5},
+                                                 #{"tweets":1, "desc":0.2},
+#                                                 {"tweets":1, "desc":0.0},
                                                  #{"tweets":1, "desc":0.0}
-                                                 ],
+#                                                 ],
 
                   # param for MultinomialNB
-                  'model__alpha': (5, 1, 0.5),
+                  #'model__alpha': ( 1, 0.1, 0.1),
 
                   # param for LogisticRegression
-                  #'model__C' : [35.0, 30.0, 25.0],
-                  #'model__tol' : [1e-10, 1e-9],
+                  'model__C' : [40.0, 35.0],
+                  'model__tol' : [1e-10, 1e-9],
 
                   # param for SVC
                   #'model__kernel' : ["linear", "poly", "rbf"],
-                  #'model__C' : [35.0, 30.0, 25.0],
+                  #'model__C' :[35.0, 30.0, 25.0],
                   #'model__tol' : [1e-10, 1e-9],
 
                   # param for RandomForestClassifier
-                  #'model__n_estimators' : [20, 30, 40],
+                  #'model__n_estimators' : [ 30, 40],
                   #'model__criterion' : ['gini', 'entropy'],
                   #'model__max_features' : ['auto', 'log2', None],
                   #'model__max_depth' : [10, 20, 30]
@@ -318,14 +142,14 @@ if __name__ == '__main__':
     # https://github.com/scikit-learn/scikit-learn/issues/5115
     # To fix bug set environment variable: export JOBLIB_START_METHOD="forkserver"
     #%env JOBLIB_START_METHOD="forkserver"
-    #grid = GridSearchCV(pipeline, parameters, cv=10, n_jobs=-1, verbose=2)
-    #grid = grid.fit(tweets, labels)
+    grid = GridSearchCV(pipeline, parameters, cv=10, n_jobs=14, verbose=2)
+    grid = grid.fit(tweets, labels)
     #pp = pipeline.fit_transform(tweets, labels)
 
     #print(grid.cv_results_)
-    #print("\nBest: %f using %s" % (grid.best_score_, grid.best_params_))
+    print("\nBest: %f using %s" % (grid.best_score_, grid.best_params_))
 
-
+"""
     # train best model
     best_model = MultinomialNB()
     best_params = {'union__tweets__tfidfvect__ngram_range': (1, 1),
@@ -340,7 +164,7 @@ if __name__ == '__main__':
     }
 
     # create best pipeline
-    best_pipeline = create_pipeline(best_model,  meta_data=[], user_description=[])
+    best_pipeline = create_pipeline_BoW(best_model,  meta_data=[], user_description=[])
     best_pipeline.set_params(**best_params)
 
     print("Train model...")
@@ -352,9 +176,153 @@ if __name__ == '__main__':
     joblib.dump(best_pipeline_trained, file_name)
 
     #import ipdb; ipdb.set_trace()
+"""
+
+"""
+NEW =====================================================
+WITH MORE SAMPLES
+
+---------------------
+MultinomialNB
+Best: 0.877802 using {'model__alpha': 0.1, 'union__tweets__tfidfvect__max_df':.9,
+'union__tweets__tfidfvect__smooth_idf': True, 'union__tweets__tfidfvect__u_idf': False,
+'union__tweets__tfidfvect__analyzer': 'word', 'union__tweets__tffvect__min_df': 5,
+'union__tweets__tfidfvect__ngram_range': (1, 2), 'union__twts__tfidfvect__sublinear_tf': False}
+
+Multinomial with metadata
+Best: 0.877802 using {'union__tweets__tfidfvect__ngram_range': (1, 2),
+ 'union__tweets__tfidfvect__use_idf': False, 'model__alpha': 0.1,
+ 'union__tweets__tfidfvect__min_df': 5, 'union__metadata__selectKbest__k': 0,
+ 'union__tweets__tfidfvect__analyzer': 'word', 'union__tweets__tfidfvect__smooth_idf': True,
+ 'union__tweets__tfidfvect__max_df': 0.9, 'union__metadata__scale__with_std': True,
+ 'union__tweets__tfidfvect__sublinear_tf': False}
+
+Multinomial with description
+Best: 0.785055 using {'union__tweets__tfidfvect__use_idf': False,
+'union__desc__tfidfvect__min_df': 1, 'union__desc__tfidfvect__use_idf': True,
+'union__desc__tfidfvect__ngram_range': (1, 1),
+'model__alpha': 1, 'union__tweets__tfidfvect__sublinear_tf': False,
+'union__tweets__tfidfvect__ngram_range': (1, 2), 'union__tweets__tfidfvect__min_df': 5,
+'union__tweets__tfidfvect__smooth_idf': True, 'union__desc__tfidfvect__analyzer': 'word',
+'union__desc__tfidfvect__sublinear_tf': True, 'union__desc__tfidfvect__smooth_idf': True,
+'union__desc__tfidfvect__max_df': 0.9, 'union__tweets__tfidfvect__max_df': 0.9,
+'union__tweets__tfidfvect__analyzer': 'word'}
+--------------------------
+
+
+SVC
+Best: 0.880000 using {'model__tol': 1e-10, 'model__C': 30.0,
+'union__tweets__tfidfvect__min_df': 1, 'union__tweets__tfidfvect__ngram_range': (1, 2),
+'union__tweets__tfidfvect__sublinear_tf': True, 'union__tweets__tfidfvect__max_df': 0.9,
+'union__tweets__tfidfvect__use_idf': True, 'model__kernel': 'linear',
+'union__tweets__tfidfvect__smooth_idf': False, 'union__tweets__tfidfvect__analyzer': 'word'}
+
+
+SVC with metadata
+Best: 0.880000 using
+{'model__kernel': 'linear', 'union__tweets__tfidfvect__use_idf': True, 'union__tweets__tfidfvect__min_df': 1, 'model__C': 30.0, 'union__twe
+ets__tfidfvect__sublinear_tf': True, 'union__tweets__tfidfvect__ngram_range': (1
+, 2), 'model__tol': 1e-10, 'union__metadata__selectKbest__k': 0, 'union__tweets_
+_tfidfvect__smooth_idf': False, 'union__tweets__tfidfvect__max_df': 0.9, 'union_
+_tweets__tfidfvect__analyzer': 'word'}
+
+SVC with description
+Best: 0.825495 using
+{'union__tweets__tfidfvect__use_idf': True, 'model__C': 35.0,
+ 'union__tweets__tfidfvect__analyzer': 'word', 'union__desc__tfidfvect__ngram_range': (1, 1),
+ 'union__tweets__tfidfvect__max_df': 0.9, 'union__desc__tfidfvect__max_df': 0.9,
+ 'union__tweets__tfidfvect__ngram_range': (1, 2), 'union__desc__tfidfvect__sublinear_tf': False,
+ 'union__tweets__tfidfvect__smooth_idf': False, 'model__kernel': 'linear',
+ 'union__desc__tfidfvect__min_df': 5, 'union__tweets__tfidfvect__min_df': 1,
+ 'union__desc__tfidfvect__analyzer': 'word', 'model__tol':1e-10,
+ 'union__desc__tfidfvect__use_idf': False, 'union__tweets__tfidfvect__sublinear_tf': True,
+ 'union__desc__tfidfvect__smooth_idf': True}
+--------------------------------------------------------------
+
+LogisticRegression
+Best: 0.883077 using
+{'union__tweets__tfidfvect__sublinear_tf': True, 'model__tol': 1e-10,
+ 'union__tweets__tfidfvect__max_df': 0.9, 'union__tweets__tfidfvect__min_df': 1,
+ 'union__tweets__tfidfvect__use_idf': True, 'union__tweets__tfidfvect__analyzer': 'word',
+ 'union__tweets__tfidfvect__smooth_idf': False, 'model__C': 40.0,
+ 'union__tweets__tfidfvect__ngram_range': (1, 2)}
+
+LogisticRegression with meta data
+Best: 0.883516 using
+{'model__C': 42.0, 'union__tweets__tfidfvect__use_idf': True,
+ 'union__tweets__tfidfvect__ngram_range': (1, 2), 'union__tweets__tfidfvect__sublinear_tf': True,
+ 'model__tol': 1e-10, 'union__tweets__tfidfvect__min_df': 1,
+ 'union__metadata__selectKbest__k': 0, 'union__tweets__tfidfvect__max_df': 0.9,
+ 'union__tweets__tfidfvect__analyzer': 'word', 'union__tweets__tfidfvect__smooth_idf': True}
+
+
+LogisticRegression with user description
+Best: 0.835604 using
+{'union__tweets__tfidfvect__max_df': 0.9, 'union__tweets__tfidfvect__ngram_range': (1, 2),
+ 'union__desc__tfidfvect__max_df': 0.9, 'union__tweets__tfidfvect__min_df': 1,
+ 'union__desc__tfidfvect__smooth_idf': False, 'model__C': 40.0,
+ 'union__desc__tfidfvect__min_df': 1, 'model__tol': 1e-10,
+ 'union__desc__tfidfvect__sublinear_tf': True, 'union__desc__tfidfvect__analyzer': 'word',
+ 'union__desc__tfidfvect__use_idf': True, 'union__tweets__tfidfvect__smooth_idf': True,
+ 'union__tweets__tfidfvect__sublinear_tf': True, 'union__tweets__tfidfvect__analyzer': 'word',
+ 'union__tweets__tfidfvect__use_idf': True, 'union__desc__tfidfvect__ngram_range': (1, 2)}
+
+
+-----------------------------------------------------------
+
+RandomForest
+Best: 0.872088 using
+{'model__n_estimators': 40, 'union__tweets__tfidfvect__min_df': 5,
+ 'union__tweets__tfidfvect__smooth_idf': False, 'union__tweets__tfidfvect__use_idf': True,
+ 'union__tweets__tfidfvect__ngram_range': (1, 1), 'union__tweets__tfidfvect__sublinear_tf': True,
+ 'model__criterion': 'entropy', 'model__max_depth': 30, 'model__max_features': 'auto',
+ 'union__tweets__tfidfvect__max_df': 0.9, 'union__tweets__tfidfvect__analyzer': 'word'}
+
+RandomForest with meta_data
+Best: 0.872088 using
+{'model__criterion': 'entropy', 'union__tweets__tfidfvect__smooth_idf': False,
+ 'model__max_depth': 30, 'union__tweets__tfidfvect__min_df':5,
+ 'union__metadata__selectKbest__k': 0, 'union__tweets__tfidfvect__use_idf': True,
+ 'union__tweets__tfidfvect__max_df': 0.9, 'union__tweets__tfidfvect__sublinear_tf': True,
+ 'union__tweets__tfidfvect__ngram_range': (1, 1), 'model__n_estimators': 40,
+ 'model__max_features': 'auto', 'union__tweets__tfidfvect__analyzer': 'word'}
+
+Random Forest with users description
+Best: 0.860659 using
+{'union__tweets__tfidfvect__ngram_range': (1, 1), 'model__max_depth': 20,
+'union__tweets__tfidfvect__sublinear_tf': False, 'union__tweets__tfidfvect__smooth_idf': False,
+'union__desc__tfidfvect__sublinear_tf': False, 'union__tweets__tfidfvect__analyzer': 'word',
+'union__desc__tfidfvect__analyzer':'word', 'union__desc__tfidfvect__use_idf': False,
+'union__desc__tfidfvect__min_df': 1, 'union__desc__tfidfvect__max_df': 0.9,
+'model__criterion': 'gini', 'model__n_estimators': 40,
+'union__desc__tfidfvect__ngram_range': (1, 2), 'model__max_features': None,
+'union__desc__tfidfvect__smooth_idf': True, 'union__tweets__tfidfvect__min_df': 1,
+'union__tweets__tfidfvect__use_idf': True, 'union__tweets__tfidfvect__max_df': 0.9}
+
+
+RandomForest with users description and weights for both matrices (but does not change anythin)
+Best: 0.865934 using {'model__n_estimators': 40, 'model__max_depth': 20, 'union_
+_desc__tfidfvect__min_df': 1, 'union__desc__tfidfvect__max_df': 0.9, 'union__twe
+ets__tfidfvect__max_df': 0.9, 'union__transformer_weights': {'desc': 0.0, 'tweet
+s': 1}, 'union__tweets__tfidfvect__use_idf': True, 'union__desc__tfidfvect__smoo
+th_idf': True, 'union__tweets__tfidfvect__sublinear_tf': False, 'union__desc__tf
+idfvect__sublinear_tf': False, 'model__max_features': None, 'union__tweets__tfid
+fvect__smooth_idf': False, 'union__tweets__tfidfvect__analyzer': 'word', 'union_
+_tweets__tfidfvect__ngram_range': (1, 1), 'union__desc__tfidfvect__use_idf': Fal
+se, 'union__desc__tfidfvect__analyzer': 'word', 'model__criterion': 'gini', 'uni
+on__tweets__tfidfvect__min_df': 1, 'union__desc__tfidfvect__ngram_range': (1, 1)
+}
 
 
 """
+
+
+
+"""
+OLD ==============================
+WITH LESS SAMPLES
+
+
 MultinomialNB
 Best: 0.846271 using
 {'union__metadata__scale__with_std': True, 'union__tweets__tfidfvect__use_idf': False,
