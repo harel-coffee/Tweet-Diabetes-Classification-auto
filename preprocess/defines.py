@@ -21,6 +21,9 @@ nltk.download('wordnet')
 
 from emotion_codes import EMOTICONS_UNICODE
 from stopword_def import *
+from emotionKeywords import *
+from emotion_codes import *
+
 
 class Constants:
     URL = "URL"
@@ -58,3 +61,39 @@ class WordLists:
 
     TYPE1_WORDS = re.compile(u"|".join(type1))
     TYPE2_WORDS = re.compile(u"|".join(type2))
+
+    excludeTweets = ["#chloegracemoretz",  "#chloegmoretz",  "#chloegrace",  "#chloemoretz",
+                     "#moretzgrace", "#chloemoretz"] # list with words whose tweets are to be excluded
+
+
+class Emotions:
+
+    excludeSynonyms_ = ["go", "like", "get", "pull", "floor",  "know", "give",
+                        "longer", "please", "handle", "dear", "deal", "substitute",
+                        "crank"]
+    addWords_ = ["ashamed"]
+
+    parrotsEmotions = get_parrotsEmotions_list_all()
+    allEmotions = get_parrotsEmotions_list_all()+DDS_list+PAID_list
+    allEmotions_allForms_synonyms = get_synonyms(all_word_forms(allEmotions),
+                                                excludeSynonyms_, addWords_)
+    # list with all emotions and their synonyms (deleted some which were clearly not an emotion)
+    emotions_full_list = emotion_key_words_fulllist
+
+    def get_emotion_synonyms(emotion, excludeWords=excludeSynonyms_, addWords=addWords_,
+                             all_emotions_list=emotions_full_list):
+        return list(set(get_synonyms(all_word_forms(get_parrotsEmotions_for_emtion(emotion)),
+                                                        excludeWords, addWords))
+                                     & set(all_emotions_list))
+
+
+
+
+    emotions_synonyms_joy = get_emotion_synonyms("joy")
+    emotions_synonyms_love = get_emotion_synonyms("love")
+    emotions_synonyms_surprise = get_emotion_synonyms("surprise")
+    emotions_synonyms_anger = get_emotion_synonyms("anger")
+    emotions_synonyms_sadness = get_emotion_synonyms("sadness")
+    emotions_synonyms_fear = get_emotion_synonyms("fear")
+
+    EMOTION_CATEGORIES = Emotions_positive.CATEGORIES_POSITIVE+Emotions_negative.CATEGORES_NEGATIVE

@@ -25,7 +25,6 @@ from emotion_codes import UNICODE_EMOJI
 #from emotion_codes import EMOTICONS_UNICODE
 from emotion_codes import EMOTICONS
 from emotion_codes import EMOJI_TO_CATEGORY
-from emotion_codes import Emotions_positive, Emotions_negative, EMOTION_CATEGORIES
 from defines import *
 from contractions_def import *
 
@@ -37,7 +36,7 @@ class Preprocess:
         # Constant words like URL, USER, EMOT_SMILE, etc. that we want to keep in uppercase
         self.Constant_words = [value for attr, value in Constants.__dict__.items()
                                if not callable(getattr(Constants, attr)) and
-                               not attr.startswith("__")]+EMOTION_CATEGORIES
+                               not attr.startswith("__")]+Emotions.EMOTION_CATEGORIES
 
         self.WN_Lemmatizer = WordNetLemmatizer()
 
@@ -184,28 +183,79 @@ class Preprocess:
 
         return cleaned_tweet
 
-    def preprocess_emojis(self, tweet):
+    # def preprocess_emojis(self, tweet):
+    #     '''
+    #         Replace emojis with their emotion category
+    #         Example:
+    #             >>> text = "I love eating 😄"
+    #             >>> preprocess_emoji(text)
+    #             >>> "I love eating EMOT_LAUGH"
+    #     '''
+    #
+    #     cleaned_tweet = []
+    #     for ind, char in enumerate(tweet):
+    #         if char in UNICODE_EMOJI:
+    #
+    #             if EMOJI_TO_CATEGORY[UNICODE_EMOJI[char]] != "":
+    #                 cleaned_tweet.append(EMOJI_TO_CATEGORY[UNICODE_EMOJI[char]])
+    #             else:
+    #                 print("INFO: No category set for emoji {} -> delete emoji {}".format(char, UNICODE_EMOJI[char]))
+    #         else:
+    #             cleaned_tweet.append(char)
+    #
+    #     return cleaned_tweet
+
+
+    def preprocess_emojis(self, tweet, limit_nEmojis=False):
         '''
             Replace emojis with their emotion category
             Example:
                 >>> text = "I love eating 😄"
                 >>> preprocess_emoji(text)
                 >>> "I love eating EMOT_LAUGH"
+
+            Parameters:
+            ------------------------------------------------------------
+            tweet:          tokenized tweet
+            limit_nEmojis:  give maximum number of emojis of the same emotion category
+                            that should occur in a tweet. Delete the other ones
+                            Default: False, all emojis are considered
+
+            Return
+            ---------------------------------------------------------------
+            tokenized tweet with replaced emojis by their emotion category
         '''
+
+        # counts occurrences of emojis in their emotion category
+        emot_counter = {}
+        for emotion in Emotions.EMOTION_CATEGORIES:
+            emot_counter[emotion] = 0
 
         cleaned_tweet = []
         for ind, char in enumerate(tweet):
             if char in UNICODE_EMOJI:
 
-                if EMOJI_TO_CATEGORY[UNICODE_EMOJI[char]] != "":
-                    cleaned_tweet.append(EMOJI_TO_CATEGORY[UNICODE_EMOJI[char]])
+                emot_cat = EMOJI_TO_CATEGORY[UNICODE_EMOJI[char]]
+                if emot_cat != "":
+
+                    if limit_nEmojis is not False:
+
+                        # it is possible that one emoji is categorized into two
+                        # different categories, for instance: 'EMOT_SURPRISE EMOT_FEAR'
+                        emot_cat = emot_cat.split(" ")
+                        for emo in emot_cat:
+                            emot_counter[emo] += 1 # counts for the emotion in this tweet
+                            if emot_counter[emo] <= limit_nEmojis:
+                                cleaned_tweet.append(emo)
+                    else:
+                        cleaned_tweet.append(emot_cat)
+
                 else:
                     print("INFO: No category set for emoji {} -> delete emoji {}".format(char, UNICODE_EMOJI[char]))
             else:
                 cleaned_tweet.append(char)
 
         return cleaned_tweet
-
 
     def preprocess_emoticons(self, tweet):
         '''

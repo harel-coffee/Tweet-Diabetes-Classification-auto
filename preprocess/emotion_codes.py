@@ -68,7 +68,6 @@ class Emotions_negative:
 #                          EMOT_ANGER, EMOT_SURPRISE_SHOCK, EMOT_CRY,
 #                          EMOT_HORROR_DISGUST, EMOT_SKEPTICAL_ANNOYED]
 
-EMOTION_CATEGORIES = Emotions_positive.CATEGORIES_POSITIVE+Emotions_negative.CATEGORES_NEGATIVE
 
 
 
