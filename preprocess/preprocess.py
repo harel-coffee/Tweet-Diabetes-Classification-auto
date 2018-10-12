@@ -25,9 +25,8 @@ from emotion_codes import UNICODE_EMOJI
 #from emotion_codes import EMOTICONS_UNICODE
 from emotion_codes import EMOTICONS
 from emotion_codes import EMOJI_TO_CATEGORY
-from emotion_codes import Emotions
 from defines import *
-
+from contractions_def import *
 
 
 class Preprocess:
@@ -35,8 +34,9 @@ class Preprocess:
     def __init__(self):
         self.TweetTokenizer = TweetTokenizer()
         # Constant words like URL, USER, EMOT_SMILE, etc. that we want to keep in uppercase
-        self.Constant_words = [attr for attr in dir(Constants) if not callable(getattr(Constants, attr)) \
-                            and not attr.startswith("__")]+Emotions.EMOTION_CATEGORIES
+        self.Constant_words = [value for attr, value in Constants.__dict__.items()
+                               if not callable(getattr(Constants, attr)) and
+                               not attr.startswith("__")]+Emotions.EMOTION_CATEGORIES
 
         self.WN_Lemmatizer = WordNetLemmatizer()
 
@@ -58,19 +58,35 @@ class Preprocess:
               - "are the main cause of obeisty" -> "are the main because of obesity"
               - "in the U.S are" -> "in the you.S. are"
         """
-        return contractions.fix(tweet)
+        #return contractions.fix(tweet)
+        return  contractions_fix(tweet)
 
-    def replace_hashtags_URL_USER(self, tweet, mode="replace"):
+    def replace_hashtags_URL_USER(self, tweet, mode_URL="replace",
+                                  mode_Mentions="replace", mode_Hashtag="replace" ):
         """
-            if mode == "replace"
-                Replaces hashtags by its words
-                Replaces URLs by the "URL"
-                Replace user mentions by "USER"
+            Function handling the preprocessing of the hashtags, User mentions
+            and URL patterns
 
-            if mode == "delete"
-                Delete hasthags
-                Delete URLs
-                Delete USERs
+            Parameters
+            -------------------------------------------------------
+
+            mode_URL : ("replace", "delete")
+                       if "replace" : all url's in tweet are replaced with the value of Constants.URL
+                       if "delete" : all url's are deleted
+
+            mode_Mentions : ("replace", "delete", "screen_name")
+                       if "replace" : all user mentions in tweet are replaced
+                                      with the value of Constants.USER
+                       if "delete" : all user mentions are deleted
+                       if "screen_name" : delete '@' of all user mentions
+
+            mode_Hashtag : ("replace", "delete")
+                       if "replace" : all '#' from the hashtags are deleted
+                       if "delete" : all hashtags are deleted
+
+            Return
+            -------------------------------------------------------------
+            List of preprocessed tweet tokens
 
             https://github.com/yogeshg/Twitter-Sentiment
 
@@ -82,32 +98,58 @@ class Preprocess:
 
             TODO: maybe replace @Obama with Obama -> to be checked!
         """
-
-        if mode == "replace":
-            # replace URLs
+        if mode_URL == "replace":
             tweet = Patterns.URL_PATTERN.sub(Constants.URL, tweet)
+        elif mode_URL == "delete":
+            tweet = Patterns.URL_PATTERN.sub("", tweet)
+        else:
+            print("ERROR: mode_URL {} not defined!".format(mode_URL))
+            exit()
 
-            # replace mentions : @Obama
+        if mode_Mentions == "replace":
             tweet = Patterns.MENTION_PATTERN.sub(Constants.USER, tweet)
+        elif mode_Mentions == "delete":
+            tweet = Patterns.MENTION_PATTERN.sub("", tweet)
+        elif mode_Mentions == "screen_name":
+            mentions = Patterns.MENTION_PATTERN.findall(tweet)
+            for mention in mentions:
+                tweet = tweet.replace("@"+mention, mention)
+        else:
+            print("ERROR: mode_Mentions {} not defined!".format(mode_Mentions))
+            exit()
 
-            # replace hashtags by its words
+        if mode_Hashtag == "replace":
             hashtags = Patterns.HASHTAG_PATTERN.findall(tweet)
             for hashtag in hashtags:
                 tweet = tweet.replace("#"+hashtag, hashtag)
-
-        elif mode == "delete":
-            # replace URLs
-            tweet = Patterns.URL_PATTERN.sub("", tweet)
-
-            # replace mentions : @Obama
-            tweet = Patterns.MENTION_PATTERN.sub("", tweet)
-
-            # replace hashtags by its words
+        elif mode_Hashtag == "delete":
             hashtags = Patterns.HASHTAG_PATTERN.findall(tweet)
             for hashtag in hashtags:
                 tweet = tweet.replace("#"+hashtag, "")
+        else:
+            print("ERROR: mode_Hashtag {} not defined!".format(mode_Hashtag))
+            exit()
 
         return tweet
+
+
+    def replace_special_words(self, tweet):
+        """
+            Replace special words
+
+            For ex.: all the type 1 related words like "#type1", "Type 1", "t1d", etc.
+                     are transformed to "type1"
+
+        """
+
+        # replace type 1 words
+        tweet = WordLists.TYPE1_WORDS.sub(Constants.TYPE1, tweet)
+
+        # replace type 2 words
+        tweet = WordLists.TYPE2_WORDS.sub(Constants.TYPE2, tweet)
+
+        return tweet
+
 
     def tokenize(self, tweet):
         """
@@ -136,33 +178,84 @@ class Preprocess:
         cleaned_tweet = []
         for word in tweet:
             #if word not in string.punctuation and word != '...' and word != '…' and word != '..':
-            if word not in string.punctuation and word not in ['...', '…', '..', "\n", "\t", " "] :
+            if word not in string.punctuation and word not in ['...', '…', '..', "\n", "\t", " ", ""] :
                 cleaned_tweet.append(word)
 
         return cleaned_tweet
 
-    def preprocess_emojis(self, tweet):
+    # def preprocess_emojis(self, tweet):
+    #     '''
+    #         Replace emojis with their emotion category
+    #         Example:
+    #             >>> text = "I love eating 😄"
+    #             >>> preprocess_emoji(text)
+    #             >>> "I love eating EMOT_LAUGH"
+    #     '''
+    #
+    #     cleaned_tweet = []
+    #     for ind, char in enumerate(tweet):
+    #         if char in UNICODE_EMOJI:
+    #
+    #             if EMOJI_TO_CATEGORY[UNICODE_EMOJI[char]] != "":
+    #                 cleaned_tweet.append(EMOJI_TO_CATEGORY[UNICODE_EMOJI[char]])
+    #             else:
+    #                 print("INFO: No category set for emoji {} -> delete emoji {}".format(char, UNICODE_EMOJI[char]))
+    #         else:
+    #             cleaned_tweet.append(char)
+    #
+    #     return cleaned_tweet
+
+
+    def preprocess_emojis(self, tweet, limit_nEmojis=False):
         '''
             Replace emojis with their emotion category
             Example:
                 >>> text = "I love eating 😄"
                 >>> preprocess_emoji(text)
                 >>> "I love eating EMOT_LAUGH"
+
+            Parameters:
+            ------------------------------------------------------------
+            tweet:          tokenized tweet
+            limit_nEmojis:  give maximum number of emojis of the same emotion category
+                            that should occur in a tweet. Delete the other ones
+                            Default: False, all emojis are considered
+
+            Return
+            ---------------------------------------------------------------
+            tokenized tweet with replaced emojis by their emotion category
         '''
+
+        # counts occurrences of emojis in their emotion category
+        emot_counter = {}
+        for emotion in Emotions.EMOTION_CATEGORIES:
+            emot_counter[emotion] = 0
 
         cleaned_tweet = []
         for ind, char in enumerate(tweet):
             if char in UNICODE_EMOJI:
 
-                if EMOJI_TO_CATEGORY[UNICODE_EMOJI[char]] != "":
-                    cleaned_tweet.append(EMOJI_TO_CATEGORY[UNICODE_EMOJI[char]])
+                emot_cat = EMOJI_TO_CATEGORY[UNICODE_EMOJI[char]]
+                if emot_cat != "":
+
+                    if limit_nEmojis is not False:
+
+                        # it is possible that one emoji is categorized into two
+                        # different categories, for instance: 'EMOT_SURPRISE EMOT_FEAR'
+                        emot_cat = emot_cat.split(" ")
+                        for emo in emot_cat:
+                            emot_counter[emo] += 1 # counts for the emotion in this tweet
+                            if emot_counter[emo] <= limit_nEmojis:
+                                cleaned_tweet.append(emo)
+                    else:
+                        cleaned_tweet.append(emot_cat)
+
                 else:
                     print("INFO: No category set for emoji {} -> delete emoji {}".format(char, UNICODE_EMOJI[char]))
             else:
                 cleaned_tweet.append(char)
 
         return cleaned_tweet
-
 
     def preprocess_emoticons(self, tweet):
         '''
@@ -211,11 +304,17 @@ class Preprocess:
 
     def remove_non_ascii(self, tweet):
         """Remove non-ASCII characters from list of tokenized words"""
-        for ind, word in enumerate(tweet):
+#        for ind, word in enumerate(tweet):
             # normalize returns the normal fom 'NFKD' of the word
-            tweet[ind] = unicodedata.normalize('NFKD', word).encode('ascii', 'ignore').decode('utf-8', 'ignore')
+#            tweet[ind] = unicodedata.normalize('NFKD', word).encode('ascii', 'ignore').decode('utf-8', 'ignore')
 
-        return tweet
+        new_tweet = []
+        for word in tweet:
+            non_ascii_word = unicodedata.normalize('NFKD', word).encode('ascii', 'ignore').decode('utf-8', 'ignore')
+            if non_ascii_word is not '':
+                new_tweet.append(non_ascii_word)
+
+        return new_tweet
 
     def replace_numbers(self, tweet, mode="replace"):
         """
@@ -240,9 +339,20 @@ class Preprocess:
 
         return tweet
 
-    def remove_stopwords(self, tweet):
+    def remove_stopwords(self, tweet, include_personal_words=False, include_negations=False):
         """
             Remove stop words from list of tokenized words
+
+            Parameter:
+                tweet : tokenised list of strings
+                include_personal_words : [True, False]
+                                        if True, personal stopwords like
+                                        "I", "me", "my" are not considered as
+                                        stopwords
+                include_negations: [True, False]
+                                    if True, negation words like "no", "not" ,"nothing"
+                                    are included and not considered as stopwords
+                ignore_whitelist : whitelist containing words
 
             Example:
             >>> text = ['five', 'reasons', 'to', 'eat', 'like', 'a', 'hunter']
@@ -251,8 +361,21 @@ class Preprocess:
         """
         new_tweet = []
         for word in tweet:
-            if word not in Grammar.STOPWORDS: # TODO maybe add manually more stopwords
-                new_tweet.append(word)
+            if include_personal_words:
+                if include_negations:
+                    if word not in Grammar.STOPWORDS_NO_PERSONAL or word in Grammar.WHITELIST_EN: # TODO maybe add manually more stopwords
+                        new_tweet.append(word)
+                else:
+                    if word not in Grammar.STOPWORDS_NO_PERSONAL: # TODO maybe add manually more stopwords
+                        new_tweet.append(word)
+            else:
+                if include_negations:
+                    if word not in Grammar.STOPWORDS or word in Grammar.WHITELIST_EN: # TODO maybe add manually more stopwords
+                        new_tweet.append(word)
+                else:
+                    if word not in Grammar.STOPWORDS: # TODO maybe add manually more stopwords
+                        new_tweet.append(word)
+
         return new_tweet
 
     def lemmatize_verbs(self, tweet):
