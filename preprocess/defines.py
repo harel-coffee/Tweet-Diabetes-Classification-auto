@@ -43,14 +43,13 @@ class Patterns:
 
 
 class Grammar:
-    STOPWORDS = stopwords.words('english')
-    STOPWORDS_NO_PERSONAL = stopwords_no_personal_list # excludes personal words like "I", "me", "my" to keep them when filtering personal from institutional tweets
-    STOPWORDS_FR = stopwords_fr
+    STOPWORDS_EN = stopwords.words('english')
+    STOPWORDS_NO_PERSONAL_EN = stopwords_no_personal_list # excludes personal words like "I", "me", "my" to keep them when filtering personal from institutional tweets
     STOPWORDS_FR = stopwords_fr
     WHITELIST_EN = ["n't", "not", "no", "nor", "never", "nothing", "nowhere", "noone", "none"]
     STEMMER_LANCASTER = LancasterStemmer() # aggressive, fast, sometimes confusing
 #    STEMMER_PORTER = PorterStemmer(mode='NLTK_EXTENSIONS') # mode that includes further improvements
-    STEMMER_SNOWBALL = SnowballStemmer('english') # improved porter
+    STEMMER_SNOWBALL_EN = SnowballStemmer('english') # improved porter
     STEMMER_SNOWBALL_FR = nltk.stem.snowball.FrenchStemmer()
 
     LEMMATIZER = WordNetLemmatizer()
