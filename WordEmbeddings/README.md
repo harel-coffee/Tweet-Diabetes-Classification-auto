@@ -49,3 +49,7 @@ Additionally you can specify:
                      otherwise this is like Word2Vec if 0 (default=1)
 - min_n: Minimum length of char n-grams to be used for training (default=3)
 - max_n: Maximum length of char n-grams to be used for training (default=6)
+
+
+## Example call
+python FastText_train.py --mode "local" -s "TESTPATH" -lcsv '/home/test.csv' -lcsvS ";" --iter=20
