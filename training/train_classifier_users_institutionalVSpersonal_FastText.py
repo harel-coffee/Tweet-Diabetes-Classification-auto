@@ -38,9 +38,6 @@ import gensim
 from gensim.models import FastText
 #from gensim.models.wrappers import FastText
 import multiprocessing
-from keras.wrappers.scikit_learn import KerasClassifier
-from keras.layers import LSTM, Dense, Flatten
-from keras.models import Sequential
 
 
 # CONSTANTS
@@ -55,34 +52,6 @@ ft_pretrained_wiki = "D:\\A_AHNE1\\Data\\FastText_Wikipedia_300\\wiki.en.bin"
 
 # --------------------------------------------------------------------
 
-
-def create_model(loss, optimizer, dropout, reccurent_dropout):
-    """
-        Create Keras model
-
-        Parameters (to use a grid search) for the LSTM:
-        -----------------------------------------------------------------
-        loss:       list of loss functions
-        optimizer:  list of optimizers
-        dropout:    list of dropout rates
-        reccurent_dropout: list of reccurent_dropouts
-
-        Return
-        -----------------------------------------------------------------
-        Model
-    """
-
-    model = Sequential()
-    #model.add(Embedding(2000, embed_dim,input_length = X.shape[1], dropout = 0.2))
-    model.add(LSTM(128, input_shape=(200, 1), dropout = dropout,
-                   recurrent_dropout = reccurent_dropout, return_sequences=True))
-#    model.add(LSTM(64, return_sequences=True))
-    model.add(Flatten())
-    model.add(Dense(2,activation='softmax'))
-    model.compile(loss = loss, optimizer=optimizer,
-                  metrics = ['accuracy'])
-
-    return model
 
 
 
@@ -118,6 +87,7 @@ if __name__ == '__main__':
         sys.path.insert(0, path)
 
     from tweet_utils import *
+    from keras_utils import *
 
 
     # load csv in which we manually labelled the users
@@ -348,45 +318,4 @@ Best: 0.894505 using
   'model__hidden_layer_sizes': (64, 64), 'model__solver': 'adam'}
 
 
-"""
-
-
-
-
-
-"""
-OLD  ##############################################################
-
-
-LogisticRegression
-With more institutional tweets to train
-Best: 0.887033 using {'model__tol': 1e-10, 'model__C': 1.0}
-
-SVC
-old:
-Best: 0.862378 using
-{'model__kernel': 'rbf', 'model__C': 10.0, 'model__tol': 0.01}
-
-With more insitutional tweets to train:
-Best: 0.894066 using {'model__C': 12.0, 'model__tol': 0.01, 'model__kernel': 'rb
-f'}
-
-
-
-MultiLayerPerceptron
-Best: 0.868078 using
-{'model__learning_rate': 'constant', 'model__alpha': 1e-06,  'model__solver': 'adam',
- 'model__tol': 0.0001, 'model__hidden_layer_sizes': (16, 16), 'model__activation': 'tanh'}
-
-With more insitutional tweets to train:
-Best: 0.895385 using
-{'model__solver': 'adam', 'model__learning_rate': 'constant
-', 'model__activation': 'relu', 'model__max_iter': 300, 'model__alpha': 1e-06, '
-model__tol': 0.001, 'model__hidden_layer_sizes': 64}
-
-
-RandomForest
-Best: 0.860749 using
-{'model__max_depth': 40, 'model__criterion': 'gini', 'model
-__max_features': 'log2', 'model__n_estimators': 60}
 """
