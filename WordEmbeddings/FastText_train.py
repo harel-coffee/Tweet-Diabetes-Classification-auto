@@ -19,7 +19,6 @@ path_utils = op.join(basename , "utils")
 sys.path.insert(0, path_utils)
 
 from sys_utils import load_library
-from mongoDB_utils import connect_to_database
 
 load_library(op.join(basename, 'preprocess'))
 from preprocess import Preprocess
@@ -110,6 +109,8 @@ if __name__ == '__main__':
 
         else:
             print("Local mode: Connect to MongoDB collection..")
+            from mongoDB_utils import connect_to_database
+
             client = connect_to_database()
             db = client[args.localMongoDatabase]
             collection = db[args.localMongoCollection]
