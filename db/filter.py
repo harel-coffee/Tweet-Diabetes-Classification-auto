@@ -25,7 +25,7 @@ import sys
 import json
 import os.path as op
 import pandas as pd
-from ..readWrite.readWrite import savePandasDFtoFile
+#from ..readWrite.readWrite import savePandasDFtoFile
 
 # add path to utils module to python path
 basename = op.split(op.dirname(op.realpath(__file__)))[0]
@@ -33,7 +33,7 @@ path_utils = op.join(basename , "utils")
 sys.path.insert(0, path_utils)
 
 from sys_utils import load_library, strInput2bool
-from mongoDB_utils import connect_to_database
+#from mongoDB_utils import connect_to_database
 
 # add path to utils module to python path
 basename = op.split(op.dirname(op.realpath(__file__)))[0]
@@ -41,6 +41,8 @@ load_library(op.join(basename, 'preprocess'))
 from defines import ColumnNames as cn
 from defines import Patterns
 
+load_library(op.join(basename, 'readWrite'))
+from readWrite import savePandasDFtoFile
 
 
 # def create_temp_collection(raw_tweets, temp_tweets):
@@ -461,6 +463,7 @@ if __name__ == '__main__':
         else:
             print("Local mode: Connect to MongoDB collection..")
 
+            from mongoDB_utils import connect_to_database
             import pymongo
             from pymongo import MongoClient
             
