@@ -1,4 +1,4 @@
-
+import sys
 
 
 def readToList(path):
@@ -12,3 +12,14 @@ def readToList(path):
             ll.append(line)
 
     return ll
+
+
+def savePandasDFtoFile(df, path):
+
+    if path.endswith(".parquet"):
+        df.to_parquet(path, engine="pyarrow")
+    elif path.endswith(".csv"):
+        df.to_csv(path, sep=";")
+    else:
+        print("ERROR: Unable to save result. Unknown file extension. Supported formats: .parquet, .csv")
+        sys.exit()

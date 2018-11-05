@@ -27,7 +27,7 @@ import sys
 import json
 import os.path as op
 import pandas as pd
-
+from ..readWrite.readWrite import savePandasDFtoFile
 
 # add path to utils module to python path
 basename = op.split(op.dirname(op.realpath(__file__)))[0]
@@ -391,15 +391,6 @@ def getTweetColumnName(columnName, configDict):
         return cn[columnName]
 
 
-def saveFile(df, path):
-
-    if path.endswith(".parquet"):
-        df.to_parquet(path, engine="pyarrow")
-    elif path.endswith(".csv"):
-        df.to_csv(path, sep=";")
-    else:
-        print("ERROR: Unable to save result. Unknown file extension. Supported formats: .parquet, .csv")
-        sys.exit()
 
 
 
@@ -496,4 +487,4 @@ if __name__ == '__main__':
                                     withRetweets=args.withRetweets, withOriginalTweetOfRetweet=args.withOriginalTweetOfRetweet,
                                     deleteDuplicates=True)
 
-        saveFile(filtered_df, args.saveResultPath)
+        savePandasDFtoFile(filtered_df, args.saveResultPath)
