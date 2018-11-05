@@ -19,8 +19,6 @@ The field 'number_of_weeks' will allow more precise analysis in a later step
 """
 
 import argparse
-import pymongo
-from pymongo import MongoClient
 from pprint import pprint
 import datetime
 import sys
@@ -462,6 +460,10 @@ if __name__ == '__main__':
         # use MongoDB storage
         else:
             print("Local mode: Connect to MongoDB collection..")
+
+            import pymongo
+            from pymongo import MongoClient
+            
             client = connect_to_database()
             db = client[args.localMongoDatabase]
             raw_tweets = db[args.localMongoCollection]
