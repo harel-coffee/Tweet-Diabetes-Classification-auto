@@ -8,12 +8,15 @@ Helping functions and classes to handle / process tweets
 
 import numpy as np
 import pandas as pd
+import os.path as op
 from sklearn.pipeline import Pipeline
 from sys_utils import *
 
 
-# load preprocessing library
-load_library('D:\A_AHNE1\Tweet-Classification-Diabetes-Distress\preprocess')
+
+# add path to utils module to python path
+basename = op.split(op.dirname(op.realpath(__file__)))[0]
+load_library(op.join(basename, 'preprocess'))
 
 from sklearn_utils import *
 from mongoDB_utils import *
@@ -22,7 +25,7 @@ from preprocess import Preprocess
 prep = Preprocess()
 
 
-def preprocess_tweet(tweet, mode="partial_preprocessing"):
+def preprocess_tweet(tweet, mode="no_preprocessing"):
     """
         Preprocess tweets in the same way the word embeddings (Word2Vec) are trained
 

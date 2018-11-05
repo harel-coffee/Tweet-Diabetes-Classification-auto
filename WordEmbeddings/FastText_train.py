@@ -49,6 +49,7 @@ if __name__ == '__main__':
     parser.add_argument("-ldb", "--localMongoDatabase", help="MongoDB database to connect to")
     parser.add_argument("-lc", "--localMongoCollection", help="MongoDB collection (table) in which data is stored")
     parser.add_argument("-lpar", "--localParquetfile", help="Path to the parquet file")
+    parser.add_argument("-pC", "--columnInParquet", help="Name of column to extract")
     parser.add_argument("-lcsv", "--localCSV", help="Path to the csv file")
     parser.add_argument("-lcsvS", "--localCSVDelimiter", help="Delimiter used in csv file (default=',')", default=",")
     parser.add_argument("-cp", "--clusterPathData", help="Path to the data in cluster mode")
