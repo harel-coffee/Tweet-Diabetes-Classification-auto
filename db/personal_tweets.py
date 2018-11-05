@@ -61,12 +61,10 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description="Obtaining database with only personal tweets",
                                      epilog='Example usage in local mode : \
-                                             python train_classifier_user.py -m "local"  \
-                                             -pwe "PAAAATH" -twe "ft" -ptd "PAAATH_TRAINING" \
-                                             -mo "SVC", \
-                                             --parameterGrid {"model__kernel":["linear", "poly", "rbf"], \
-                                              "model__C":  [ 12.0, 10.0, 8.0, 6.0, 4.0, 1.0]} \
-                                            ')
+                                             python personal_tweets.py -m "local"  \
+                                             -puc "P_A_T_H" -ptc "P_A_T_H" -pwe "P_A_T_H" \
+                                             -pdata "P_A_T_H" -sm 0.25 -s "P_A_T_H" \
+                                      ')
     parser.add_argument("-m", "--mode", help="Mode of execution (default=local)", choices=["local", "cluster"], required=True, default="local")
     parser.add_argument("-puc", "--pathUserClassifier", help="Path to the user classifier (personal vs institutional)", required=True)
     parser.add_argument("-ptc", "--pathTweetClassifier", help="Path to the tweet classifier (personal vs institutional)", required=True)
