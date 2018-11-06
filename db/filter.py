@@ -388,7 +388,7 @@ def getTweetColumnName(columnName, configDict):
         print("Info: For key {} the value {} is defined".format(columnName,configDict[columnName]))
         return configDict[columnName]
     else:
-        print("Info: For key {} the value {} is defined".format(columnName,cn[columnName]))
+        print("Info: For key {} the value {} is defined".format(columnName,configDict[columnName]))
         return cn[columnName]
 
 
@@ -409,9 +409,9 @@ if __name__ == '__main__':
     parser.add_argument("-ldb", "--localMongoDatabase", help="MongoDB database to connect to")
     parser.add_argument("-lc", "--localMongoCollection", help="MongoDB collection (table) in which data is stored")
     parser.add_argument("-lcr", "--localMongoCollectionResult", help="New name of MongoDB collection in which filtered data is stored")
-    parser.add_argument("-lpar", "--localParquetfile", help="Path to the parquet file")
-    parser.add_argument("-lcsv", "--localCSV", help="Path to the csv file")
-    parser.add_argument("-lcsvS", "--localCSVDelimiter", help="Delimiter used in csv file (default=',')", default=",")
+    parser.add_argument("-lf", "--localFile", help="Path to the data file")
+    parser.add_argument("-lfd", "--localFileDelimiter", help="Delimiter used in file (default=',')", default=",")
+    parser.add_argument("-lfc", "--localFileColumns", help="String with column names")
     parser.add_argument("-cp", "--clusterPathData", help="Path to the data in cluster mode")
 #    parser.add_argument("-dcn", "--dataColumnName", help="If data stored in tabular form, gives the column of the desired text data (default='tweetText')", default="tweetText")
     parser.add_argument("-s", "--saveResultPath", help="Path name where result should be stored")
@@ -433,27 +433,18 @@ if __name__ == '__main__':
 
         # check from which source to read the data
 
-        # check if parquet file
-        if args.localParquetfile is not None:
-            print("Local mode: Read parquet file..")
-            raw_tweets = pd.read_parquet(args.localParquetfile, engine="pyarrow")
+        if args.localFile is not None:
+            print("Local mode: Read file..")
+            raw_tweets = readFile(args.localFile, columns=args.localFileColumns, sep=args.localFileDelimiter)
+#            raw_tweets = pd.read_parquet(args.localParquetfile, engine="pyarrow")
 
             filtered_df = filter_dataframe(raw_tweets, args.saveResultPath, args.configDict, language=args.lang,
                             withRetweets=args.withRetweets, withOriginalTweetOfRetweet=args.withOriginalTweetOfRetweet,
                             deleteDuplicates=True)
 
-            savePandasDFtoFile(filtered_df, args.saveResultPath)
+            saveFile(filtered_df, args.saveResultPath)
 
-        # check if csv
-        elif args.localCSV is not None:
-            print("Local mode: Read csv file..")
-            raw_tweets = pd.read_csv(args.localCSV, sep=args.localCSVDelimiter)
 
-            filtered_df = filter_dataframe(raw_tweets, args.saveResultPath, args.configDict, language=args.lang,
-                            withRetweets=args.withRetweets, withOriginalTweetOfRetweet=args.withOriginalTweetOfRetweet,
-                            deleteDuplicates=True)
-
-            savePandasDFtoFile(filtered_df, args.saveResultPath)
 
         # Check if necessary arguments are given
         elif args.localMongoDatabase is None and args.localMongoCollection is None:

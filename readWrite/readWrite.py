@@ -1,5 +1,6 @@
 import sys
-
+import os
+import pandas as pd
 
 def readToList(path):
     """
@@ -22,4 +23,24 @@ def savePandasDFtoFile(df, path):
         df.to_csv(path, sep=";")
     else:
         print("ERROR: Unable to save result. Unknown file extension. Supported formats: .parquet, .csv")
+        sys.exit()
+
+
+
+def readFile(path, columns=None, sep=";"):
+
+    if columns is not None:
+        columns = [item.strip() for item in columns.split(',')]
+
+    if path.endswith(".csv"):
+        return pd.read_csv(path, sep=args.localCSVDelimiter)
+    elif path.endswith(".parquet"):
+        if path.startswith("hdfs"):
+            print("INFO: Set HADOOP_HOME variable to: {}".format("/space/hadoop/hadoop_home"))
+            os.environ["HADOOP_HOME"] = "/space/hadoop/hadoop_home"
+
+        return pd.read_parquet(path, engine="pyarrow", columns=None)
+
+    else:
+        print("ERROR: Unsupported format file. Allowed only .parquet or .csv files")
         sys.exit()

@@ -23,7 +23,8 @@ from sys_utils import load_library
 load_library(op.join(basename, 'preprocess'))
 from preprocess import Preprocess
 
-
+load_library(op.join(basename, 'readWrite'))
+from readWrite import savePandasDFtoFile, readFile
 
 
 
@@ -47,10 +48,9 @@ if __name__ == '__main__':
     parser.add_argument("-lp", "--localMongoPort", help="Port to connect to MongoDB (default=27017)", default="27017")
     parser.add_argument("-ldb", "--localMongoDatabase", help="MongoDB database to connect to")
     parser.add_argument("-lc", "--localMongoCollection", help="MongoDB collection (table) in which data is stored")
-    parser.add_argument("-lpar", "--localParquetfile", help="Path to the parquet file")
-    parser.add_argument("-cip", "--columnsInParquet", help="Names of column to extract", default=None)
-    parser.add_argument("-lcsv", "--localCSV", help="Path to the csv file")
-    parser.add_argument("-lcsvS", "--localCSVDelimiter", help="Delimiter used in csv file (default=',')", default=",")
+    parser.add_argument("-lf", "--localFile", help="Path to the data file")
+    parser.add_argument("-lfd", "--localFileDelimiter", help="Delimiter used in file (default=',')", default=",")
+    parser.add_argument("-lfc", "--localFileColumns", help="String with column names")
     parser.add_argument("-cp", "--clusterPathData", help="Path to the data in cluster mode")
     parser.add_argument("-dcn", "--dataColumnName", help="If data stored in tabular form, gives the column of the desired text data (default='tweetText')", default="tweetText")
     parser.add_argument("--vecDim", help="Vector dimension of the word embedding (default=200)", default=200, type=int)
@@ -78,29 +78,15 @@ if __name__ == '__main__':
     if args.mode == "local":
 
         # check from which source to read the data
-        # check if parquet file
-        if args.localParquetfile is not None:
-            print("Local mode: Read parquet file..")
-            if args.columnsInParquet is None:
-                raw_tweets = pd.read_parquet(args.localParquetfile, engine="pyarrow")
-            else:
-                col = args.columnsInParquet.split(",")
-                raw_tweets = pd.read_parquet(args.localParquetfile, engine="pyarrow", columns=col)
+        if args.localFile is not None:
+            print("Local mode: Read file..")
+            raw_tweets = readFile(args.localFile, columns=args.localFileColumns, sep=args.localFileDelimiter)
 
             print("Tokenize tweets..")
             tweets = []
             for tweet in raw_tweets[args.dataColumnName].values:
                 tweets.append(prep.tokenize(tweet))
 
-        # check if csv
-        elif args.localCSV is not None:
-            print("Local mode: Read csv file..")
-            raw_tweets = pd.read_csv(args.localCSV, sep=args.localCSVDelimiter)
-
-            print("Tokenize tweets..")
-            tweets = []
-            for tweet in raw_tweets[args.dataColumnName].values:
-                tweets.append(prep.tokenize(tweet))
 
         # Check if necessary arguments are given
         elif args.localMongoDatabase is None and args.localMongoCollection is None:
