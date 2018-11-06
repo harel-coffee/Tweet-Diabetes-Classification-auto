@@ -114,8 +114,7 @@ if __name__ == '__main__':
             sys.exit(1)
 
         print("Cluster mode: Read parquet files..")
-        # TODO: Load data from cluster and tokenize
-        raw_tweets = pd.read_parquet(args.clusterPathData, engine="pyarrow")
+        raw_tweets = readFile(args.localFile, columns=args.localFileColumns, sep=args.localFileDelimiter)
 
         print("Tokenize tweets..")
         tweets = []

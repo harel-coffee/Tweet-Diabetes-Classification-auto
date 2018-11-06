@@ -45,66 +45,6 @@ load_library(op.join(basename, 'readWrite'))
 from readWrite import savePandasDFtoFile
 
 
-# def create_temp_collection(raw_tweets, temp_tweets):
-#     """
-#         Add new field 'created_at_orig' which saves in datetime format the date of the tweet
-#         For retweets the date of the original post is saved
-#
-#         Parameters:
-#           - raw_tweets: MongoDB collection of raw tweets
-#           - temp_tweets: MongoDB collection in which to store the tweets temporary
-#     """
-#
-#     for tweet in raw_tweets.find({'lang': 'en'}):
-#         # if no retweet -> save date of tweet
-#         if "retweeted_status" not in tweet.keys():
-#             tweet['created_at_orig'] = datetime.datetime.strptime(tweet['created_at'], '%a %b %d %H:%M:%S +0000 %Y')
-#         # if retweet -> save date of original post
-#         else:
-#             tweet['created_at_orig'] = datetime.datetime.strptime(tweet['retweeted_status']['created_at'], '%a %b %d %H:%M:%S +0000 %Y')
-#
-#         try:
-#             temp_tweets.insert_one(tweet)
-#         except Exception as e:
-#             print("Could not insert tweet: '{}' to MongoDB!".format(tweet), str(e))
-#
-#
-# def create_english_tweets_collection(temp_tweets, new_collection, start_date):
-#     """
-#     Create database consisting only of english tweets and add additional field
-#     'number_of_weeks' to be able to do more precise analyses in a later step
-#
-#     INFO:
-#     sort tweets by date (s.t. we can label them easily with the number of weeks and so to which bin they belong)
-#
-#     """
-#
-#     end_of_week = start_date + datetime.timedelta(days=7)
-#     number_of_week = 1
-#
-#     # sort tweets by date and only greater than start_date
-#     for tweet in temp_tweets.find({'created_at_orig': {'$gt': start_date}}).sort('created_at_orig', pymongo.ASCENDING):
-#
-#         if tweet['created_at_orig'] < end_of_week:
-#             tweet['number_of_weeks'] = number_of_week
-#
-#             try:
-#                 new_collection.insert_one(tweet)
-#             except Exception as e:
-#                 print("Could not insert tweet: '{}' to MongoDB!".format(tweet), str(e))
-#
-#         else:
-#             # go to next week if current tweet was not in the current week bin
-#             number_of_week = number_of_week + 1
-#             end_of_week = end_of_week + datetime.timedelta(days=7)
-#             print("number of weeks:", number_of_week, " end of week: ", end_of_week)
-#             tweet['number_of_weeks'] = number_of_week
-#
-#             try:
-#                 new_collection.insert_one(tweet)
-#             except Exception as e:
-#                 print("Could not insert tweet: '{}' to MongoDB!".format(tweet), str(e))
-
 def add_field_to_collection(collection, URL_PATTERN=False, MENTION_PATTERN=False):
     """
         Function adding a new field to each element of the collection
