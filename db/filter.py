@@ -45,7 +45,7 @@ load_library(op.join(basename, 'readWrite'))
 from readWrite import savePandasDFtoFile
 
 load_library(op.join(basename, 'readWrite'))
-from readWrite import savePandasDFtoFile, readFiles
+from readWrite import savePandasDFtoFile, readFile
 
 
 def add_field_to_collection(collection, URL_PATTERN=False, MENTION_PATTERN=False):
