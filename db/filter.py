@@ -339,7 +339,7 @@ def getTweetColumnName(columnName, configDict):
         print("Info: For key {} the value {} is defined".format(columnName,configDict[columnName]))
         return configDict[columnName]
     else:
-        print("Info: For key {} the value {} is defined".format(columnName,configDict[columnName]))
+        print("Info: For key {} the value {} is defined".format(columnName,cn[columnName]))
         return cn[columnName]
 
 
