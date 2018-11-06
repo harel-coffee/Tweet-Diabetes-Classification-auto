@@ -99,7 +99,7 @@ if __name__ == '__main__':
         # check from which source to read the data
         if args.localFile is not None:
 
-            print("Write tokenized tweets to temporary file: {} ...".format(tempFilePath))
+            print("Write tokenized tweets to temporary file: {} ...".format(args.tempFile))
             preprocessTweetsAndSave(args, prep)
             print("Write to temporary file finished")
 
