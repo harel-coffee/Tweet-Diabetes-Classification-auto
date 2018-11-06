@@ -41,7 +41,7 @@ if __name__ == '__main__':
                                                                         -lc "en_noRetweets" \
                                                                         --iter 50 \
                                                                         --alpha 0.05 \
-                                            ')
+                                                                        -lpar "hdfs://bgdta1-demy:8020/data/twitter/track-analyse/reduced-tweets.parquet" ')
     parser.add_argument("-m", "--mode", help="Mode of execution (default=local)", choices=["local", "cluster"], required=True, default="local")
     parser.add_argument("-lh", "--localMongoHost", help="Host to connect to MongoDB (default=localhost)", default="localhost")
     parser.add_argument("-lp", "--localMongoPort", help="Port to connect to MongoDB (default=27017)", default="27017")

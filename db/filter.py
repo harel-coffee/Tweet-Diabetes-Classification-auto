@@ -388,7 +388,7 @@ def getTweetColumnName(columnName, configDict):
         print("Info: For key {} the value {} is defined".format(columnName,configDict[columnName]))
         return configDict[columnName]
     else:
-        print("Info: For key {} the value {} is defined".format(columnName,configDict[columnName]))
+        print("Info: For key {} the value {} is defined".format(columnName,cn[columnName]))
         return cn[columnName]
 
 
@@ -442,7 +442,7 @@ if __name__ == '__main__':
                             withRetweets=args.withRetweets, withOriginalTweetOfRetweet=args.withOriginalTweetOfRetweet,
                             deleteDuplicates=True)
 
-            saveFile(filtered_df, args.saveResultPath)
+            savePandasDFtoFile(filtered_df, args.saveResultPath)
 
         # check if csv
         elif args.localCSV is not None:
@@ -453,7 +453,7 @@ if __name__ == '__main__':
                             withRetweets=args.withRetweets, withOriginalTweetOfRetweet=args.withOriginalTweetOfRetweet,
                             deleteDuplicates=True)
 
-            saveFile(filtered_df, args.saveResultPath)
+            savePandasDFtoFile(filtered_df, args.saveResultPath)
 
         # Check if necessary arguments are given
         elif args.localMongoDatabase is None and args.localMongoCollection is None:
