@@ -385,9 +385,10 @@ def getTweetColumnName(columnName, configDict):
         as defined in class columnNames cn
     """
     if columnName in configDict.keys():
+        print("Info: For key {} the value {} is defined".format(columnName,configDict[columnName]))
         return configDict[columnName]
     else:
-        #return cn.columnName
+        print("Info: For key {} the value {} is defined".format(columnName,configDict[columnName]))
         return cn[columnName]
 
 
@@ -466,7 +467,7 @@ if __name__ == '__main__':
             from mongoDB_utils import connect_to_database
             import pymongo
             from pymongo import MongoClient
-            
+
             client = connect_to_database()
             db = client[args.localMongoDatabase]
             raw_tweets = db[args.localMongoCollection]
