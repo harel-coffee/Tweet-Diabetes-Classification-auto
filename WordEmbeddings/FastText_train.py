@@ -89,11 +89,13 @@ if __name__ == '__main__':
 
             tweets = []
             for tweet in readFile(args.localFile, columns=args.localFileColumns, sep=args.localFileDelimiter)[args.dataColumnName].values:
-                try:
-                    tweets.append(prep.tokenize(tweet))
-                except:
-                    print("Weird")
-                    print(tweet)
+                # some tweets in the file reduced-tweets.parquet were None
+                if tweet is not None:
+                    try:
+                        tweets.append(prep.tokenize(tweet))
+                    except:
+                        print("Weird")
+                        print(tweet)
 
 
 
@@ -136,7 +138,6 @@ if __name__ == '__main__':
         print("ERROR: Provided mode : {} is not supported. Possible options (local, cluster) ".format(args.mode))
         sys.exit()
 
-    import ipdb; ipdb.set_trace()
 
 
     print("Train FastText...")
