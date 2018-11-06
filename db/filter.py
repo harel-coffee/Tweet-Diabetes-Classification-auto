@@ -44,6 +44,9 @@ from defines import Patterns
 load_library(op.join(basename, 'readWrite'))
 from readWrite import savePandasDFtoFile
 
+load_library(op.join(basename, 'readWrite'))
+from readWrite import savePandasDFtoFile, readFiles
+
 
 def add_field_to_collection(collection, URL_PATTERN=False, MENTION_PATTERN=False):
     """
@@ -375,12 +378,17 @@ if __name__ == '__main__':
 
         if args.localFile is not None:
             print("Local mode: Read file..")
-            raw_tweets = readFile(args.localFile, columns=args.localFileColumns, sep=args.localFileDelimiter)
-#            raw_tweets = pd.read_parquet(args.localParquetfile, engine="pyarrow")
+#             raw_tweets = readFile(args.localFile, columns=args.localFileColumns, sep=args.localFileDelimiter)
+# #            raw_tweets = pd.read_parquet(args.localParquetfile, engine="pyarrow")
+#
+#             filtered_df = filter_dataframe(raw_tweets, args.saveResultPath, args.configDict, language=args.lang,
+#                             withRetweets=args.withRetweets, withOriginalTweetOfRetweet=args.withOriginalTweetOfRetweet,
+#                             deleteDuplicates=True)
 
-            filtered_df = filter_dataframe(raw_tweets, args.saveResultPath, args.configDict, language=args.lang,
-                            withRetweets=args.withRetweets, withOriginalTweetOfRetweet=args.withOriginalTweetOfRetweet,
-                            deleteDuplicates=True)
+            filtered_df = filter_dataframe(readFile(args.localFile, columns=args.localFileColumns, sep=args.localFileDelimiter),
+                                        args.saveResultPath, args.configDict, language=args.lang,
+                                        withRetweets=args.withRetweets, withOriginalTweetOfRetweet=args.withOriginalTweetOfRetweet,
+                                        deleteDuplicates=True)
 
             saveFile(filtered_df, args.saveResultPath)
 
