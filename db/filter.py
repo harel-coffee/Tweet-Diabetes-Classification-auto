@@ -288,33 +288,29 @@ def addOriginalTweetsOfRetweets_df(retweets, tweets):
     # get original tweets from the retweets
     # Remark: The column 'retweet_count' contains -1, to be able to refer to the original tweets later
 
-    dict_col = {"lang" : retweets.lang.values,
-                "user_id" : retweets.retweeted_user_id.values ,
-                "user_name" : retweets.retweeted_user_name.values ,
-                "user_screen_name" : retweets.retweeted_user_screen_name.values ,
-                "user_location" : retweets.retweeted_user_location.values ,
-                "user_created_at" : retweets.retweeted_user_created_at.values ,
-                "user_favourites_count" : retweets.retweeted_user_favourites_count.values ,
-                "user_followers_count" : retweets.retweeted_user_followers_count.values,
-                "user_friends_count" : retweets.retweeted_user_friends_count.values ,
-                "user_tweets_count" : retweets.retweeted_user_tweet_count.values ,
-                "user_description" : retweets.retweeted_user_description.values ,
-                "user_time_zone" : retweets.retweeted_user_time_zone.values ,
-                "place_country" : retweets.retweeted_place_country.values ,
-                "place_name" : retweets.retweeted_place_name.values ,
-                "place_full_name" : retweets.retweeted_place_full_name.values ,
-                "place_country_code" : retweets.retweeted_place_country_code.values ,
-                "place_type" : retweets.retweeted_place_place_type.values ,
-                "tweet_longitude" : retweets.retweeted_tweet_longitude.values ,
-                "tweet_latitude" : retweets.retweeted_tweet_latitude.values ,
-                "text" : retweets.retweeted_text.values,
-                "retweet_count" : [-1 for i in range(len(retweets.lang.values))]
-               }
+    dict_col = {}
+    if "lang" in retweets.columns: dict_col["lang"] = retweets.lang.values
+    if "user_id" in retweets.columns: dict_col["user_id"] = retweets.retweeted_user_id.values
+    if "user_name" in retweets.columns: dict_col["user_name"] = retweets.retweeted_user_name.values
+    if "user_screen_name" in retweets.columns: dict_col["user_screen_name"] = retweets.retweeted_user_screen_name.values
+    if "user_location" in retweets.columns: dict_col["user_location"] = retweets.retweeted_user_location.values
+    if "user_created_at" in retweets.columns: dict_col["user_created_at"] = retweets.retweeted_user_created_at.values
+    if "user_favourites_count" in retweets.columns: dict_col["user_favourites_count"] = retweets.retweeted_user_favourites_count.values
+    if "user_followers_count" in retweets.columns: dict_col["user_followers_count"] = retweets.retweeted_user_followers_count.values
+    if "user_friends_count" in retweets.columns: dict_col["user_friends_count"] = retweets.retweeted_user_friends_count.values
+    if "user_tweets_count" in retweets.columns: dict_col["user_tweets_count"] = retweets.retweeted_user_tweet_count.values
+    if "user_description" in retweets.columns: dict_col["user_description"] = retweets.retweeted_user_description.values
+    if "user_time_zone" in retweets.columns: dict_col["user_time_zone"] = retweets.retweeted_user_time_zone.values
+    if "place_country" in retweets.columns: dict_col["place_country"] = retweets.retweeted_place_country.values
+    if "place_name" in retweets.columns: dict_col["place_name"] = retweets.retweeted_place_name.values
+    if "place_full_name" in retweets.columns: dict_col["place_full_name"] = retweets.retweeted_place_full_name.values
+    if "place_country_code" in retweets.columns: dict_col["place_country_code"] = retweets.retweeted_place_country_code.values
+    if "place_type" in retweets.columns: dict_col["place_type"] = retweets.retweeted_place_country_code.values
+    if "tweet_longitude" in retweets.columns: dict_col["tweet_longitude"] = retweets.retweeted_tweet_longitude.values
+    if "tweet_latitude" in retweets.columns: dict_col["tweet_latitude"] = retweets.retweeted_tweet_latitude.values
+    if "text" in retweets.columns: dict_col["text"] = retweets.retweeted_text.values
+    if "retweet_count" in retweets.columns: dict_col["retweet_count"] = [-1 for i in range(len(retweets.lang.values))]
 
-    # removes the key / value pairs of dict_col that do not occur in the provided data
-    for key, value in dict_col.items():
-        if key not in retweets.column:
-            dict_col.pop(key, None)
 
     originalTweets = pd.DataFrame(dict_col, columns=retweets.columns)
 
