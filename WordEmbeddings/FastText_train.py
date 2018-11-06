@@ -9,7 +9,6 @@ Date: 22-10-2018
 import argparse
 import pandas as pd
 from gensim.models import FastText
-from gensim.models.word2vec import LineSentence
 import multiprocessing
 import os.path as op
 import sys
@@ -145,7 +144,7 @@ if __name__ == '__main__':
     #
 
     print("Train FastText...")
-    model_ft = FastText(corpus_file=LineSentence(args.tempFile), size=args.vecDim, window=args.window, min_count=args.minCount,
+    model_ft = FastText(corpus_file=args.tempFile, size=args.vecDim, window=args.window, min_count=args.minCount,
                         workers=args.localWorkers ,sg=args.sg, hs=args.hs, iter=args.iter,
                         word_ngrams=args.word_ngrams, min_n=args.min_n, max_n=args.max_n,
                         seed=args.seed, alpha=args.alpha)
