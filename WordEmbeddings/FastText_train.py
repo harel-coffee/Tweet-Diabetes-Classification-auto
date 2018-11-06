@@ -28,9 +28,9 @@ from readWrite import savePandasDFtoFile, readFile
 
 
 
-def preprocessTweetsAndSave(args, tempFilePath, prep):
+def preprocessTweetsAndSave(args, prep):
 
-    with open(tempFilePath, "w") as f:
+    with open(args.tempFile, "w") as f:
         for tweet in readFile(args.localFile, columns=args.localFileColumns, sep=args.localFileDelimiter)[args.dataColumnName].values:
             # some tweets in the file reduced-tweets.parquet were None
             if tweet is not None:
@@ -100,7 +100,7 @@ if __name__ == '__main__':
         if args.localFile is not None:
 
             print("Write tokenized tweets to temporary file: {} ...".format(tempFilePath))
-            preprocessTweetsAndSave(args, tempFilePath, prep)
+            preprocessTweetsAndSave(args, prep)
             print("Write to temporary file finished")
 
         # Check if necessary arguments are given
