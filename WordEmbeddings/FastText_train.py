@@ -80,12 +80,21 @@ if __name__ == '__main__':
         # check from which source to read the data
         if args.localFile is not None:
             print("Local mode: Read file..")
-            raw_tweets = readFile(args.localFile, columns=args.localFileColumns, sep=args.localFileDelimiter)
+#            raw_tweets = readFile(args.localFile, columns=args.localFileColumns, sep=args.localFileDelimiter)
 
             print("Tokenize tweets..")
+#            tweets = []
+#            for tweet in raw_tweets[args.dataColumnName].values:
+#                tweets.append(prep.tokenize(tweet))
+
             tweets = []
-            for tweet in raw_tweets[args.dataColumnName].values:
-                tweets.append(prep.tokenize(tweet))
+            for tweet in readFile(args.localFile, columns=args.localFileColumns, sep=args.localFileDelimiter)[args.dataColumnName].values:
+                try:
+                    tweets.append(prep.tokenize(tweet))
+                except:
+                    print("Weird")
+                    print(tweet)
+
 
 
         # Check if necessary arguments are given
