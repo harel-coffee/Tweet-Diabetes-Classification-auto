@@ -39,7 +39,7 @@ def readFile(path, columns=None, sep=";"):
             print("INFO: Set HADOOP_HOME variable to: {}".format("/space/hadoop/hadoop_home"))
             os.environ["HADOOP_HOME"] = "/space/hadoop/hadoop_home"
 
-        return pd.read_parquet(path, engine="pyarrow", columns=None)
+        return pd.read_parquet(path, engine="pyarrow", columns=columns)
 
     else:
         print("ERROR: Unsupported format file. Allowed only .parquet or .csv files")
