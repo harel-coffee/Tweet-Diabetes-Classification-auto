@@ -32,6 +32,7 @@ def readFile(path, columns=None, sep=";"):
     if columns is not None:
         columns = [item.strip() for item in columns.split(',')]
 
+    print("Local mode: Read file..")
     if path.endswith(".csv"):
         return pd.read_csv(path, sep=args.localCSVDelimiter)
     elif path.endswith(".parquet"):

@@ -28,6 +28,23 @@ from readWrite import savePandasDFtoFile, readFile
 
 
 
+def preprocessTweetsAndSave(args, tempFilePath, prep):
+
+    with open(tempFilePath, "w") as f:
+        for tweet in readFile(args.localFile, columns=args.localFileColumns, sep=args.localFileDelimiter)[args.dataColumnName].values:
+            # some tweets in the file reduced-tweets.parquet were None
+            if tweet is not None:
+    #        tweets.append(prep.tokenize(tweet))
+                f.write(" ".join(prep.tokenize(tweet)))
+
+    f.close()
+
+
+
+
+
+
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description="Train FastText model to create word vectors. \
@@ -53,6 +70,7 @@ if __name__ == '__main__':
     parser.add_argument("-lfc", "--localFileColumns", help="String with column names")
     parser.add_argument("-cp", "--clusterPathData", help="Path to the data in cluster mode")
     parser.add_argument("-dcn", "--dataColumnName", help="If data stored in tabular form, gives the column of the desired text data (default='tweetText')", default="tweetText")
+    parser.add_argument("-tf", "--tempFile", help="Temporary file to write preprocessed tweets in and to read directly to FastText training", default="/space/Work/tmp/tmp.cor")
     parser.add_argument("--vecDim", help="Vector dimension of the word embedding (default=200)", default=200, type=int)
     parser.add_argument("--window", help="Maximum distance between the current and predicted word within a sentence (default=5)", default=5, type=int)
     parser.add_argument("--minCount", help="The model ignores all words with total frequency lower than this (default=1)", default=1, type=int)
@@ -77,27 +95,13 @@ if __name__ == '__main__':
     # get tweets
     if args.mode == "local":
 
+
         # check from which source to read the data
         if args.localFile is not None:
-            print("Local mode: Read file..")
-#            raw_tweets = readFile(args.localFile, columns=args.localFileColumns, sep=args.localFileDelimiter)
 
-            print("Tokenize tweets..")
-#            tweets = []
-#            for tweet in raw_tweets[args.dataColumnName].values:
-#                tweets.append(prep.tokenize(tweet))
-
-            tweets = []
-            for tweet in readFile(args.localFile, columns=args.localFileColumns, sep=args.localFileDelimiter)[args.dataColumnName].values:
-                # some tweets in the file reduced-tweets.parquet were None
-                if tweet is not None:
-                    try:
-                        tweets.append(prep.tokenize(tweet))
-                    except:
-                        print("Weird")
-                        print(tweet)
-
-
+            print("Write tokenized tweets to temporary file: {} ...".format(tempFilePath))
+            preprocessTweetsAndSave(args, tempFilePath, prep)
+            print("Write to temporary file finished")
 
         # Check if necessary arguments are given
         elif args.localMongoDatabase is None and args.localMongoCollection is None:
@@ -132,8 +136,6 @@ if __name__ == '__main__':
         for tweet in raw_tweets[args.dataColumnName].values:
             tweets.append(prep.tokenize(tweet))
 
-
-
     else:
         print("ERROR: Provided mode : {} is not supported. Possible options (local, cluster) ".format(args.mode))
         sys.exit()
@@ -141,7 +143,7 @@ if __name__ == '__main__':
 
 
     print("Train FastText...")
-    model_ft = FastText(tweets, size=args.vecDim, window=args.window, min_count=args.minCount,
+    model_ft = FastText(corpus_file=args.tempFile, size=args.vecDim, window=args.window, min_count=args.minCount,
                         workers=args.localWorkers ,sg=args.sg, hs=args.hs, iter=args.iter,
                         word_ngrams=args.word_ngrams, min_n=args.min_n, max_n=args.max_n,
                         seed=args.seed, alpha=args.alpha)
@@ -149,3 +151,6 @@ if __name__ == '__main__':
     print("Save model to disk...")
     #file_name = "Trained_FastText_{}.model".format(datetime.datetime.now().strftime(DATE_FORMAT))
     model_ft.save(args.savePath)
+
+    print("Delete temporary file {}".format(args.tempFile))
+    os.remove(args.tempFile)
