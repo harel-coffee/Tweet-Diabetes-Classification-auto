@@ -36,6 +36,7 @@ def preprocessTweetsAndSave(args, prep):
             # some tweets in the file reduced-tweets.parquet were None
             if tweet is not None:
     #        tweets.append(prep.tokenize(tweet))
+                tweet = prep.replace_hashtags_URL_USER(tweet, mode_URL="replace", mode_mentions="replace")
                 f.write(" ".join(prep.tokenize(tweet)))
 
     f.close()
@@ -73,8 +74,8 @@ if __name__ == '__main__':
     parser.add_argument("-dcn", "--dataColumnName", help="If data stored in tabular form, gives the column of the desired text data (default='tweetText')", default="tweetText")
     parser.add_argument("-tf", "--tempFile", help="Temporary file to write preprocessed tweets in and to read directly to FastText training", default="/space/Work/tmp/tmp.cor")
     parser.add_argument("--vecDim", help="Vector dimension of the word embedding (default=200)", default=200, type=int)
-    parser.add_argument("--window", help="Maximum distance between the current and predicted word within a sentence (default=5)", default=5)
-    parser.add_argument("--minCount", help="The model ignores all words with total frequency lower than this (default=1)", default=1)
+    parser.add_argument("--window", help="Maximum distance between the current and predicted word within a sentence (default=5)", default=5, type=int)
+    parser.add_argument("--minCount", help="The model ignores all words with total frequency lower than this (default=1)", default=1, type=int)
     parser.add_argument("--localWorkers", help="Number of worker threads to train the model (default=all possible cores of machine)", default=multiprocessing.cpu_count())
     parser.add_argument("--sg", help="Training algo: Skip-gram if sg=1, otherwise CBOW (default=1)", choices=[0,1], default=1)
     parser.add_argument("--hs", help="Hierarchical softmax used for training if hs=1, otherwise negative sampling (default=0)", choices=[0,1], default=0)
@@ -136,7 +137,7 @@ if __name__ == '__main__':
         tweets = []
         for tweet in raw_tweets[args.dataColumnName].values:
             tweets.append(prep.tokenize(tweet))
-    
+
     else:
         print("ERROR: Provided mode : {} is not supported. Possible options (local, cluster) ".format(args.mode))
         sys.exit()
