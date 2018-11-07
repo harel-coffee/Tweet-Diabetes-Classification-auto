@@ -320,7 +320,7 @@ def addOriginalTweetsOfRetweets_df(retweets, tweets):
     print("Lenght original tweets without duplicates:", len(originalTweets))
 
     # add original tweets (of the retweets) to the non-retweets
-    
+
     return tweets.append(originalTweets)
 
 
@@ -382,18 +382,14 @@ if __name__ == '__main__':
 
         if args.localFile is not None:
             print("Local mode: Read file..")
-#             raw_tweets = readFile(args.localFile, columns=args.localFileColumns, sep=args.localFileDelimiter)
-# #            raw_tweets = pd.read_parquet(args.localParquetfile, engine="pyarrow")
-#
-#             filtered_df = filter_dataframe(raw_tweets, args.saveResultPath, args.configDict, language=args.lang,
-#                             withRetweets=args.withRetweets, withOriginalTweetOfRetweet=args.withOriginalTweetOfRetweet,
-#                             deleteDuplicates=True)
+
 
             filtered_df = filter_dataframe(readFile(args.localFile, columns=args.localFileColumns, sep=args.localFileDelimiter),
                                         args.saveResultPath, args.configDict, language=args.lang,
                                         withRetweets=args.withRetweets, withOriginalTweetOfRetweet=args.withOriginalTweetOfRetweet,
                                         deleteDuplicates=True)
-            
+
+            print("Save result to {} ..".format(args.saveResultPath))
             savePandasDFtoFile(filtered_df, args.saveResultPath)
 
 
