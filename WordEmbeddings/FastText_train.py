@@ -37,7 +37,7 @@ def preprocessTweetsAndSave(args, prep):
             if tweet is not None:
     #        tweets.append(prep.tokenize(tweet))
                 tweet = prep.replace_hashtags_URL_USER(tweet, mode_URL="replace", mode_Mentions="replace")
-                f.write(" ".join(prep.tokenize(tweet)))
+                f.writeLine(" ".join(prep.tokenize(tweet)))
 
     f.close()
 
@@ -89,59 +89,59 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    #
-    # # Preprocessing class
-    # prep = Preprocess(lang="english")
-    #
-    #
-    # # get tweets
-    # if args.mode == "local":
-    #
-    #
-    #     # check from which source to read the data
-    #     if args.localFile is not None:
-    #
-    #         print("Write tokenized tweets to temporary file: {} ...".format(args.tempFile))
-    #         preprocessTweetsAndSave(args, prep)
-    #         print("Write to temporary file finished")
-    #
-    #     # Check if necessary arguments are given
-    #     elif args.localMongoDatabase is None and args.localMongoCollection is None:
-    #         sys.stderr.write("ERROR: A MongoDB database and collection need to be provided to extract the data")
-    #         sys.exit(1)
-    #
-    #     else:
-    #         print("Local mode: Connect to MongoDB collection..")
-    #         from mongoDB_utils import connect_to_database
-    #
-    #         client = connect_to_database()
-    #         db = client[args.localMongoDatabase]
-    #         collection = db[args.localMongoCollection]
-    #
-    #         print("Tokenize tweets..")
-    #         tweets = []
-    #         for tweet in collection.find():
-    #             tweets.append(prep.tokenize(tweet))
-    #
-    # elif args.mode == "cluster":
-    #
-    #     # Check if necessary arguments are given
-    #     if args.clusterPathData is None:
-    #         sys.stderr.write("ERROR: A path to file containing the data needs to be provided")
-    #         sys.exit(1)
-    #
-    #     print("Cluster mode: Read parquet files..")
-    #     raw_tweets = readFile(args.localFile, columns=args.localFileColumns, sep=args.localFileDelimiter)
-    #
-    #     print("Tokenize tweets..")
-    #     tweets = []
-    #     for tweet in raw_tweets[args.dataColumnName].values:
-    #         tweets.append(prep.tokenize(tweet))
-    #
-    # else:
-    #     print("ERROR: Provided mode : {} is not supported. Possible options (local, cluster) ".format(args.mode))
-    #     sys.exit()
-    # 
+
+    # Preprocessing class
+    prep = Preprocess(lang="english")
+
+
+    # get tweets
+    if args.mode == "local":
+
+
+        # check from which source to read the data
+        if args.localFile is not None:
+
+            print("Write tokenized tweets to temporary file: {} ...".format(args.tempFile))
+            preprocessTweetsAndSave(args, prep)
+            print("Write to temporary file finished")
+
+        # Check if necessary arguments are given
+        elif args.localMongoDatabase is None and args.localMongoCollection is None:
+            sys.stderr.write("ERROR: A MongoDB database and collection need to be provided to extract the data")
+            sys.exit(1)
+
+        else:
+            print("Local mode: Connect to MongoDB collection..")
+            from mongoDB_utils import connect_to_database
+
+            client = connect_to_database()
+            db = client[args.localMongoDatabase]
+            collection = db[args.localMongoCollection]
+
+            print("Tokenize tweets..")
+            tweets = []
+            for tweet in collection.find():
+                tweets.append(prep.tokenize(tweet))
+
+    elif args.mode == "cluster":
+
+        # Check if necessary arguments are given
+        if args.clusterPathData is None:
+            sys.stderr.write("ERROR: A path to file containing the data needs to be provided")
+            sys.exit(1)
+
+        print("Cluster mode: Read parquet files..")
+        raw_tweets = readFile(args.localFile, columns=args.localFileColumns, sep=args.localFileDelimiter)
+
+        print("Tokenize tweets..")
+        tweets = []
+        for tweet in raw_tweets[args.dataColumnName].values:
+            tweets.append(prep.tokenize(tweet))
+
+    else:
+        print("ERROR: Provided mode : {} is not supported. Possible options (local, cluster) ".format(args.mode))
+        sys.exit()
+    
 
 
     print("Train FastText...")
