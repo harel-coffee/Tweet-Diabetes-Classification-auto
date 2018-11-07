@@ -37,7 +37,7 @@ def preprocessTweetsAndSave(args, prep):
             if tweet is not None:
     #        tweets.append(prep.tokenize(tweet))
                 tweet = prep.replace_hashtags_URL_USER(tweet, mode_URL="replace", mode_Mentions="replace")
-                f.writeLine(" ".join(prep.tokenize(tweet)))
+                f.write((" ".join(prep.tokenize(tweet)))+"\n")
 
     f.close()
 
@@ -141,7 +141,7 @@ if __name__ == '__main__':
     else:
         print("ERROR: Provided mode : {} is not supported. Possible options (local, cluster) ".format(args.mode))
         sys.exit()
-    
+
 
 
     print("Train FastText...")
