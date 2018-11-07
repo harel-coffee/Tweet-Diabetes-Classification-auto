@@ -12,6 +12,7 @@ from gensim.models import FastText
 import multiprocessing
 import os.path as op
 import sys
+import os
 
 
 # add path to utils module to python path
@@ -141,7 +142,7 @@ if __name__ == '__main__':
     else:
         print("ERROR: Provided mode : {} is not supported. Possible options (local, cluster) ".format(args.mode))
         sys.exit()
-
+    
 
 
     print("Train FastText...")
