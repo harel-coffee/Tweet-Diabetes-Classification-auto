@@ -87,6 +87,18 @@ ColumnNames = {
 Assuming in your dataframe the column containing the tweet text is called "tweetText",
 pass -cD '{"text":"tweetText"}'
 
+Sample call:
+python filter.py -m "local" -fn  "hdfs://bgdta1-demy:8020/pathToProject"
+                 -lfc "id, lang, text, user_screen_name, user_followers_count, user_friends_count,
+                       user_location, user_description, user_tweets_count, place_country,
+                       place_full_name,tweet_longitude, tweet_latitude, user_id, retweeted_user_id,
+                       retweeted_user_screen_name, retweeted_user_followers_count,
+                       retweeted_user_friends_count, retweeted_user_tweet_count,
+                       retweeted_user_location, retweeted_user_description, retweeted_place_country,
+                       retweeted_place_full_name, retweeted_tweet_longitude, retweeted_tweet_latitude,
+                       retweeted_text, is_retweet, posted_month"
+                  -s "/space/Work/spark/matching-tweets_diabetes_noRetweetsDuplicates.parquet"
+                  -wr "False" -wo "True" -cD '{"retweeted_text":"retweeted_text"}'
 
 
 ## english_noRetweets_tweets.py
