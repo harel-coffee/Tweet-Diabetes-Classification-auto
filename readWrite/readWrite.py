@@ -35,7 +35,8 @@ def readFile(path, columns=None, sep=";"):
     print("Local mode: Read file..")
     if path.endswith(".csv"):
         return pd.read_csv(path, sep=args.localCSVDelimiter)
-    elif path.endswith(".parquet"):
+#    elif path.endswith(".parquet"):
+    elif ".parquet" in path:
         if path.startswith("hdfs"):
             print("INFO: Set HADOOP_HOME variable to: {}".format("/space/hadoop/hadoop_home"))
             os.environ["HADOOP_HOME"] = "/space/hadoop/hadoop_home"

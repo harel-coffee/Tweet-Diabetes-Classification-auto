@@ -42,9 +42,6 @@ from defines import ColumnNames as cn
 from defines import Patterns
 
 load_library(op.join(basename, 'readWrite'))
-from readWrite import savePandasDFtoFile
-
-load_library(op.join(basename, 'readWrite'))
 from readWrite import savePandasDFtoFile, readFile
 
 
@@ -227,29 +224,30 @@ def filter_dataframe(raw_tweets, filtered_tweets, configDict, language='en', wit
           - deleteDuplicates : - True : delete duplicates
                                - False : keep duplicates
     """
+    print("Number raw tweets:", len(raw_tweets))
 
     lang = getTweetColumnName("lang", configDict)
 
     if withRetweets:
         tweets = raw_tweets.loc[raw_tweets[lang] == language] # filter by language
-        print("len(withRetweets):", len(tweets))
+        print("Number tweets (with retweets) filtered by language {}:".format(lang), len(tweets))
 
     # filter out retweets
     else:
         retweeted_text = getTweetColumnName("retweeted_text", configDict)
         print("INFO: Get non-retweets..")
         tweets = raw_tweets.loc[(raw_tweets[lang].values == language) & (raw_tweets[retweeted_text].values == None)] # filter by language and retweet
-        print("len(noRetweets):", len(tweets))
+        print("Number tweets (no retweets) filtered by language {}:".format(lang), len(tweets))
 
         # add original tweets of retweets
         if withOriginalTweetOfRetweet:
             print("INFO: Get retweets..")
             retweets = raw_tweets.loc[(raw_tweets[lang].values == language) & (raw_tweets[retweeted_text].values != None)]
-            print("len(Retweets):", len(retweets))
+            print("Number retweets :", len(retweets))
 
             print("INFO: Add original tweets of retweets..")
             tweets = addOriginalTweetsOfRetweets_df(retweets, tweets)
-            print("len(notweets+originalRetweets):", len(tweets))
+            print("Number of tweets (noRetweets + original tweets of retweets):", len(tweets))
 
 
     if deleteDuplicates:
@@ -263,8 +261,9 @@ def filter_dataframe(raw_tweets, filtered_tweets, configDict, language='en', wit
 
         # delete temporary created column
         tweets.drop("tweet_URL_USER", axis=1)
-        print("len(noduplicates):", len(tweets))
+        print("Number tweets without duplicates:", len(tweets))
 
+    print("Number tweets cleaned total:", len(tweets))
     return tweets
 
 
@@ -310,18 +309,18 @@ def addOriginalTweetsOfRetweets_df(retweets, tweets):
     if "tweet_latitude" in retweets.columns: dict_col["tweet_latitude"] = retweets.retweeted_tweet_latitude.values
     if "text" in retweets.columns: dict_col["text"] = retweets.retweeted_text.values
     if "retweet_count" in retweets.columns: dict_col["retweet_count"] = [-1 for i in range(len(retweets.lang.values))]
-
+    if "is_retweet" in retweets.columns: dict_col["is_retweet"] = [False for i in range(len(retweets.lang.values))]
 
     originalTweets = pd.DataFrame(dict_col, columns=retweets.columns)
 
     print("Lenght original tweets:", len(originalTweets))
 
-    import ipdb; ipdb.set_trace()
     # delete duplicates: when a tweet was retweeted several times, keep only one original tweet
     originalTweets.drop_duplicates(subset=["text","user_screen_name"], keep='first', inplace=True)
     print("Lenght original tweets without duplicates:", len(originalTweets))
 
     # add original tweets (of the retweets) to the non-retweets
+    
     return tweets.append(originalTweets)
 
 
@@ -394,8 +393,8 @@ if __name__ == '__main__':
                                         args.saveResultPath, args.configDict, language=args.lang,
                                         withRetweets=args.withRetweets, withOriginalTweetOfRetweet=args.withOriginalTweetOfRetweet,
                                         deleteDuplicates=True)
-
-            saveFile(filtered_df, args.saveResultPath)
+            
+            savePandasDFtoFile(filtered_df, args.saveResultPath)
 
 
 
@@ -437,4 +436,5 @@ if __name__ == '__main__':
                                     withRetweets=args.withRetweets, withOriginalTweetOfRetweet=args.withOriginalTweetOfRetweet,
                                     deleteDuplicates=True)
 
+        print("Save result to {} ..".format(args.saveResultPath))
         savePandasDFtoFile(filtered_df, args.saveResultPath)
