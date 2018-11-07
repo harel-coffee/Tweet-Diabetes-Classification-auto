@@ -12,6 +12,9 @@ from gensim.models import Word2Vec, KeyedVectors
 import multiprocessing
 import os.path as op
 import sys
+import os
+
+
 # add path to utils module to python path
 basename = op.split(op.dirname(op.realpath(__file__)))[0]
 path_utils = op.join(basename , "utils")
@@ -27,7 +30,17 @@ from readWrite import savePandasDFtoFile, readFile
 
 
 
+def preprocessTweetsAndSave(args, prep):
 
+    with open(args.tempFile, "w") as f:
+        for tweet in readFile(args.filename, columns=args.filenameColumns, sep=args.filenameDelimiter)[args.dataColumnName].values:
+            # some tweets in the file reduced-tweets.parquet were None
+            if tweet is not None:
+    #        tweets.append(prep.tokenize(tweet))
+                tweet = prep.replace_hashtags_URL_USER(tweet, mode_URL="replace", mode_Mentions="replace")
+                f.write((" ".join(prep.tokenize(tweet)))+"\n")
+
+    f.close()
 
 
 
@@ -54,11 +67,12 @@ if __name__ == '__main__':
     parser.add_argument("-lp", "--localMongoPort", help="Port to connect to MongoDB (default=27017)", default="27017")
     parser.add_argument("-ldb", "--localMongoDatabase", help="MongoDB database to connect to")
     parser.add_argument("-lc", "--localMongoCollection", help="MongoDB collection (table) in which data is stored")
-    parser.add_argument("-lf", "--localFile", help="Path to the data file")
-    parser.add_argument("-lfd", "--localFileDelimiter", help="Delimiter used in file (default=',')", default=",")
-    parser.add_argument("-lfc", "--localFileColumns", help="String with column names")
+    parser.add_argument("-lf", "--filename", help="Path to the data file")
+    parser.add_argument("-lfd", "--filenameDelimiter", help="Delimiter used in file (default=',')", default=",")
+    parser.add_argument("-lfc", "--filenameColumns", help="String with column names")
     parser.add_argument("-cp", "--clusterPathData", help="Path to the data in cluster mode")
     parser.add_argument("-dcn", "--dataColumnName", help="If data stored in tabular form, gives the column of the desired text data (default='tweetText')", default="tweetText")
+    parser.add_argument("-tf", "--tempFile", help="Temporary file to write preprocessed tweets in and to read directly to FastText training", default="/space/Work/tmp/tmp.cor")
     parser.add_argument("--vecDim", help="Vector dimension of the word embedding (default=200)", default=200, type=int)
     parser.add_argument("--window", help="Maximum distance between the current and predicted word within a sentence (default=5)", default=5, type=int)
     parser.add_argument("--minCount", help="The model ignores all words with total frequency lower than this (default=1)", default=1, type=int)
@@ -82,14 +96,11 @@ if __name__ == '__main__':
 
 
         # check from which source to read the data
-        if args.localFile is not None:
-            print("Local mode: Read file..")
-            raw_tweets = readFile(args.localFile, columns=args.localFileColumns, sep=args.localFileDelimiter)
+        if args.filename is not None:
 
-            print("Tokenize tweets..")
-            tweets = []
-            for tweet in raw_tweets[args.dataColumnName].values:
-                tweets.append(prep.tokenize(tweet))
+            print("Write tokenized tweets to temporary file: {} ...".format(args.tempFile))
+            preprocessTweetsAndSave(args, prep)
+            print("Writing temporary file finished")
 
 
         # Check if necessary arguments are given for MongoDB
@@ -112,18 +123,17 @@ if __name__ == '__main__':
     elif args.mode == "cluster":
 
         # Check if necessary arguments are given
-        if args.clusterPathData is None:
+        if args.filename is None:
             sys.stderr.write("A path to file containing the data needs to be provided")
             sys.exit(1)
 
         print("Cluster mode: Read parquet files..")
-        raw_tweets = readFile(args.localFile, columns=args.localFileColumns, sep=args.localFileDelimiter)
+        raw_tweets = readFile(args.filename, columns=args.filenameColumns, sep=args.filenameDelimiter)
 
         print("Tokenize tweets..")
         tweets = []
         for tweet in raw_tweets[args.dataColumnName].values:
             tweets.append(prep.tokenize(tweet))
-
 
 
     else:
@@ -142,3 +152,6 @@ if __name__ == '__main__':
     print("Save model to disk...")
     #file_name = "Trained_Word2Vec_{}.model".format(datetime.datetime.now().strftime(DATE_FORMAT))
     model_w2v.save(args.savePath)
+
+    print("Delete temporary file {}".format(args.tempFile))
+    os.remove(args.tempFile)

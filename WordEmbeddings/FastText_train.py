@@ -33,7 +33,7 @@ from readWrite import savePandasDFtoFile, readFile
 def preprocessTweetsAndSave(args, prep):
 
     with open(args.tempFile, "w") as f:
-        for tweet in readFile(args.localFile, columns=args.localFileColumns, sep=args.localFileDelimiter)[args.dataColumnName].values:
+        for tweet in readFile(args.filename, columns=args.filenameColumns, sep=args.filenameDelimiter)[args.dataColumnName].values:
             # some tweets in the file reduced-tweets.parquet were None
             if tweet is not None:
     #        tweets.append(prep.tokenize(tweet))
@@ -41,8 +41,6 @@ def preprocessTweetsAndSave(args, prep):
                 f.write((" ".join(prep.tokenize(tweet)))+"\n")
 
     f.close()
-
-
 
 
 
@@ -62,16 +60,15 @@ if __name__ == '__main__':
                                                                         -lc "en_noRetweets" \
                                                                         --iter 50 \
                                                                         --alpha 0.05 \
-                                                                        -lpar "hdfs://bgdta1-demy:8020/data/twitter/track-analyse/reduced-tweets.parquet" ')
+                                                                        -fn "hdfs://bgdta1-demy:8020/data/twitter/track-analyse/reduced-tweets.parquet" ')
     parser.add_argument("-m", "--mode", help="Mode of execution (default=local)", choices=["local", "cluster"], required=True, default="local")
     parser.add_argument("-lh", "--localMongoHost", help="Host to connect to MongoDB (default=localhost)", default="localhost")
     parser.add_argument("-lp", "--localMongoPort", help="Port to connect to MongoDB (default=27017)", default="27017")
     parser.add_argument("-ldb", "--localMongoDatabase", help="MongoDB database to connect to")
     parser.add_argument("-lc", "--localMongoCollection", help="MongoDB collection (table) in which data is stored")
-    parser.add_argument("-lf", "--localFile", help="Path to the data file")
-    parser.add_argument("-lfd", "--localFileDelimiter", help="Delimiter used in file (default=',')", default=",")
-    parser.add_argument("-lfc", "--localFileColumns", help="String with column names")
-    parser.add_argument("-cp", "--clusterPathData", help="Path to the data in cluster mode")
+    parser.add_argument("-fn", "--filename", help="Path to the data file")
+    parser.add_argument("-lfd", "--filenameDelimiter", help="Delimiter used in file (default=',')", default=",")
+    parser.add_argument("-lfc", "--filenameColumns", help="String with column names")
     parser.add_argument("-dcn", "--dataColumnName", help="If data stored in tabular form, gives the column of the desired text data (default='tweetText')", default="tweetText")
     parser.add_argument("-tf", "--tempFile", help="Temporary file to write preprocessed tweets in and to read directly to FastText training", default="/space/Work/tmp/tmp.cor")
     parser.add_argument("--vecDim", help="Vector dimension of the word embedding (default=200)", default=200, type=int)
@@ -100,11 +97,11 @@ if __name__ == '__main__':
 
 
         # check from which source to read the data
-        if args.localFile is not None:
+        if args.filename is not None:
 
             print("Write tokenized tweets to temporary file: {} ...".format(args.tempFile))
             preprocessTweetsAndSave(args, prep)
-            print("Write to temporary file finished")
+            print("Writing temporary file finished")
 
         # Check if necessary arguments are given
         elif args.localMongoDatabase is None and args.localMongoCollection is None:
@@ -127,12 +124,12 @@ if __name__ == '__main__':
     elif args.mode == "cluster":
 
         # Check if necessary arguments are given
-        if args.clusterPathData is None:
+        if args.filename is None:
             sys.stderr.write("ERROR: A path to file containing the data needs to be provided")
             sys.exit(1)
 
         print("Cluster mode: Read parquet files..")
-        raw_tweets = readFile(args.localFile, columns=args.localFileColumns, sep=args.localFileDelimiter)
+        raw_tweets = readFile(args.filename, columns=args.filenameColumns, sep=args.filenameDelimiter)
 
         print("Tokenize tweets..")
         tweets = []
@@ -142,7 +139,7 @@ if __name__ == '__main__':
     else:
         print("ERROR: Provided mode : {} is not supported. Possible options (local, cluster) ".format(args.mode))
         sys.exit()
-    
+
 
 
     print("Train FastText...")

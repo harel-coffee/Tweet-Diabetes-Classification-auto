@@ -6,27 +6,28 @@ gensim package:
 - FastText (uses subword information by taking n-grams into consideration)
 
 This can be done in two modes:
-- local mode:
-  - load parquet file, provide flag:
-    - localParquetfile -lpar
+- local mode (-m "local"):
+  - Load data
+    - from .parquet or .csv to pandas DF (-lf "pathToFile.parquet")
+      - Flags:
+        - Load only specific columns: --localFileColumns -lfc (-lfc "text, user_name")
+        - Specifies column name of text data, default "tweetText": --dataColumnName -dcn (-dcn "text")
+
+    - from MongoDB collection, provide flags:
+      - localMongoHost -lh
+      - localMongoPort -lp
+      - localMongoDatabase -ldb
+      - localMongoCollection -lc
+
+- cluster mode (-m "cluster"):
+  - load parquet file, provide flag (-lf "hdfs://machine:8888/pathToFile.parquet"):
     - dataColumnName -dcn : column in the dataframe containing the text data (default="tweetText")
 
-  - load csv file, provide flags:
-    - localCSV -lcsv
-    - localCSVDelimiter -lcsvS
-    - dataColumnName -dcn : column in the dataframe containing the text data (default="tweetText")
 
-  - load mongoDB collection, provide flags:
-    - localMongoHost -lh
-    - localMongoPort -lp
-    - localMongoDatabase -ldb
-    - localMongoCollection -lc
-
-- cluster mode:
-  - load parquet file, provide flag:
-    - clusterPathData -cp
-    - dataColumnName -dcn : column in the dataframe containing the text data (default="tweetText")
-
+After loading the data:
+- Preprocesses tweets and stores tweet line by line in a temporary file
+  (from which the Word2Vec / FastText algorithm can read the data)
+  - Path to temporary file (-tf "path")
 
 Provide a path to which the trained model will be stored via the -s flag
 
@@ -52,4 +53,4 @@ Additionally you can specify:
 
 
 ## Example call
-python FastText_train.py --mode "local" -s "TESTPATH" -lcsv '/home/test.csv' -lcsvS ";" --iter=20
+python FastText_train.py -m "local" -fn "hdfs://machinename:8888/tweets.parquet" -lfc "text" -dcn "text" -s "/space/Work/spark/FastText_model/ft_wordembeddings_07112018.parquet" --minCount 1 --iter 50
