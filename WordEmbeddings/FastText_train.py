@@ -89,7 +89,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-
+"""
     # Preprocessing class
     prep = Preprocess(lang="english")
 
@@ -141,7 +141,7 @@ if __name__ == '__main__':
     else:
         print("ERROR: Provided mode : {} is not supported. Possible options (local, cluster) ".format(args.mode))
         sys.exit()
-
+"""
 
 
     print("Train FastText...")
