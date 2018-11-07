@@ -12,6 +12,7 @@ from gensim.models import FastText
 import multiprocessing
 import os.path as op
 import sys
+import os
 
 
 # add path to utils module to python path
