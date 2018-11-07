@@ -36,7 +36,7 @@ def preprocessTweetsAndSave(args, prep):
             # some tweets in the file reduced-tweets.parquet were None
             if tweet is not None:
     #        tweets.append(prep.tokenize(tweet))
-                tweet = prep.replace_hashtags_URL_USER(tweet, mode_URL="replace", mode_mentions="replace")
+                tweet = prep.replace_hashtags_URL_USER(tweet, mode_URL="replace", mode_Mentions="replace")
                 f.write(" ".join(prep.tokenize(tweet)))
 
     f.close()
