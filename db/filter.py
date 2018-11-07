@@ -316,6 +316,7 @@ def addOriginalTweetsOfRetweets_df(retweets, tweets):
 
     print("Lenght original tweets:", len(originalTweets))
 
+    import ipdb; ipdb.set_trace()
     # delete duplicates: when a tweet was retweeted several times, keep only one original tweet
     originalTweets.drop_duplicates(subset=["text","user_screen_name"], keep='first', inplace=True)
     print("Lenght original tweets without duplicates:", len(originalTweets))
