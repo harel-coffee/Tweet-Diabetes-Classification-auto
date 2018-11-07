@@ -346,9 +346,20 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description="Filter tweets by language ",
                                      epilog='Example usage in local mode : \
-                                             python filter_language.py -m "local" --lang "en" \
-                                             --configDict {"lang":"language", "retweeted_text": "retweeted_status.text"} \
-                                            ')
+                                             python filter.py -m "local" -lf "hdfs://bgdta1-demy:8020/data/twitter/track-analyse/matching-tweets.parquet/Project=Diabetes" \
+                                             -lfc "id, lang, text, user_screen_name, user_followers_count, \
+                                              user_friends_count, user_location, user_description, user_tweets_count, \
+                                              place_country, place_full_name,tweet_longitude, tweet_latitude, user_id, \
+                                              retweeted_user_id, retweeted_user_screen_name, retweeted_user_followers_count, \
+                                              retweeted_user_friends_count, retweeted_user_tweet_count, retweeted_user_location,\
+                                              retweeted_user_description, retweeted_place_country, retweeted_place_full_name, \
+                                              retweeted_tweet_longitude, retweeted_tweet_latitude, retweeted_text, is_retweet, posted_month" \
+                                              -s "/space/Work/spark/matching-tweets_diabetes_noRetweetsDuplicates.parquet" \
+                                              -wr "False" -wo "True" -cD {"retweeted_text":"retweeted_text"} \
+                                              ')
+
+
+
     parser.add_argument("-m", "--mode", help="Mode of execution (default=local)", choices=["local", "cluster"], required=True, default="local")
     parser.add_argument("--lang", help="Language to filter the tweets", default="en", choices=["en", "fr", "es"])
     parser.add_argument("-lh", "--localMongoHost", help="Host to connect to MongoDB (default=localhost)", default="localhost")
