@@ -8,7 +8,7 @@ gensim package:
 This can be done in two modes:
 - local mode (-m "local"):
   - Load data
-    - from .parquet or .csv to pandas DF (-lf "pathToFile.parquet")
+    - from .parquet or .csv to pandas DF (-fn "pathToFile.parquet")
       - Flags:
         - Load only specific columns: --localFileColumns -lfc (-lfc "text, user_name")
         - Specifies column name of text data, default "tweetText": --dataColumnName -dcn (-dcn "text")
@@ -20,7 +20,7 @@ This can be done in two modes:
       - localMongoCollection -lc
 
 - cluster mode (-m "cluster"):
-  - load parquet file, provide flag (-lf "hdfs://machine:8888/pathToFile.parquet"):
+  - load parquet file from hdfs, provide flag (-fn "hdfs://machine:8888/pathToFile.parquet"):
     - dataColumnName -dcn : column in the dataframe containing the text data (default="tweetText")
 
 

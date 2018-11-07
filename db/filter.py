@@ -367,11 +367,9 @@ if __name__ == '__main__':
     parser.add_argument("-ldb", "--localMongoDatabase", help="MongoDB database to connect to")
     parser.add_argument("-lc", "--localMongoCollection", help="MongoDB collection (table) in which data is stored")
     parser.add_argument("-lcr", "--localMongoCollectionResult", help="New name of MongoDB collection in which filtered data is stored")
-    parser.add_argument("-lf", "--localFile", help="Path to the data file")
-    parser.add_argument("-lfd", "--localFileDelimiter", help="Delimiter used in file (default=',')", default=",")
-    parser.add_argument("-lfc", "--localFileColumns", help="String with column names")
-    parser.add_argument("-cp", "--clusterPathData", help="Path to the data in cluster mode")
-#    parser.add_argument("-dcn", "--dataColumnName", help="If data stored in tabular form, gives the column of the desired text data (default='tweetText')", default="tweetText")
+    parser.add_argument("-lf", "--filename", help="Path to the data file")
+    parser.add_argument("-lfd", "--filenameDelimiter", help="Delimiter used in file (default=',')", default=",")
+    parser.add_argument("-lfc", "--filenameColumns", help="String with column names")
     parser.add_argument("-s", "--saveResultPath", help="Path name where result should be stored")
     parser.add_argument("-wr", "--withRetweets", help="Keep retweets or filter out", choices=(True,False), default=False, type=strInput2bool, nargs='?', const=True)
     parser.add_argument("-wo", "--withOriginalTweetOfRetweet", help="Add original tweets of retweets", choices=(True,False), default=True, type=strInput2bool, nargs='?', const=True)
@@ -391,11 +389,11 @@ if __name__ == '__main__':
 
         # check from which source to read the data
 
-        if args.localFile is not None:
+        if args.filename is not None:
             print("Local mode: Read file..")
 
 
-            filtered_df = filter_dataframe(readFile(args.localFile, columns=args.localFileColumns, sep=args.localFileDelimiter),
+            filtered_df = filter_dataframe(readFile(args.filename, columns=args.filenameColumns, sep=args.filenameDelimiter),
                                         args.saveResultPath, args.configDict, language=args.lang,
                                         withRetweets=args.withRetweets, withOriginalTweetOfRetweet=args.withOriginalTweetOfRetweet,
                                         deleteDuplicates=True)
