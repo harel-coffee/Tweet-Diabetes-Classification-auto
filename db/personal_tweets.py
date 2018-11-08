@@ -20,8 +20,18 @@ import sys
 from sklearn.externals import joblib
 from gensim.models import FastText
 
-from ..readWrite.readWrite import savePandasDFtoFile
-from ..preprocess.preprocess import Preprocess
+# add path to utils module to python path
+basename = op.split(op.dirname(op.realpath(__file__)))[0]
+path_utils = op.join(basename , "utils")
+sys.path.insert(0, path_utils)
+
+from sys_utils import load_library
+
+load_library(op.join(basename, 'readWrite'))
+load_library(op.join(basename, 'preprocess'))
+from preprocess import Preprocess
+from readWrite import savePandasDFtoFile, readFile
+
 
 prep = Preprocess()
 
@@ -53,8 +63,8 @@ def get_personal_tweets(tweets, model_tweet_classif, wordEmbedding, textColumn="
         Remark: A personal user can tweet personal and institutional!
     """
 
-    return tweets[tweets[textColumn]
-                .apply(lambda x: model_tweet_classif
+    return tweets[tweets[textColumn] \
+                .apply(lambda x: model_tweet_classif \
                             .predict(tweet_vectorizer(preprocess_tweet(tweet), wordEmbedding).reshape(1, -1)) == 1)]
 
 
@@ -75,7 +85,7 @@ if __name__ == '__main__':
     parser.add_argument("-pwe", "--pathWordEmbedding", help="Path to the word embeddings", required=True)
     parser.add_argument("-pdata", "--pathData", help="Path to the data to classify", required=True)
     parser.add_argument("-sm", "--scorePersonalMinimum", help="Minimum mean-score [0,1] over all tweets per user. \
-                                                                Users are excluded with a mean score less than the provided one. Default=0.25", default=0.25)
+                                                                Users are excluded with a mean score less than the provided one. Default=0.25", default=0.25, type=int)
     parser.add_argument("-s", "--pathSave", help="Path to save personal database to (.parquet or .csv)")
     parser.add_argument("-tn", "--columnNameTextData", help="Column name of the text data", default="tweet")
 
@@ -92,7 +102,7 @@ if __name__ == '__main__':
     wordEmbedding = FastText.load(args.pathWordEmbedding)
 
     print("Load data..")
-    tweets = pd.read_parquet(args.pathData, engine="pyarrow")
+    tweets = readFile(args.pathData, engine="pyarrow")
 
     print("Classify all tweets of an user and exclude all users with a mean score < {} ...".format(scorePersonalMinimum))
     tweets_user_pers = score_users(tweets, model_user_classif, wordEmbedding, score_personal_minimum=args.scorePersonalMinimum, textColumn=args.columnNameTextData)
