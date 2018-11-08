@@ -35,12 +35,14 @@ def score_users(tweets, model_user_classif, wordEmbedding, score_personal_minimu
         as institutions. The score is the mean over the classification result of
         all tweets of a user, where the a personal user : 1 and a institution : 0
     """
-
+    print("Number raw tweets:", len(tweets))
     tweets_user_pers = tweets.groupby(by="user_name")
                              .filter(lambda userTweets: np.mean([model_user_classif.predict(
                                                                  tweet_vectorizer(preprocess_tweet(tweet), wordEmbedding).reshape(1, -1))
                                                                  for tweet in userTweets[textColumn].values]) >= score_personal_minimum)
 
+    print("Number tweets with personal users (user-score > {}): {}".format(score_personal_minimum, len(tweets_user_pers)))
+    print(tweets_user_pers.head())
     return tweets_user_pers
 
 
@@ -51,7 +53,9 @@ def get_personal_tweets(tweets, model_tweet_classif, wordEmbedding, textColumn="
         Remark: A personal user can tweet personal and institutional!
     """
 
-    return tweets[tweets[textColumn].apply(lambda x: model_tweet_classif.predict(tweet_vectorizer(preprocess_tweet(tweet), wordEmbedding).reshape(1, -1)) == 1)]
+    return tweets[tweets[textColumn]
+                .apply(lambda x: model_tweet_classif
+                            .predict(tweet_vectorizer(preprocess_tweet(tweet), wordEmbedding).reshape(1, -1)) == 1)]
 
 
 
@@ -95,6 +99,8 @@ if __name__ == '__main__':
 
     print("Classify only personal tweets of personal users..")
     tweets_personal = get_personal_tweets(tweets, model_tweet_classif, wordEmbedding, textColumn="tweet")
+    print("Number personal tweets:", len(tweets_personal))
+    print(tweets_personal.head())
 
     print("Save personal tweets to file {}  ...".args.pathSave)
     savePandasDFtoFile(tweets_personal, args.pathSave)
