@@ -28,11 +28,13 @@ path_utils = op.join(basename , "utils")
 sys.path.insert(0, path_utils)
 
 from sys_utils import load_library
+from tweet_utils import tweet_vectorizer
 
 load_library(op.join(basename, 'readWrite'))
 load_library(op.join(basename, 'preprocess'))
 from preprocess import Preprocess
 from readWrite import savePandasDFtoFile, readFile
+
 
 
 prep = Preprocess()
