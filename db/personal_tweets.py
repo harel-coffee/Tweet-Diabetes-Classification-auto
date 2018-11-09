@@ -105,7 +105,7 @@ if __name__ == '__main__':
     print("Load data..")
     tweets = readFile(args.pathData)
 
-    print("Classify all tweets of an user and exclude all users with a mean score < {} ...".format(scorePersonalMinimum))
+    print("Classify all tweets of an user and exclude all users with a mean score < {} ...".format(args.scorePersonalMinimum))
     tweets_user_pers = score_users(tweets, model_user_classif, wordEmbedding, score_personal_minimum=args.scorePersonalMinimum, textColumn=args.columnNameTextData)
 
     print("Classify only personal tweets of personal users..")
