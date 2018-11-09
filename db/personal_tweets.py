@@ -41,7 +41,7 @@ prep = Preprocess()
 def preprocess_tweet(tweet):
     return prep.tokenize(tweet)
 
-def score_users(tweets, model_user_classif, wordEmbedding, score_personal_minimum=0.25, textColumn="tweet"):
+def score_users(tweets, model_user_classif, wordEmbedding, user_name, score_personal_minimum=0.25, textColumn="tweet"):
     """
         Calculates score for each user and excludes user with a score < score_personal_minimum
         as institutions. The score is the mean over the classification result of
@@ -50,7 +50,7 @@ def score_users(tweets, model_user_classif, wordEmbedding, score_personal_minimu
     print("Number raw tweets:", len(tweets))
     print(tweets.columns)
     print(tweets.head())
-    tweets_user_pers = tweets.groupby(by="user_name").filter(lambda userTweets: np.mean([model_user_classif.predict(\
+    tweets_user_pers = tweets.groupby(by=user_name).filter(lambda userTweets: np.mean([model_user_classif.predict(\
                                                                  tweet_vectorizer(preprocess_tweet(tweet), wordEmbedding).reshape(1, -1))\
                                                                  for tweet in userTweets[textColumn].values]) >= score_personal_minimum)
 
@@ -91,6 +91,7 @@ if __name__ == '__main__':
                                                                 Users are excluded with a mean score less than the provided one. Default=0.25", default=0.25, type=float)
     parser.add_argument("-s", "--pathSave", help="Path to save personal database to (.parquet or .csv)")
     parser.add_argument("-tn", "--columnNameTextData", help="Column name of the text data", default="tweet")
+    parser.add_argument("-unc", "--userNameColumn", help="Give the user_name column (default: user_screen_name)", default="user_screen_name")
 
     args = parser.parse_args()
 
@@ -108,7 +109,7 @@ if __name__ == '__main__':
     tweets = readFile(args.pathData)
 
     print("Classify all tweets of an user and exclude all users with a mean score < {} ...".format(args.scorePersonalMinimum))
-    tweets_user_pers = score_users(tweets, model_user_classif, wordEmbedding, score_personal_minimum=args.scorePersonalMinimum, textColumn=args.columnNameTextData)
+    tweets_user_pers = score_users(tweets, model_user_classif, wordEmbedding, args.user_nameColumn, score_personal_minimum=args.scorePersonalMinimum, textColumn=args.columnNameTextData)
 
     print("Classify only personal tweets of personal users..")
     tweets_personal = get_personal_tweets(tweets, model_tweet_classif, wordEmbedding, textColumn="tweet")
