@@ -86,7 +86,7 @@ if __name__ == '__main__':
     parser.add_argument("-pwe", "--pathWordEmbedding", help="Path to the word embeddings", required=True)
     parser.add_argument("-pdata", "--pathData", help="Path to the data to classify", required=True)
     parser.add_argument("-sm", "--scorePersonalMinimum", help="Minimum mean-score [0,1] over all tweets per user. \
-                                                                Users are excluded with a mean score less than the provided one. Default=0.25", default=0.25, type=int)
+                                                                Users are excluded with a mean score less than the provided one. Default=0.25", default=0.25, type=float)
     parser.add_argument("-s", "--pathSave", help="Path to save personal database to (.parquet or .csv)")
     parser.add_argument("-tn", "--columnNameTextData", help="Column name of the text data", default="tweet")
 
