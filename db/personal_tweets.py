@@ -109,7 +109,7 @@ if __name__ == '__main__':
     tweets = readFile(args.pathData)
 
     print("Classify all tweets of an user and exclude all users with a mean score < {} ...".format(args.scorePersonalMinimum))
-    tweets_user_pers = score_users(tweets, model_user_classif, wordEmbedding, args.user_nameColumn, score_personal_minimum=args.scorePersonalMinimum, textColumn=args.columnNameTextData)
+    tweets_user_pers = score_users(tweets, model_user_classif, wordEmbedding, args.userNameColumn, score_personal_minimum=args.scorePersonalMinimum, textColumn=args.columnNameTextData)
 
     print("Classify only personal tweets of personal users..")
     tweets_personal = get_personal_tweets(tweets, model_tweet_classif, wordEmbedding, textColumn="tweet")
