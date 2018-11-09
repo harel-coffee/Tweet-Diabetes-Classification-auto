@@ -48,6 +48,8 @@ def score_users(tweets, model_user_classif, wordEmbedding, score_personal_minimu
         all tweets of a user, where the a personal user : 1 and a institution : 0
     """
     print("Number raw tweets:", len(tweets))
+    print(tweets.columns)
+    print(tweets.head())
     tweets_user_pers = tweets.groupby(by="user_name").filter(lambda userTweets: np.mean([model_user_classif.predict(\
                                                                  tweet_vectorizer(preprocess_tweet(tweet), wordEmbedding).reshape(1, -1))\
                                                                  for tweet in userTweets[textColumn].values]) >= score_personal_minimum)
