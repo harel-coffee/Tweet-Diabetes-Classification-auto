@@ -11,12 +11,14 @@ duplicates, a database consisting only of personal tweets will be created by:
 
 - Classify each tweet: personal (1) or institution (0)
 """
-
+import argparse
 from pprint import pprint
 import numpy as np
 import scipy
 import pandas as pd
 import sys
+import os
+import os.path as op
 from sklearn.externals import joblib
 from gensim.models import FastText
 
