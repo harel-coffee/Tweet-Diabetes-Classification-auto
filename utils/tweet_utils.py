@@ -19,7 +19,7 @@ basename = op.split(op.dirname(op.realpath(__file__)))[0]
 load_library(op.join(basename, 'preprocess'))
 
 from sklearn_utils import *
-from mongoDB_utils import *
+
 
 from preprocess import Preprocess
 prep = Preprocess()
