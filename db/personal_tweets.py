@@ -50,19 +50,18 @@ def score_users(tweets, model_user_classif, wordEmbedding, user_name, score_pers
         all tweets of a user, where the a personal user : 1 and a institution : 0
     """
     print("Number raw tweets:", len(tweets))
-    print(tweets.columns)
-    print(tweets.head())
+
     tweets_user_pers = tweets.groupby(by=user_name).filter(lambda userTweets: np.mean([model_user_classif.predict(\
                                                                  tweet_vectorizer(preprocess_tweet(tweet), wordEmbedding).reshape(1, -1))\
                                                                  for tweet in userTweets[textColumn].values]) >= score_personal_minimum)
 
     print("Number tweets with personal users (user-score > {}): {}".format(score_personal_minimum, len(tweets_user_pers)))
-    print(tweets_user_pers.head())
+    print(tweets_user_pers.columns)
     return tweets_user_pers
 
 
 
-def get_personal_tweets(tweets, model_tweet_classif, wordEmbedding, textColumn="tweet"):
+def get_personal_tweets(tweets, model_tweet_classif, wordEmbedding, textColumn="text"):
     """
         From the given database with personal users, get only personal tweets
         Remark: A personal user can tweet personal and institutional!
@@ -114,7 +113,7 @@ if __name__ == '__main__':
     tweets_user_pers = score_users(tweets, model_user_classif, wordEmbedding, args.userNameColumn, score_personal_minimum=args.scorePersonalMinimum, textColumn=args.columnNameTextData)
 
     print("Classify only personal tweets of personal users..")
-    tweets_personal = get_personal_tweets(tweets, model_tweet_classif, wordEmbedding, textColumn="tweet")
+    tweets_personal = get_personal_tweets(tweets, model_tweet_classif, wordEmbedding, textColumn=args.columnNameTextData)
     print("Number personal tweets:", len(tweets_personal))
     print(tweets_personal.head())
 
