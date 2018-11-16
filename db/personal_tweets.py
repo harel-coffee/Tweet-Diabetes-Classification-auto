@@ -51,27 +51,40 @@ def score_users(tweets, model_user_classif, wordEmbedding, user_name, score_pers
     """
     print("Number raw tweets:", len(tweets))
 
-    tweets_user_pers = tweets.groupby(by=user_name).filter(lambda userTweets: np.mean([model_user_classif.predict(\
-                                                                 tweet_vectorizer(preprocess_tweet(tweet), wordEmbedding).reshape(1, -1))\
-                                                                 for tweet in userTweets[textColumn].values]) >= score_personal_minimum)
+#    tweets_user_pers = tweets.groupby(by=user_name).filter(lambda userTweets: np.mean([model_user_classif.predict(\
+#                                                                 tweet_vectorizer(preprocess_tweet(tweet), wordEmbedding).reshape(1, -1))\
+#                                                                 for tweet in userTweets[textColumn].values]) >= score_personal_minimum)
 
-    print("Number tweets with personal users (user-score > {}): {}".format(score_personal_minimum, len(tweets_user_pers)))
-    print(tweets_user_pers.columns)
-    return tweets_user_pers
+#    return tweets_user_pers
+    for i, (userName, userTweets) in enumerate(tweets.groupby(by=user_name)):
+        if i % 1000 == 0:
+            print(userName, np.mean([model_user_classif.predict(tweet_vectorizer(preprocess_tweet(tweet), wordEmbedding).reshape(1, -1)) for tweet in userTweets[textColumn].values]))
+            for tweet in userTweets[textColumn].values:
+                print(tweet)
+            print() 
+        
+        if i == 1000000:
+            break
 
-
+def f(tweet, wordEmbedding, model_tweet_classif):
+    tweet = tweet_vectorizer(preprocess_tweet(tweet), wordEmbedding)
+    tweet = tweet.reshape(1, -1)
+    predict = model_tweet_classif.predict(tweet)
+    print("predict:", predict)
+    return predict[0]
 
 def get_personal_tweets(tweets, model_tweet_classif, wordEmbedding, textColumn="text"):
     """
         From the given database with personal users, get only personal tweets
         Remark: A personal user can tweet personal and institutional!
     """
-
+#    tweets = tweets[textColumn]
+#    tweets = tweets.apply(lambda tweet: f(tweet, wordEmbedding, model_tweet_classif) == 1)
+#    return tweets
     return tweets[tweets[textColumn] \
-                .apply(lambda x: model_tweet_classif \
-                            .predict(tweet_vectorizer(preprocess_tweet(tweet), wordEmbedding).reshape(1, -1)) == 1)]
+                .apply(lambda tweet: model_tweet_classif.predict(tweet_vectorizer(preprocess_tweet(tweet), wordEmbedding).reshape(1, -1))[0] == 1)]
 
-
+    
 
 
 if __name__ == '__main__':
@@ -111,11 +124,12 @@ if __name__ == '__main__':
 
     print("Classify all tweets of an user and exclude all users with a mean score < {} ...".format(args.scorePersonalMinimum))
     tweets_user_pers = score_users(tweets, model_user_classif, wordEmbedding, args.userNameColumn, score_personal_minimum=args.scorePersonalMinimum, textColumn=args.columnNameTextData)
+#    print("Number tweets personal users:", len(tweets_user_pers))
 
-    print("Classify only personal tweets of personal users..")
-    tweets_personal = get_personal_tweets(tweets, model_tweet_classif, wordEmbedding, textColumn=args.columnNameTextData)
-    print("Number personal tweets:", len(tweets_personal))
-    print(tweets_personal.head())
+#    print("Classify only personal tweets of personal users..")
+#    tweets_personal = get_personal_tweets(tweets_user_pers, model_tweet_classif, wordEmbedding, textColumn=args.columnNameTextData)
+#    print("Number personal tweets:", len(tweets_personal))
+#    print(tweets_personal.head())
 
-    print("Save personal tweets to file {}  ...".args.pathSave)
-    savePandasDFtoFile(tweets_personal, args.pathSave)
+#    print("Save personal tweets to file {}  ...".format(args.pathSave))
+#    savePandasDFtoFile(tweets_personal, args.pathSave)
