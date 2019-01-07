@@ -81,10 +81,10 @@ if __name__ == '__main__':
     parser.add_argument("-mo", "--modelAlgo", help="Trainings algorithm",
                         choices=["SVC", "logReg", "RandomForest", "XGBoost", "MultinomialNB", "MLP"], default="SVC")
     parser.add_argument("-sm", "--savePathTrainedModel", help="Path where to save trained model", default= "best_model_classif_{}.sav".format(datetime.datetime.now().strftime(DATE_FORMAT)))
+    parser.add_argument("-t", "--type", help="Type of execution, mode: ['gridsearch', 'bestmodel'] ; \n gridsearch: executes a gridsearch with the provided parameterGrid; \n bestmodel: trains a model for the given parameter and saves it", choices=["gridsearch", "bestmodel"], default="gridsearch")
 
 
     args = parser.parse_args()
-
 
     # load csv in which we manually labelled the users
     #path_tweets = "D:\A_AHNE1\Tweet-Classification-Diabetes-Distress\\data\\manual_labeled_tweets\\manually_labeled_users_instVSpers_MoreInstTweets_30072018.csv"
@@ -216,39 +216,43 @@ if __name__ == '__main__':
     #   2) Train best model and save to disk
 
     # Option 1) Grid search to find best model
-    """
-    print("Start Grid search...")
-    grid = GridSearchCV(pipeline, parameters, cv=10, n_jobs=-1, verbose=2)
+    if args.type == "gridsearch":
+        print("Start Grid search...")
+        grid = GridSearchCV(pipeline, parameters, cv=10, n_jobs=-1, verbose=2)
 
-    grid = grid.fit(V, labels.values.ravel())
+        grid = grid.fit(V, labels.values.ravel())
 
-    #print(grid.cv_results_)
-    print("\nBest: %f using %s" % (grid.best_score_, grid.best_params_))
-    """
+        #print(grid.cv_results_)
+        print("\nBest: %f using %s" % (grid.best_score_, grid.best_params_))
+    
+    elif args.type == "bestmodel":
 
-    # Option 2) Train best model and save to disk
-    print("Train best model:")
-    # train best model
-    best_model = SVC()  # training acc of 90.20%; no preprocessing
-    best_params = {
-                  'model__tol': 0.1,
-                  'model__C' : 10.0,
-                  'model__kernel':'rbf',
-                  'model__gamma': 0.1
-    }
+        # Option 2) Train best model and save to disk
+        print("Train best model:")
+        # train best model
+#        best_model = SVC()  # training acc of 90.20%; no preprocessing
+#        best_params = {
+#                  'model__tol': 0.1,
+#                  'model__C' : 10.0,
+#                  'model__kernel':'rbf',
+#                  'model__gamma': 0.1
+#        }
 
-    # create best pipeline
-    best_pipeline = pipeline
-    best_pipeline.set_params(**best_params)
+        # create best pipeline
+        best_pipeline = pipeline
+        best_pipeline.set_params(**args.parameterGrid)
 
-    print("Train model...")
-    best_pipeline_trained = best_pipeline.fit(V, labels.values.ravel())
+        print("Train model...")
+        best_pipeline_trained = best_pipeline.fit(V, labels.values.ravel())
 
-    # save best model
-    print("Save model to {} ...".format(args.savePathTrainedModel))
-#    file_name = "best_model_user_classif_{}.sav".format(datetime.datetime.now().strftime(DATE_FORMAT))
-    joblib.dump(best_pipeline_trained, args.savePathTrainedModel)
+        # save best model
+        print("Save model to {} ...".format(args.savePathTrainedModel))
+    #    file_name = "best_model_user_classif_{}.sav".format(datetime.datetime.now().strftime(DATE_FORMAT))
+        joblib.dump(best_pipeline_trained, args.savePathTrainedModel)
 
+    else:
+        print("ERROR: Provided type {} is not implemented!".format(args.type))
+    
 
 
 """

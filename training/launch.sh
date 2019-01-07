@@ -4,17 +4,19 @@
   --mode "local" \
   --pathWordEmbedding "/space/Work/spark/FastText_model/ft_wordembeddings_09112018.model" \
   --typeWordEmbedding "ft" \
-  --pathTrainingSet "/space/Work/spark/manually_labeled_users_instVSpers_MoreInstTweets_30072018.csv" \
+  --pathTrainingSet "/space/Work/spark/manually_labeled_tweets_instVSpers_25072018.csv" \
   --columnNameLabel "personal (0=no, 1=yes)" \
   --columnNameTextData "tweet" \
-  --parameterGrid '{"model__kernel" : ["linear", "poly", "rbf"], "model__C" : [30.0, 25.0, 20.0, 15.0, 12.0, 10.0], "model__tol" : [1e-1, 1e-2, 1e-3], "model__gamma" : ["auto", 0.01, 0.1, 1.0]}' \
+  --parameterGrid '{"model__C":10.0, "model__tol":1e-1, "model__gamma":0.1, "model__kernel":"poly"}' \
   --modelAlgo "SVC" \
+  --type "bestmodel"
 
+#  --parameterGrid '{"model__kernel" : ["linear", "poly", "rbf"], "model__C" : [ 12.0, 10.0, 5.0, 1.0, 0.1], "model__tol" : [1e-0, 1e-1, 1e-2], "model__gamma" : ["auto", 0.01, 0.1, 1.0]}' \
+#  --modelAlgo "SVC" \
 
 #  --parameterGrid '{"model__C":[10.0, 1.0, 0.1, 0.01], "model__tol":[1e-10, 1e-9, 1e-8, 1e-7, 1e-6], "model__solver":["liblinear"]}' \
 #  --modelAlgo "logReg"
-
-
+ 
 
   # parameters_ft = {
   #               # param for MultinomialNB
