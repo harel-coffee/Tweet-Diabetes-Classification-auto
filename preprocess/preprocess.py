@@ -160,6 +160,21 @@ class Preprocess:
         return tweet
 
 
+    def remove_repeating_characters(self, tweet):
+        """
+            If a word contains repeating characters, reduce it to only two repeating characters
+            Ex. "coooooool" => "cool"
+        """
+        return re.sub(r'(.)\1+', r'\1\1', word)
+
+
+    def remove_repeating_words(self, tweet):
+        """
+            Remove repeating words and only keep one
+            Ex.: "I so need need need to sing" => "I so need to sing"
+        """
+        return re.sub(r'\b(\w+)( \1\b)+', r'\1', tweet)
+
     def tokenize(self, tweet):
         """
             Tokenizes tweet in its single components (words, emojis, emoticons)
