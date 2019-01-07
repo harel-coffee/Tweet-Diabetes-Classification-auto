@@ -8,6 +8,7 @@ Creation date: 24/04/2018
 """
 import string
 import unicodedata
+import re
 import sys
 import contractions # expanding contractions
 import inflect # natural language related tasks of generating plurals, singular nouns, etc.
@@ -336,6 +337,15 @@ class Preprocess:
             tweet = [word for word in tweet if not word.isdigit() ]
 
         return tweet
+
+
+    def remove_repeating_characters(self, tweet):
+        """
+            If a word contains repeating characters, reduce it to only two repeating characters
+            Ex. "coooooool" => "cool"
+        """
+        return re.sub(r'(.)\1+', r'\1\1', word)
+
 
     def remove_stopwords(self, tweet, include_personal_words=False, include_negations=False, list_stopwords_manual=False):
         """
