@@ -15,7 +15,7 @@ on their tweets
 
 """
 import argparse
-from pymongo import MongoClient
+#from pymongo import MongoClient
 from pprint import pprint
 import sys
 import numpy as np
@@ -26,39 +26,37 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import GridSearchCV, cross_val_predict
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.svm import SVC, LinearSVC
-from sklearn.cross_validation import cross_val_score
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import confusion_matrix
 from sklearn.feature_selection import SelectKBest, f_classif
 from sklearn.neural_network import MLPClassifier
 from sklearn.externals import joblib
-from xgboost import XGBClassifier
+#from xgboost import XGBClassifier
 import datetime
 import gensim
 from gensim.models import FastText
 from gensim.test.utils import datapath, get_tmpfile
 from gensim.scripts.glove2word2vec import glove2word2vec
 import multiprocessing
+import os.path as op
+import json
 
-from ..utils.sys_utils import load_library
-from ..utils.tweet_utils import *
-from ..utils.keras_utils import *
 
-"""
 # add path to utils module to python path
 basename = op.split(op.dirname(op.realpath(__file__)))[0]
 path_utils = op.join(basename , "utils")
 sys.path.insert(0, path_utils)
 
 from sys_utils import load_library
-from mongoDB_utils import connect_to_database
+#from mongoDB_utils import connect_to_database
+from tweet_utils import *
+#from keras_utils import *
 
 
 # CONSTANTS
 DATE_FORMAT = "%Y-%m-%d_%H-%M-%S"
 
 
-"""
 
 
 if __name__ == '__main__':
@@ -75,13 +73,14 @@ if __name__ == '__main__':
                                             ')
     parser.add_argument("-m", "--mode", help="Mode of execution (default=local)", choices=["local", "cluster"], required=True, default="local")
     parser.add_argument("-pwe", "--pathWordEmbedding", help="Path to the word embeddings", required=True)
-    parser.add_argument("-twe", "--typeWordEmbedding", help="FastText or Word2Vec embedding (default: ft)", choices=["ft, w2v"], default="ft")
+    parser.add_argument("-twe", "--typeWordEmbedding", help="FastText or Word2Vec embedding (default: ft)", choices=["ft", "w2v"], default="ft")
     parser.add_argument("-ptd", "--pathTrainingSet", help="Path to the training data csv", required=True)
     parser.add_argument("-ln", "--columnNameLabel", help="Column name of the label", default="personal (0=no, 1=yes)")
     parser.add_argument("-tn", "--columnNameTextData", help="Column name of the text data", default="tweet")
     parser.add_argument("-pg", "--parameterGrid", help="Parameter grid", type=json.loads, default={})
     parser.add_argument("-mo", "--modelAlgo", help="Trainings algorithm",
                         choices=["SVC", "logReg", "RandomForest", "XGBoost", "MultinomialNB", "MLP"], default="SVC")
+    parser.add_argument("-sm", "--savePathTrainedModel", help="Path where to save trained model", default= "best_model_classif_{}.sav".format(datetime.datetime.now().strftime(DATE_FORMAT)))
 
 
     args = parser.parse_args()
@@ -92,6 +91,7 @@ if __name__ == '__main__':
     #tweets_csv = pd.read_csv(path_tweets, sep=";",
     #                         converters={"tweet_proc": lambda x: x.strip("[]").replace("'", "").split(", ")})
 
+    print("Read training set ..")
     path_tweets = args.pathTrainingSet
     tweets_csv = pd.read_csv(path_tweets, sep=";")
 
@@ -100,7 +100,7 @@ if __name__ == '__main__':
     labels = tweets_csv[args.columnNameLabel]
     tweets_raw = tweets_csv[args.columnNameTextData]
 
-
+    print("Load word vectors..")
     if args.typeWordEmbedding == "ft":
         try:
             model_we = FastText.load(args.pathWordEmbedding)
@@ -127,7 +127,7 @@ if __name__ == '__main__':
 
 
 
-
+    
     # Adapt preprocessing function depending on which preprocessed word embeddings you use!
     V = np.array([tweet_vectorizer(preprocess_tweet(tweet, mode="no_preprocessing"), model_we) for tweet in tweets_raw])
 
@@ -216,11 +216,11 @@ if __name__ == '__main__':
     #   2) Train best model and save to disk
 
     # Option 1) Grid search to find best model
-
+    """
     print("Start Grid search...")
-    grid = GridSearchCV(pipeline, parameters_ft, cv=10, n_jobs=14, verbose=2)
+    grid = GridSearchCV(pipeline, parameters, cv=10, n_jobs=-1, verbose=2)
 
-    grid = grid.fit(V, labels.values)
+    grid = grid.fit(V, labels.values.ravel())
 
     #print(grid.cv_results_)
     print("\nBest: %f using %s" % (grid.best_score_, grid.best_params_))
@@ -231,9 +231,10 @@ if __name__ == '__main__':
     # train best model
     best_model = SVC()  # training acc of 90.20%; no preprocessing
     best_params = {
-                  'model__tol': 0.01,
-                  'model__C' : 6.0,
-                  'model__kernel':'rbf'
+                  'model__tol': 0.1,
+                  'model__C' : 10.0,
+                  'model__kernel':'rbf',
+                  'model__gamma': 0.1
     }
 
     # create best pipeline
@@ -241,16 +242,18 @@ if __name__ == '__main__':
     best_pipeline.set_params(**best_params)
 
     print("Train model...")
-    best_pipeline_trained = best_pipeline.fit(V, labels.values)
+    best_pipeline_trained = best_pipeline.fit(V, labels.values.ravel())
 
     # save best model
-    print("Save model to file...")
-    file_name = "best_model_user_classif_{}.sav".format(datetime.datetime.now().strftime(DATE_FORMAT))
-    joblib.dump(best_pipeline_trained, file_name)
-"""
+    print("Save model to {} ...".format(args.savePathTrainedModel))
+#    file_name = "best_model_user_classif_{}.sav".format(datetime.datetime.now().strftime(DATE_FORMAT))
+    joblib.dump(best_pipeline_trained, args.savePathTrainedModel)
 
 
+
 """
+RESULTS FROM AUGUST 2018!!
+
 NEW ####################################################
 SVC full preprocessing embeddings
 Best: 0.883516 using
