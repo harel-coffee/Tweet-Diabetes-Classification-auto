@@ -411,6 +411,7 @@ class Preprocess:
                 - Snowball / Porter2: better than Porter, a bit faster than Porter
                 - Lancaster: aggressive algorithm, sometimes to a fault; fastest algo
                             often not intuitiive words; reduces words space hugely
+                - Snowball French
         """
         for ind, word in enumerate(tweet):
             if word not in self.Constant_words: # do not change words like USER, URL, EMOT_SMILE,...
