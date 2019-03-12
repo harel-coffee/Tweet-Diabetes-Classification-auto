@@ -70,8 +70,8 @@ class Emotions:
 
     excludeSynonyms_ = ["go", "like", "get", "pull", "floor",  "know", "give",
                         "longer", "please", "handle", "dear", "deal", "substitute",
-                        "crank"]
-    addWords_ = ["ashamed"]
+                        "crank", "lecture", "starve",  "soreness"]
+    addWords_ = []
 
     parrotsEmotions = get_parrotsEmotions_list_all()
     allEmotions = get_parrotsEmotions_list_all()+DDS_list+PAID_list
@@ -88,12 +88,19 @@ class Emotions:
 
 
 
+    # take defintions from emotionKeywords
+    emotions_synonyms_joy = emotions_synonyms_joy
+    emotions_synonyms_love = emotions_synonyms_love
+    emotions_synonyms_surprise = emotions_synonyms_surprise
+    emotions_synonyms_anger = emotions_synonyms_anger
+    emotions_synonyms_sadness = emotions_synonyms_sadness
+    emotions_synonyms_fear = emotions_synonyms_fear
 
-    emotions_synonyms_joy = get_emotion_synonyms("joy")
-    emotions_synonyms_love = get_emotion_synonyms("love")
-    emotions_synonyms_surprise = get_emotion_synonyms("surprise")
-    emotions_synonyms_anger = get_emotion_synonyms("anger")
-    emotions_synonyms_sadness = get_emotion_synonyms("sadness")
-    emotions_synonyms_fear = get_emotion_synonyms("fear")
+#    emotions_synonyms_joy = get_emotion_synonyms("joy")
+#    emotions_synonyms_love = get_emotion_synonyms("love")
+#    emotions_synonyms_surprise = get_emotion_synonyms("surprise")
+#    emotions_synonyms_anger = get_emotion_synonyms("anger")
+#    emotions_synonyms_sadness = get_emotion_synonyms("sadness")
+#    emotions_synonyms_fear = get_emotion_synonyms("fear")
 
     EMOTION_CATEGORIES = Emotions_positive.CATEGORIES_POSITIVE+Emotions_negative.CATEGORES_NEGATIVE
