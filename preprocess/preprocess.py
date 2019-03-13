@@ -165,7 +165,7 @@ class Preprocess:
             If a word contains repeating characters, reduce it to only two repeating characters
             Ex. "coooooool" => "cool"
         """
-        return re.sub(r'(.)\1+', r'\1\1', word)
+        return re.sub(r'(.)\1+', r'\1\1', tweet)
 
 
     def remove_repeating_words(self, tweet):

@@ -66,18 +66,16 @@ def delete_similar_tweets(df):
                     print(cos)
                     print("Remove", i, " :", df.loc[i]["text"])
                     all_indices.remove(i)
-            print("append", first, " : ", df.loc[first]["text"])
+#            print("append", first, " : ", df.loc[first]["text"])
             new_indices.append(first)
             all_indices.remove(first)
 
         else:
             if len(all_indices) > 0:
-                print("Append last", all_indices[0], " : ", df.loc[all_indices[0]]["text"])
+ #               print("Append last", all_indices[0], " : ", df.loc[all_indices[0]]["text"])
                 new_indices.append(all_indices[0])
  
         print("\n New dataframe", df.ix[new_indices].shape)
-        print(df.ix[new_indices].head())
-        print("\n ----------------------- \n")
         return df.ix[new_indices]
 
 
@@ -85,7 +83,8 @@ def delete_similar_tweets(df):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description="Delete too similar tweets of the same user based on cosinus similarity",
-                                    epilog='Example usage in local mode: ')
+                                    epilog='Example usage in local mode: ' 
+                                    )
 
     parser.add_argument("-m", "--mode", help="Mode of execution (default=local)", choices=["local", "cluster"], required=True, default="local")
     parser.add_argument("-fn", "--filename", help="Path to the data file", required=True)

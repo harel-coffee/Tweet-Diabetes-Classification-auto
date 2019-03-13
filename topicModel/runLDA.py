@@ -9,7 +9,7 @@ For a given number of clusters, calculate the topics
 import numpy as np
 #import matplotlib.pyplot as plt
 import pandas as pd
-import pymongo
+#import pymongo
 import gensim
 import re
 import sys
@@ -17,6 +17,7 @@ import argparse
 import os
 import os.path as op
 from gensim import models, corpora
+import nltk
 from nltk import word_tokenize
 from nltk.corpus import stopwords
 from sklearn.decomposition import LatentDirichletAllocation
@@ -26,7 +27,10 @@ from gensim.models.wrappers import LdaMallet
 from gensim.corpora import Dictionary
 from dateutil.relativedelta import relativedelta
 import datetime
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
+
+nltk.set_proxy('http://proxy.admin2.oxa.tld:3128') # set proxy to be able to download nltk files
+
 
 basename = op.split(op.dirname(op.realpath(__file__)))[0]
 path_utils = op.join(basename , "utils")
@@ -154,14 +158,9 @@ def concatenateTweetsOfMonthToDoc(users, data, format, user_screen_name):
         return tweet_docs, tweet_docs_prep
 
     elif format == "Pandas":
-        count_single_tweets = 0
-        for user in users:
-            user_tweets = data.find({'user.screen_name' : user})
-            if user_tweets.count() == 1:
-                count_single_tweets += 1
 
-        count_users_with_only_one_tweet = pd.Series(users).map(lambda user: data[data["user_screen_name"] == user].shape[0]).values.tolist().count(1)
-        print("Number of users that tweet only once:", count_users_with_only_one_tweet)
+ #       count_users_with_only_one_tweet = pd.Series(users).map(lambda user: data[data["user_screen_name"] == user].shape[0]).values.tolist().count(1)
+ #       print("Number of users that tweet only once:", count_users_with_only_one_tweet)
 
         tweet_docs = []
         tweet_docs_prep = []
@@ -196,14 +195,14 @@ def concatenateTweetsOfMonthToDoc(users, data, format, user_screen_name):
 
                     current_tweet = user_tweets.iloc[nt]
 
-                    if to_date(current_tweet["created_at"]) < end_date:
+                    if current_tweet["created_at"] < end_date:
                         tweet_doc += " "+current_tweet["text"]
                     else:
                         tweet_docs.append(tweet_doc)
                         tweet_docs_prep.append(preprocess_tweet(tweet_doc))
 
                         tweet_doc = current_tweet["text"]
-                        end_date = to_date(current_tweet["created_at"]) + relativedelta(months=1)
+                        end_date = current_tweet["created_at"] + relativedelta(months=1)
 
                     nt += 1
 
@@ -303,7 +302,7 @@ if __name__ == '__main__':
 
 #    path_save_LDA = "D:\\A_AHNE1\\Tweet-Classification-Diabetes-Distress\\topicModel\\emotion_LDA_11-09-2018_excludedWords\\"
 #    path_save_dict = "D:\\A_AHNE1\\Tweet-Classification-Diabetes-Distress\\topicModel\\emotion_LDA_11-09-2018_excludedWords\\dictionary.dict"
-    path_save_LDA = op.join(saveResultPath, "LDA_"+current_date()+"\\")#"D:\\A_AHNE1\\Tweet-Classification-Diabetes-Distress\\topicModel\\emotion_LDA_11-09-2018_excludedWords\\"
+    path_save_LDA = op.join(args.saveResultPath, "LDA_"+current_date()+"\\")#"D:\\A_AHNE1\\Tweet-Classification-Diabetes-Distress\\topicModel\\emotion_LDA_11-09-2018_excludedWords\\"
     path_save_dict = path_save_LDA+"dictionary.dict"
 
     print("Path to save LDA model to: ", path_save_LDA)
@@ -324,11 +323,22 @@ if __name__ == '__main__':
             df = readFile(args.filename, columns=args.filenameColumns, sep=args.filenameDelimiter)
 
             print("Get distinct users...")
-            unique_users = df.[user_screen_name].unique().tolist()
+            unique_users = df.user_screen_name.unique().tolist()
             print("Number of distinct users:", len(unique_users))
 
             print("Concatenate all tweets of one person in one month to one single document...")
-            tweet_docs, tweet_docs_prep = concatenateTweetsOfMonthToDoc(unique_users, df, format="Pandas")
+            tweet_docs, tweet_docs_prep = concatenateTweetsOfMonthToDoc(unique_users, df, format="Pandas", user_screen_name="user_screen_name")
+
+            print("Save tweet_doc to {}..".format(path_save_LDA+"tweet_doc.txt"))
+            with open(path_save_LDA+"tweet_doc.txt", "w") as f:
+                    for tweet in tweet_docs:
+                        f.write("%s\n" % tweet)
+
+            print("Save tweet_doc_prep to {}..".format(path_save_LDA+"tweet_doc_prep.txt"))
+            with open(path_save_LDA+"tweet_doc_prep.txt", "w") as f:
+                for tweet in tweet_docs_prep:
+                    tweet_prep = ",".join(tweet)
+                    f.write("%s\n" % tweet)
 
 
         # Check if necessary arguments are given
@@ -346,9 +356,9 @@ if __name__ == '__main__':
 
             client = connect_to_database(host=args.localMongoHost, port=args.localMongoPort)
             # get database with all tweets
-            db = client.[args.localMongoDatabase]
+            db = client[args.localMongoDatabase]
 
-            db_collection = client.[args.localMongoCollection]
+            db_collection = client[args.localMongoCollection]
 
             print("Get distinct users...")
             db_collection.create_index("user.screen_name")
@@ -378,22 +388,23 @@ if __name__ == '__main__':
                             saveModelPath=path_save_LDA)
 
 
-        print("Plot...")
-        plt.figure()
+#        print("Plot...")
+#        plt.figure()
 
-        plt.subplot(121)
-        plt.plot(list_num_topics, c_v)
-        plt.xlabel("num_topics")
-        plt.ylabel("Coherence score")
-        plt.legend(("c_v"), loc='best')
+#        plt.subplot(121)
+#        plt.plot(list_num_topics, c_v)
+#        plt.xlabel("num_topics")
+#        plt.ylabel("Coherence score")
+#       plt.legend(("c_v"), loc='best')
 
-        plt.subplot(122)
-        plt.plot(list_num_topics, logPerplex)
-        plt.xlabel("num_topics")
-        plt.ylabel("log Perplexity")
-        plt.legend(("logPerpl"), loc='best')
+#        plt.subplot(122)
+#        plt.plot(list_num_topics, logPerplex)
+#        plt.xlabel("num_topics")
+#        plt.ylabel("log Perplexity")
+#        plt.legend(("logPerpl"), loc='best')
 
-        plt.savefig(op.join(path_save_LDA, "plot_coherencescore_logPerplex.png"))
+#        plt.savefig(op.join(path_save_LDA, "plot_coherencescore_logPerplex.png"))
+
 
     elif mode == "cluster":
         sys.stderr.write("ERROR: Not implemented yet for cluster mode!")
