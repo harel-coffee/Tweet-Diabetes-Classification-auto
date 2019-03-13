@@ -267,6 +267,7 @@ def calculateLDA(dictionary, corpus, texts, list_num_topics, saveModelPath=[]):
 
 
 
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description="Run LDA",
