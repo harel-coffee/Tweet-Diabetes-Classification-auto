@@ -354,13 +354,6 @@ class Preprocess:
         return tweet
 
 
-    def remove_repeating_characters(self, tweet):
-        """
-            If a word contains repeating characters, reduce it to only two repeating characters
-            Ex. "coooooool" => "cool"
-        """
-        return re.sub(r'(.)\1+', r'\1\1', word)
-
 
     def remove_stopwords(self, tweet, include_personal_words=False, include_negations=False, list_stopwords_manual=False):
         """
