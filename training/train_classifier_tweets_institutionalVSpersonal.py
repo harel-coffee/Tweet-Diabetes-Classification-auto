@@ -23,34 +23,22 @@ from sklearn.feature_selection import SelectKBest, f_classif
 from sklearn.externals import joblib
 from xgboost import XGBClassifier
 import datetime
+import argparse
+import os
+import os.path as op
+
+# add path to utils module to python path
+basename = op.split(op.dirname(op.realpath(__file__)))[0]
+path_utils = op.join(basename , "utils")
+sys.path.insert(0, path_utils)
 
 from utils import *
+from sys_utils import load_library
+from mongoDB_utils import connect_to_database
+
 
 DATE_FORMAT = "%Y-%m-%d_%H-%M-%S"
 
-
-
-def connect_to_database(host='localhost', port=27017):
-    """
-        Connect to MongoDB database
-    """
-
-    try:
-        client = MongoClient(host, port)
-    except ConnectionFailure as e:
-        sys.stderr.write("Could not connect to MongoDB: %s" % e)
-        sys.exit(1)
-
-    return client
-
-
-def load_preprocess_library(path='D:\A_AHNE1\Tweet-Classification-Diabetes-Distress\preprocess'):
-    """
-        load library of the given path
-    """
-
-    if path not in sys.path:
-        sys.path.insert(0, path)
 
 
 def get_meta_data_features(tweets_csv, manually_labelled_tweets):

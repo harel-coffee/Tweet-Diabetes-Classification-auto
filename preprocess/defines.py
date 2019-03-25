@@ -43,14 +43,13 @@ class Patterns:
 
 
 class Grammar:
-    STOPWORDS = stopwords.words('english')
-    STOPWORDS_NO_PERSONAL = stopwords_no_personal_list # excludes personal words like "I", "me", "my" to keep them when filtering personal from institutional tweets
-    STOPWORDS_FR = stopwords_fr
+    STOPWORDS_EN = stopwords.words('english')
+    STOPWORDS_NO_PERSONAL_EN = stopwords_no_personal_list # excludes personal words like "I", "me", "my" to keep them when filtering personal from institutional tweets
     STOPWORDS_FR = stopwords_fr
     WHITELIST_EN = ["n't", "not", "no", "nor", "never", "nothing", "nowhere", "noone", "none"]
     STEMMER_LANCASTER = LancasterStemmer() # aggressive, fast, sometimes confusing
 #    STEMMER_PORTER = PorterStemmer(mode='NLTK_EXTENSIONS') # mode that includes further improvements
-    STEMMER_SNOWBALL = SnowballStemmer('english') # improved porter
+    STEMMER_SNOWBALL_EN = SnowballStemmer('english') # improved porter
     STEMMER_SNOWBALL_FR = nltk.stem.snowball.FrenchStemmer()
 
     LEMMATIZER = WordNetLemmatizer()
@@ -107,3 +106,52 @@ class Emotions:
 #    emotions_synonyms_fear = get_emotion_synonyms("fear")
 
     EMOTION_CATEGORIES = Emotions_positive.CATEGORIES_POSITIVE+Emotions_negative.CATEGORES_NEGATIVE
+
+
+ColumnNames = {
+    "id" : "id",
+    "created_at" : "created_at",
+    "lang" : "lang",
+    "favorite_count" : "favorite_count",
+    "favorited" : "favorited",
+    "retweeted" : "retweeted",
+    "retweet_count" : "retweet_count",
+    "text" : "text",
+    "posted_date" : "posted_date",
+    "posted_month" : "posted_month",
+    "user_id" : "user_id",
+    "user_name" : "user_name",
+    "user_screen_name" : "user_screen_name",
+    "user_followers_count" : "user_followers_count",
+    "user_friends_count" : "user_friends_count",
+    "user_tweets_count" : "user_statuses_count",
+    "user_description" : "user_description",
+    "user_time_zone" : "user_time_zone",
+    "place_country" : "place_country",
+    "place_country_code" : "place_country_code",
+    "place_place_type" : "place_place_type",
+    "place_name" : "place_name",
+    "place_full_name" : "place_full_name",
+    "tweet_longitude" : "tweet_longitude",
+    "tweet_latitude" : "tweet_latitude",
+    "retweeted_user_id" : "retweeted_status_user_id",
+    "retweeted_user_name" : "retweeted_status_user_name",
+    "retweeted_user_screen_name" : "retweeted_status_user_screen_name",
+    "retweeted_user_location" : "retweeted_status_user_location",
+    "retweeted_user_created_at" : "retweeted_status_user_created_at",
+    "retweeted_user_favourites_count" : "retweeted_status_user_favourites_count",
+    "retweeted_user_followers_count" : "retweeted_status_user_followers_count",
+    "retweeted_user_friends_count" : "retweeted_status_user_friends_count",
+    "retweeted_user_tweet_count" : "retweeted_status_user_tweet_count",
+    "retweeted_user_description" : "retweeted_status_user_description",
+    "retweeted_user_time_zone" : "retweeted_status_user_time_zone",
+    "retweeted_place_country" : "retweeted_status_place_country",
+    "retweeted_place_name" : "retweeted_status_place_name",
+    "retweeted_place_full_name" : "retweeted_status_place_full_name",
+    "retweeted_place_country_code" : "retweeted_status_place_country_code",
+    "retweeted_place_place_type" : "retweeted_status_place_place_type",
+    "retweeted_created_at" : "retweeted_status_created_at",
+    "retweeted_tweet_longitude" : "retweeted_tweet_longitude",
+    "retweeted_tweet_latitude" : "retweeted_tweet_latitude",
+    "retweeted_text" : "retweeted_status_text"
+}

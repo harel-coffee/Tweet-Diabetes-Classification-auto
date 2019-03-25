@@ -184,9 +184,10 @@ def get_synonyms(wordlist, excludeSynonyms, addWords):
     for word in excludeSynonyms:
         try:
             list_all.remove(word)
-            print("excluded {}".format(word))
+            #print("excluded {}".format(word))
         except:
-            print("Info: Could not exclude {}".format(word))
+            #print("Info: Could not exclude {}".format(word))
+            pass
 
     # add certain words
     for word in addWords:

@@ -19,7 +19,7 @@ def connect_to_database(host='localhost', port=27017):
     try:
         client = MongoClient(host, port)
     except ConnectionFailure as e:
-        sys.stderr.write("Could not connect to MongoDB: %s" % e)
+        sys.stderr.write("Could not connect to MongoDB for given host {} and port {}: {}".format(host, port, e))
         sys.exit(1)
 
     return client
