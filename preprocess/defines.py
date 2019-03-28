@@ -5,11 +5,9 @@ Author: Adrian Ahne
 Creation date: 23/04/2018
 
 Inspired by https://github.com/s/preprocessor/tree/master/preprocessor
-<<<<<<< HEAD
-=======
+
 
 - 24/08/2018 : Added Emotion terms
->>>>>>> devAA
 """
 
 
@@ -24,21 +22,17 @@ nltk.download('wordnet')
 
 from emotion_codes import EMOTICONS_UNICODE
 from stopword_def import *
-<<<<<<< HEAD
-=======
+
 from emotionKeywords import *
 from emotion_codes import *
 from stopwords_fr import *
->>>>>>> devAA
 
 class Constants:
     URL = "URL"
     USER = "USER"
-<<<<<<< HEAD
-=======
+
     TYPE1 = "TYPEONE"
     TYPE2 = "TYPETWO"
->>>>>>> devAA
 
 class Patterns:
     URL_PATTERN=re.compile(r"http\S+") # or re.compile(r'(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:\'".,<>?\xab\xbb\u201c\u201d\u2018\u2019]))')
@@ -50,17 +44,7 @@ class Patterns:
     # TODO create EMOJI PATTERN
 
 
-<<<<<<< HEAD
-class Grammar:
-    STOPWORDS = stopwords.words('english')
-    STOPWORDS_NO_PERSONAL = stopwords_no_personal_list # excludes personal words like "I", "me", "my" to keep them when filtering personal from institutional tweets
-    WHITELIST_EN = ["n't", "not", "no", "nor", "never", "nothing", "nowhere", "noone", "none"]
-    STEMMER_LANCASTER = LancasterStemmer() # aggressive, fast, sometimes confusing
-    STEMMER_PORTER = PorterStemmer(mode='NLTK_EXTENSIONS') # mode that includes further improvements
-    STEMMER_SNOWBALL = SnowballStemmer('english') # improved porter
 
-    LEMMATIZER = WordNetLemmatizer()
-=======
 
 class Grammar:
     STOPWORDS_EN = stopwords.words('english')
@@ -175,4 +159,3 @@ ColumnNames = {
     "retweeted_tweet_latitude" : "retweeted_tweet_latitude",
     "retweeted_text" : "retweeted_status_text"
 }
->>>>>>> devAA

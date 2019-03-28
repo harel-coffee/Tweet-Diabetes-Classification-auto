@@ -8,10 +8,8 @@ Creation date: 24/04/2018
 """
 import string
 import unicodedata
-<<<<<<< HEAD
-=======
+
 import re
->>>>>>> devAA
 import sys
 import contractions # expanding contractions
 import inflect # natural language related tasks of generating plurals, singular nouns, etc.
@@ -21,35 +19,16 @@ from nltk.tokenize import TweetTokenizer
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatize
 
-<<<<<<< HEAD
-#from emoticons_emoji import preprocess_emot
-#from emtion_codes import EMOJI_UNICODE
 
 from emotion_codes import UNICODE_EMOJI
-#from emotion_codes import EMOTICONS_UNICODE
 from emotion_codes import EMOTICONS
 from emotion_codes import EMOJI_TO_CATEGORY
-from emotion_codes import Emotions
-=======
-from emotion_codes import UNICODE_EMOJI
-from emotion_codes import EMOTICONS
-from emotion_codes import EMOJI_TO_CATEGORY
->>>>>>> devAA
 from defines import *
 from contractions_def import *
 
 
 class Preprocess:
 
-<<<<<<< HEAD
-    def __init__(self):
-        self.TweetTokenizer = TweetTokenizer()
-        # Constant words like URL, USER, EMOT_SMILE, etc. that we want to keep in uppercase
-        self.Constant_words = [attr for attr in dir(Constants) if not callable(getattr(Constants, attr)) \
-                            and not attr.startswith("__")]+Emotions.EMOTION_CATEGORIES
-
-        self.WN_Lemmatizer = WordNetLemmatizer()
-=======
     def __init__(self, lang="english"):
         self.TweetTokenizer = TweetTokenizer()
         # Constant words like URL, USER, EMOT_SMILE, etc. that we want to keep in uppercase
@@ -59,7 +38,6 @@ class Preprocess:
 
         self.WN_Lemmatizer_EN = WordNetLemmatizer()
         self.lang = lang
->>>>>>> devAA
 
     def get_text(self, raw_tweet):
         """ get text of tweet object in json format """
@@ -79,22 +57,6 @@ class Preprocess:
               - "are the main cause of obeisty" -> "are the main because of obesity"
               - "in the U.S are" -> "in the you.S. are"
         """
-<<<<<<< HEAD
-        #return contractions.fix(tweet)
-        return  contractions_fix(tweet)
-
-    def replace_hashtags_URL_USER(self, tweet, mode="replace"):
-        """
-            if mode == "replace"
-                Replaces hashtags by its words
-                Replaces URLs by the "URL"
-                Replace user mentions by "USER"
-
-            if mode == "delete"
-                Delete hasthags
-                Delete URLs
-                Delete USERs
-=======
 
         if self.lang == "english":
             return  contractions_fix(tweet)
@@ -130,7 +92,6 @@ class Preprocess:
             Return
             -------------------------------------------------------------
             List of preprocessed tweet tokens
->>>>>>> devAA
 
             https://github.com/yogeshg/Twitter-Sentiment
 
@@ -140,37 +101,7 @@ class Preprocess:
             print(replace_hashtags_URL_USER(s))
             >> "USER loves stackoverflow because people are very helpful!, check URL"
 
-<<<<<<< HEAD
-            TODO: maybe replace @Obama with Obama -> to be checked!
-        """
 
-        if mode == "replace":
-            # replace URLs
-            tweet = Patterns.URL_PATTERN.sub(Constants.URL, tweet)
-
-            # replace mentions : @Obama
-            tweet = Patterns.MENTION_PATTERN.sub(Constants.USER, tweet)
-
-            # replace hashtags by its words
-            hashtags = Patterns.HASHTAG_PATTERN.findall(tweet)
-            for hashtag in hashtags:
-                tweet = tweet.replace("#"+hashtag, hashtag)
-
-        elif mode == "delete":
-            # replace URLs
-            tweet = Patterns.URL_PATTERN.sub("", tweet)
-
-            # replace mentions : @Obama
-            tweet = Patterns.MENTION_PATTERN.sub("", tweet)
-
-            # replace hashtags by its words
-            hashtags = Patterns.HASHTAG_PATTERN.findall(tweet)
-            for hashtag in hashtags:
-                tweet = tweet.replace("#"+hashtag, "")
-
-        return tweet
-
-=======
         """
         if mode_URL == "replace":
             tweet = Patterns.URL_PATTERN.sub(Constants.URL, tweet)
@@ -246,7 +177,6 @@ class Preprocess:
         """
         return re.sub(r'\b(\w+)( \1\b)+', r'\1', tweet)
 
->>>>>>> devAA
     def tokenize(self, tweet):
         """
             Tokenizes tweet in its single components (words, emojis, emoticons)
@@ -279,35 +209,16 @@ class Preprocess:
 
         return cleaned_tweet
 
-<<<<<<< HEAD
-    def preprocess_emojis(self, tweet):
-=======
+
 
     def preprocess_emojis(self, tweet, limit_nEmojis=False):
->>>>>>> devAA
         '''
             Replace emojis with their emotion category
             Example:
                 >>> text = "I love eating 😄"
                 >>> preprocess_emoji(text)
                 >>> "I love eating EMOT_LAUGH"
-<<<<<<< HEAD
-        '''
 
-        cleaned_tweet = []
-        for ind, char in enumerate(tweet):
-            if char in UNICODE_EMOJI:
-
-                if EMOJI_TO_CATEGORY[UNICODE_EMOJI[char]] != "":
-                    cleaned_tweet.append(EMOJI_TO_CATEGORY[UNICODE_EMOJI[char]])
-                else:
-                    print("INFO: No category set for emoji {} -> delete emoji {}".format(char, UNICODE_EMOJI[char]))
-            else:
-                cleaned_tweet.append(char)
-
-        return cleaned_tweet
-
-=======
 
             Parameters:
             ------------------------------------------------------------
@@ -357,7 +268,6 @@ class Preprocess:
         # other language
         else:
             return(tweet)
->>>>>>> devAA
 
     def preprocess_emoticons(self, tweet):
         '''
@@ -369,23 +279,7 @@ class Preprocess:
                 >>> preprocess_emoticons(text)
                 >>> "I like nutella EMOT_SMILE"
         '''
-<<<<<<< HEAD
-        cleaned_tweet = []
-        for word in tweet:
-            match_emoticon = Patterns.EMOTICONS_PATTERN.findall(word)
-            if not match_emoticon : # if no emoticon found
-                cleaned_tweet.append(word)
-            else:
-                if match_emoticon[0] is not ':':
-                    if match_emoticon[0] is not word:
-                        cleaned_tweet.append(word)
-                    else:
-                        try:
-                            cleaned_tweet.append(EMOTICONS[word])
-                        except:
-                            print("INFO: Could not replace emoticon: {} of the word: {}".format(match_emoticon[0], word), sys.exc_info())
-        return cleaned_tweet
-=======
+
 
         if self.lang == "english":
             cleaned_tweet = []
@@ -407,7 +301,6 @@ class Preprocess:
         # other languages
         else:
             return tweet
->>>>>>> devAA
 
     def to_lowercase(self, tweet):
         """
@@ -430,9 +323,6 @@ class Preprocess:
 
     def remove_non_ascii(self, tweet):
         """Remove non-ASCII characters from list of tokenized words"""
-#        for ind, word in enumerate(tweet):
-            # normalize returns the normal fom 'NFKD' of the word
-#            tweet[ind] = unicodedata.normalize('NFKD', word).encode('ascii', 'ignore').decode('utf-8', 'ignore')
 
         new_tweet = []
         for word in tweet:
@@ -465,13 +355,8 @@ class Preprocess:
 
         return tweet
 
-<<<<<<< HEAD
-    def remove_stopwords(self, tweet, include_personal_words=False, include_negations=False):
-=======
-
 
     def remove_stopwords(self, tweet, include_personal_words=False, include_negations=False, list_stopwords_manual=False):
->>>>>>> devAA
         """
             Remove stop words from list of tokenized words
 
@@ -485,11 +370,9 @@ class Preprocess:
                                     if True, negation words like "no", "not" ,"nothing"
                                     are included and not considered as stopwords
                 ignore_whitelist : whitelist containing words
-<<<<<<< HEAD
-=======
+
                 list_stopwords_manual : list with stopwords that overwrites the default stop lists if given
 
->>>>>>> devAA
 
             Example:
             >>> text = ['five', 'reasons', 'to', 'eat', 'like', 'a', 'hunter']
@@ -497,25 +380,7 @@ class Preprocess:
             >>> ['five', 'reasons', 'eat', 'like', 'hunter']
         """
         new_tweet = []
-<<<<<<< HEAD
-        for word in tweet:
-            if include_personal_words:
-                if include_negations:
-                    if word not in Grammar.STOPWORDS_NO_PERSONAL or word in Grammar.WHITELIST_EN: # TODO maybe add manually more stopwords
-                        new_tweet.append(word)
-                else:
-                    if word not in Grammar.STOPWORDS_NO_PERSONAL: # TODO maybe add manually more stopwords
-                        new_tweet.append(word)
-            else:
-                if include_negations:
-                    if word not in Grammar.STOPWORDS or word in Grammar.WHITELIST_EN: # TODO maybe add manually more stopwords
-                        new_tweet.append(word)
-                else:
-                    if word not in Grammar.STOPWORDS: # TODO maybe add manually more stopwords
-                        new_tweet.append(word)
 
-        return new_tweet
-=======
 
         # manual list of stopwords provided
         if list_stopwords_manual != False:
@@ -556,7 +421,6 @@ class Preprocess:
                 return tweet
 
 
->>>>>>> devAA
 
     def lemmatize_verbs(self, tweet):
         """ Lemmatize verbs in list of tokenized words
@@ -566,14 +430,7 @@ class Preprocess:
             >>> lemmatize_verbs(text)
             >>> ['americans', 'stop', 'drink']
         """
-<<<<<<< HEAD
-        for ind, word in enumerate(tweet):
-            #tweet[ind] = Grammar.LEMMATIZER.lemmatize(word, pos='v')
-            tweet[ind] = self.WN_Lemmatizer.lemmatize(word, pos='v')
-        return tweet
 
-    def stem_words(self, tweet, stemmer=Grammar.STEMMER_SNOWBALL):
-=======
 
         if self.lang == "english":
             for ind, word in enumerate(tweet):
@@ -585,23 +442,16 @@ class Preprocess:
             return tweet
 
     def stem_words(self, tweet, stemmer=False):
->>>>>>> devAA
         """ Stem words in list of tokenized words
 
             Parameter:
                 - tweet :   tokenized list of words of the tweet
-<<<<<<< HEAD
-                - stemmer : algorithm to use for stemming
-                            - Grammar.STEMMER_SNOWBALL (default)
-                            - Grammar.PORTER
-                            - Grammar.STEMMER_LANCASTER
-=======
+
                 - stemmer : algorithm to use for stemming, options:
                             - Grammar.STEMMER_SNOWBALL_EN
                             - Grammar.PORTER
                             - Grammar.STEMMER_LANCASTER
                             - Grammar.STEMMER_SNOWBALL_FR
->>>>>>> devAA
 
             Example:
             >>> text = ['predictive', 'tool', 'for', 'children', 'with', 'diabetes']
@@ -613,12 +463,7 @@ class Preprocess:
                 - Snowball / Porter2: better than Porter, a bit faster than Porter
                 - Lancaster: aggressive algorithm, sometimes to a fault; fastest algo
                             often not intuitiive words; reduces words space hugely
-<<<<<<< HEAD
-        """
-        for ind, word in enumerate(tweet):
-            if word not in self.Constant_words: # do not change words like USER, URL, EMOT_SMILE,...
-                tweet[ind] = stemmer.stem(word)
-=======
+
                 - Snowball French
         """
 
@@ -632,5 +477,4 @@ class Preprocess:
                 elif self.lang == "french":
                     tweet[ind] = Grammar.STEMMER_SNOWBALL_FR.stem(word)
 
->>>>>>> devAA
         return tweet
