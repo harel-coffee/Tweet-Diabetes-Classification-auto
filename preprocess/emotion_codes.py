@@ -3,20 +3,13 @@ Dictionaries for emojis ("😄") and emoticons (":)") decoding and encoding (uni
 
 Dictionary assigning emotinal categories to emojis and emoticons
 
-<<<<<<< HEAD
-=======
+
 OLD 04/2018:
->>>>>>> devAA
 EMOTION CATEGORIES:
   - EMOT_SMILE
   - EMOT_LAUGH
   - EMOT_LOVE
   - EMOT_WINK
-<<<<<<< HEAD
-  - EMOT_SAD_ANGRY
-  - EMOT_CRY
-  - EMOT_SURPISE
-=======
   - EMOT_SAD
   - EMOT_ANGER
   - EMOT_CRY
@@ -33,18 +26,13 @@ EMOTION CATEGORIES:
   - EMOT_ANGER
   - EMOT_SADNESS
   - EMOT_FEAR
->>>>>>> devAA
 
 
 Author: Adrian Ahne
 Creation date: 23/04/2018
 
 
-<<<<<<< HEAD
-#TODO possibly add further categories like Depression, Tired/sleepy etc.
 
-# took emoticons unicode from: https://apps.timwhitlock.info/emoji/tables/unicode
-=======
 
 References:
 
@@ -55,7 +43,6 @@ took emoticons unicode from: https://apps.timwhitlock.info/emoji/tables/unicode
 
 Update 02-08-2018 emotion categories based on https://pdfs.semanticscholar.org/b908/7ac538df1e131c5f751d6cfe3f64f77d1d85.pdf
 Emotion Analysis of Twitter Data that use emoticons and emoji ideograms
->>>>>>> devAA
 """
 
 #It's a list of public objects of that module, as interpreted by import *.
@@ -64,20 +51,7 @@ Emotion Analysis of Twitter Data that use emoticons and emoji ideograms
 #            'EMOJI_TO_CATEGORY', 'EMOTION_CATEGORIES']
 
 
-<<<<<<< HEAD
-class Emotions:
-    EMOT_SMILE = "EMOT_SMILE"
-    EMOT_LAUGH = "EMOT_LAUGH"
-    EMOT_LOVE = "EMOT_LOVE"
-    EMOT_WINK = "EMOT_WINK"
-    EMOT_SAD_ANGRY = "EMOT_SAD_ANGRY"
-    EMOT_SURPRISED = "EMOT_SURPRISED"
-    EMOT_CRY = "EMOT_CRY"
 
-
-    EMOTION_CATEGORIES = [EMOT_SMILE, EMOT_LAUGH, EMOT_LOVE, EMOT_WINK, EMOT_SAD_ANGRY,
-                            EMOT_SURPRISED, EMOT_CRY]
-=======
 class Emotions_positive:
     EMOT_JOY = "EMOT_JOY"
     EMOT_LOVE = "EMOT_LOVE"
@@ -97,110 +71,11 @@ class Emotions_negative:
 #                          EMOT_HORROR_DISGUST, EMOT_SKEPTICAL_ANNOYED]
 
 
->>>>>>> devAA
 
 
 # unicode emoticons to find these patterns in tweet
 #TODO continue categorisation
 EMOTICONS_UNICODE = {
-<<<<<<< HEAD
-    u":‑\)":Emotions.EMOT_SMILE,
-    u":\)":Emotions.EMOT_SMILE,
-    u":-\]":Emotions.EMOT_SMILE,
-    u":\]":Emotions.EMOT_SMILE,
-    u":-3":Emotions.EMOT_SMILE,
-    u":3":Emotions.EMOT_SMILE,
-    u":->":Emotions.EMOT_SMILE,
-    u":>":Emotions.EMOT_SMILE,
-    u"8-\)":Emotions.EMOT_SMILE,
-    u":o\)":Emotions.EMOT_SMILE,
-    u":-\}":Emotions.EMOT_SMILE,
-    u":\}":Emotions.EMOT_SMILE,
-    u":-\)":Emotions.EMOT_SMILE,
-    u":c\)":Emotions.EMOT_SMILE,
-    u":\^\)":Emotions.EMOT_SMILE,
-    u"=\]":Emotions.EMOT_SMILE,
-    u"=\)":Emotions.EMOT_SMILE,
-    u":‑D":Emotions.EMOT_LAUGH,
-    u":D":Emotions.EMOT_LAUGH,
-    u"8‑D":Emotions.EMOT_LAUGH,
-    u"8D":Emotions.EMOT_LAUGH,
-    u"X‑D":Emotions.EMOT_LAUGH,
-    u"XD":Emotions.EMOT_LAUGH,
-    u"xD":Emotions.EMOT_LAUGH,
-    u"=D":Emotions.EMOT_LAUGH,
-    u"=3":Emotions.EMOT_LAUGH,
-    u"B\^D":Emotions.EMOT_LAUGH,
-    u"dx":Emotions.EMOT_LAUGH,
-    u"\(:":Emotions.EMOT_SMILE,
-    u":-\)\)":Emotions.EMOT_SMILE,
-    u":‑\(":Emotions.EMOT_SAD_ANGRY,
-    u":\(":Emotions.EMOT_SAD_ANGRY,
-    u"\):":Emotions.EMOT_SAD_ANGRY,
-    u":‑c":Emotions.EMOT_SAD_ANGRY,
-    u":c":Emotions.EMOT_SAD_ANGRY,
-    u":‑<":Emotions.EMOT_SAD_ANGRY,
-    u":<":Emotions.EMOT_SAD_ANGRY,
-    u":‑\[":Emotions.EMOT_SAD_ANGRY,
-    u":\[":Emotions.EMOT_SAD_ANGRY,
-    u":-\|\|":Emotions.EMOT_SAD_ANGRY,
-    u">:\[":Emotions.EMOT_SAD_ANGRY,
-    u":\{":Emotions.EMOT_SAD_ANGRY,
-    u":@":Emotions.EMOT_SAD_ANGRY,
-    u">:\(":Emotions.EMOT_SAD_ANGRY,
-    u":'‑\(":Emotions.EMOT_CRY,
-    u":'\(":Emotions.EMOT_CRY,
-    u":'‑\)":"Tears of happiness",
-    u":'\)":"Tears of happiness",
-    u"D‑':":"Horror",
-    u"D:<":Emotions.EMOT_LOVE,
-    u"D:":Emotions.EMOT_LOVE,
-    u"D8":"Great dismay",
-    u"D;":"Great dismay",
-    u"D=":"Great dismay",
-    u"DX":"Great dismay",
-    u":‑O":Emotions.EMOT_SURPRISED,
-    u":O":Emotions.EMOT_SURPRISED,
-    u":‑o":Emotions.EMOT_SURPRISED,
-    u":o":Emotions.EMOT_SURPRISED,
-    u":-0":Emotions.EMOT_SURPRISED,
-    u"8‑0":Emotions.EMOT_SURPRISED,
-    u">:O":Emotions.EMOT_SURPRISED,
-    u":-\*":Emotions.EMOT_LOVE,
-    u":\*":Emotions.EMOT_LOVE,
-    u":X":Emotions.EMOT_LOVE,
-    u";‑\)":Emotions.EMOT_WINK,
-    u";\)":Emotions.EMOT_WINK,
-    u"\*-\)":Emotions.EMOT_WINK,
-    u"\*\)":Emotions.EMOT_WINK,
-    u";‑\]":Emotions.EMOT_WINK,
-    u";\]":Emotions.EMOT_WINK,
-    u";\^\)":Emotions.EMOT_WINK,
-    u":‑,":Emotions.EMOT_WINK,
-    u";D":Emotions.EMOT_WINK,
-    u":‑P":Emotions.EMOT_WINK,
-    u":P":Emotions.EMOT_WINK,
-    u"X‑P":Emotions.EMOT_WINK,
-    #u"XP":Emotions.EMOT_WINK,
-    u":‑Þ":Emotions.EMOT_WINK,
-    u":Þ":Emotions.EMOT_WINK,
-    u":b":Emotions.EMOT_WINK,
-    u"d:":Emotions.EMOT_WINK,
-    u"=p":Emotions.EMOT_WINK,
-    u":p":Emotions.EMOT_WINK,
-    u">:P":Emotions.EMOT_WINK,
-    u":‑/":"Skeptical, annoyed, undecided, uneasy or hesitant",
-    u":/":"Skeptical, annoyed, undecided, uneasy or hesitant",
-    u":-[.]":"Skeptical, annoyed, undecided, uneasy or hesitant",
-    u">:[(\\\)]":"Skeptical, annoyed, undecided, uneasy or hesitant",
-    u">:/":"Skeptical, annoyed, undecided, uneasy or hesitant",
-    u":[(\\\)]":"Skeptical, annoyed, undecided, uneasy or hesitant",
-    u"=/":"Skeptical, annoyed, undecided, uneasy or hesitant",
-    u"=[(\\\)]":"Skeptical, annoyed, undecided, uneasy or hesitant",
-    u":L":"Skeptical, annoyed, undecided, uneasy or hesitant",
-    u"=L":"Skeptical, annoyed, undecided, uneasy or hesitant",
-    u":S":"Skeptical, annoyed, undecided, uneasy or hesitant",
-=======
     u":‑\)":Emotions_positive.EMOT_JOY,
     u":\)":Emotions_positive.EMOT_JOY,
     u":-\]":Emotions_positive.EMOT_JOY,
@@ -297,7 +172,6 @@ EMOTICONS_UNICODE = {
     u":L":'',
     u"=L":'',
     u":S":'',
->>>>>>> devAA
     u":‑\|":"Straight face",
     u":\|":"Straight face",
     u":$":"Embarrassed or blushing",
@@ -313,11 +187,7 @@ EMOTICONS_UNICODE = {
     u"0:3":"Angel, saint or innocent",
     u"0:‑\)":"Angel, saint or innocent",
     u"0:\)":"Angel, saint or innocent",
-<<<<<<< HEAD
-    u":‑b":Emotions.EMOT_WINK,
-=======
     u":‑b":'',
->>>>>>> devAA
     u"0;\^\)":"Angel, saint or innocent",
     u">:‑\)":"Evil or devilish",
     u">:\)":"Evil or devilish",
@@ -422,17 +292,10 @@ EMOTICONS_UNICODE = {
     u"\(\^O\^\)":"Happy",
     u"\(\^o\^\)":"Happy",
     u"\)\^o\^\(":"Happy",
-<<<<<<< HEAD
-    u":O o_O":Emotions.EMOT_SURPRISED,
-    u"o_0":Emotions.EMOT_SURPRISED,
-    u"o\.O":Emotions.EMOT_SURPRISED,
-    u"\(o\.o\)":Emotions.EMOT_SURPRISED,
-=======
     u":O o_O":Emotions_positive.EMOT_SURPRISE,
     u"o_0":Emotions_positive.EMOT_SURPRISE,
     u"o\.O":Emotions_positive.EMOT_SURPRISE,
     u"\(o\.o\)":Emotions_positive.EMOT_SURPRISE,
->>>>>>> devAA
 #    u"oO":"EMOT_SURPRISED", // causes problems: recognises emoticons in words like food, blood
     u"\(\*￣m￣\)":"Dissatisfied",
     u"\(‘A`\)":"Snubbed or Deflated"
@@ -442,104 +305,6 @@ EMOTICONS_UNICODE = {
 # non unicode patterns to replace string smilie by category
 # TODO: continue categorisation
 EMOTICONS = {
-<<<<<<< HEAD
-    ":‑)":Emotions.EMOT_SMILE,
-    ":)":Emotions.EMOT_SMILE,
-    ":-]":Emotions.EMOT_SMILE,
-    ":]":Emotions.EMOT_SMILE,
-    ":-3":Emotions.EMOT_SMILE,
-    ":3":Emotions.EMOT_SMILE,
-    ":->":Emotions.EMOT_SMILE,
-    ":>":Emotions.EMOT_SMILE,
-    "8-)":Emotions.EMOT_SMILE,
-    ":o)":Emotions.EMOT_SMILE,
-    ":-}":Emotions.EMOT_SMILE,
-    ":}":Emotions.EMOT_SMILE,
-    ":-)":Emotions.EMOT_SMILE,
-    ":c)":Emotions.EMOT_SMILE,
-    ":^)":Emotions.EMOT_SMILE,
-    "=]":Emotions.EMOT_SMILE,
-    "=)":Emotions.EMOT_SMILE,
-    ":‑D":Emotions.EMOT_LAUGH,
-    ":D":Emotions.EMOT_LAUGH,
-    "8‑D":Emotions.EMOT_LAUGH,
-    "8D":Emotions.EMOT_LAUGH,
-    "X‑D":Emotions.EMOT_LAUGH,
-    "XD":Emotions.EMOT_LAUGH,
-    "xD":Emotions.EMOT_LAUGH,
-    "=D":Emotions.EMOT_LAUGH,
-    "=3":Emotions.EMOT_LAUGH,
-    "B^D":Emotions.EMOT_LAUGH,
-    ":-))":Emotions.EMOT_SMILE,
-    "dx":Emotions.EMOT_LAUGH,
-    "(:":Emotions.EMOT_SMILE,
-    ":‑(":Emotions.EMOT_SAD_ANGRY,
-    ":(":Emotions.EMOT_SAD_ANGRY,
-    "):":Emotions.EMOT_SAD_ANGRY,
-    ":‑c":Emotions.EMOT_SAD_ANGRY,
-    ":c":Emotions.EMOT_SAD_ANGRY,
-    ":‑<":Emotions.EMOT_SAD_ANGRY,
-    ":<":Emotions.EMOT_SAD_ANGRY,
-    ":‑[":Emotions.EMOT_SAD_ANGRY,
-    ":[":Emotions.EMOT_SAD_ANGRY,
-    ":-||":Emotions.EMOT_SAD_ANGRY,
-    ">:[":Emotions.EMOT_SAD_ANGRY,
-    ":{":Emotions.EMOT_SAD_ANGRY,
-    ":@":Emotions.EMOT_SAD_ANGRY,
-    ">:(":Emotions.EMOT_SAD_ANGRY,
-    ":'‑(":Emotions.EMOT_CRY,
-    ":'(":Emotions.EMOT_CRY,
-    ":'‑)":"Tears of happiness",
-    ":')":"Tears of happiness",
-    "D‑':":"Horror",
-    "D:<":Emotions.EMOT_LOVE,
-    "D:":Emotions.EMOT_LOVE,
-    "D8":"Great dismay",
-    "D;":"Great dismay",
-    "D=":"Great dismay",
-    "DX":"Great dismay",
-    ":‑O":Emotions.EMOT_SURPRISED,
-    ":O":Emotions.EMOT_SURPRISED,
-    ":‑o":Emotions.EMOT_SURPRISED,
-    ":o":Emotions.EMOT_SURPRISED,
-    ":-0":Emotions.EMOT_SURPRISED,
-    "8‑0":Emotions.EMOT_SURPRISED,
-    ">:O":Emotions.EMOT_SURPRISED,
-    ":-*":Emotions.EMOT_LOVE,
-    ":*":Emotions.EMOT_LOVE,
-    ":X":Emotions.EMOT_LOVE,
-    ";‑)":Emotions.EMOT_WINK,
-    ";)":Emotions.EMOT_WINK,
-    "*-)":Emotions.EMOT_WINK,
-    "*)":Emotions.EMOT_WINK,
-    ";‑]":Emotions.EMOT_WINK,
-    ";]":Emotions.EMOT_WINK,
-    ";^)":Emotions.EMOT_WINK,
-    ":‑,":Emotions.EMOT_WINK,
-    ";D":Emotions.EMOT_WINK,
-    ":‑P":Emotions.EMOT_WINK,
-    ":P":Emotions.EMOT_WINK,
-    "X‑P":Emotions.EMOT_WINK,
-   # "XP":Emotions.EMOT_WINK,
-    ":‑Þ":Emotions.EMOT_WINK,
-    ":Þ":Emotions.EMOT_WINK,
-    ":p":Emotions.EMOT_WINK,
-    ":b":Emotions.EMOT_WINK,
-    "d:":Emotions.EMOT_WINK,
-    "=p":Emotions.EMOT_WINK,
-    ">:P":Emotions.EMOT_WINK,
-    ":‑":"Skeptical, annoyed, undecided, uneasy or hesitant",
-    ":/":"Skeptical, annoyed, undecided, uneasy or hesitant",
-    ":-[.]":"Skeptical, annoyed, undecided, uneasy or hesitant",
-    ">:[(\\)]":"Skeptical, annoyed, undecided, uneasy or hesitant",
-    ">:/":"Skeptical, annoyed, undecided, uneasy or hesitant",
-    ":[(\\)]":"Skeptical, annoyed, undecided, uneasy or hesitant",
-    "=/":"Skeptical, annoyed, undecided, uneasy or hesitant",
-    "=[(\\)]":"Skeptical, annoyed, undecided, uneasy or hesitant",
-    ":L":"Skeptical, annoyed, undecided, uneasy or hesitant",
-    "=L":"Skeptical, annoyed, undecided, uneasy or hesitant",
-    ":S":"Skeptical, annoyed, undecided, uneasy or hesitant",
-=======
     ":‑)":Emotions_positive.EMOT_JOY,
     ":)":Emotions_positive.EMOT_JOY,
     ":-]":Emotions_positive.EMOT_JOY,
@@ -636,7 +401,6 @@ EMOTICONS = {
     ":L":'',
     "=L":'',
     ":S":'',
->>>>>>> devAA
     ":‑|":"Straight face",
     ":|":"Straight face",
     ":$":"Embarrassed or blushing",
@@ -652,11 +416,7 @@ EMOTICONS = {
     "0:3":"Angel, saint or innocent",
     "0:‑)":"Angel, saint or innocent",
     "0:)":"Angel, saint or innocent",
-<<<<<<< HEAD
-    ":‑b":Emotions.EMOT_WINK,
-=======
     ":‑b":'',
->>>>>>> devAA
     "0;^)":"Angel, saint or innocent",
     ">:‑)":"Evil or devilish",
     ">:)":"Evil or devilish",
@@ -761,17 +521,10 @@ EMOTICONS = {
     "(^O^)":"Happy",
     "(^o^)":"Happy",
     ")^o^(":"Happy",
-<<<<<<< HEAD
-    ":O o_O":Emotions.EMOT_SURPRISED,
-    "o_0":Emotions.EMOT_SURPRISED,
-    "o.O":Emotions.EMOT_SURPRISED,
-    "(o.o)":Emotions.EMOT_SURPRISED,
-=======
     ":O o_O":Emotions_positive.EMOT_SURPRISE,
     "o_0":Emotions_positive.EMOT_SURPRISE,
     "o.O":Emotions_positive.EMOT_SURPRISE,
     "(o.o)":Emotions_positive.EMOT_SURPRISE,
->>>>>>> devAA
 #    "oO":"EMOT_SURPRISED",
     "(*￣m￣)":"Dissatisfied",
     "(‘A`)":"Snubbed or Deflated"
