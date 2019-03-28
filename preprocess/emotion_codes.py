@@ -3277,27 +3277,16 @@ EMOJI_TO_CATEGORY = {
      ':american_football:': '',
      ':amphora:': '',
      ':anchor:': '',
-<<<<<<< HEAD
-     ':anger_symbol:': '',
-     ':angry_face:': Emotions.EMOT_LOVE,
-     ':angry_face_with_horns:': Emotions.EMOT_LOVE,
-     ':anguished_face:': '',
-=======
      ':anger_symbol:': Emotions_negative.EMOT_ANGER,
      ':angry_face:': Emotions_negative.EMOT_ANGER,
      ':angry_face_with_horns:': Emotions_negative.EMOT_ANGER,
      ':anguished_face:': Emotions_negative.EMOT_SADNESS,
->>>>>>> devAA
      ':ant:': '',
      ':antenna_bars:': '',
      ':anticlockwise_arrows_button:': '',
      ':articulated_lorry:': '',
      ':artist_palette:': '',
-<<<<<<< HEAD
-     ':astonished_face:': Emotions.EMOT_SURPRISED,
-=======
      ':astonished_face:': Emotions_positive.EMOT_SURPRISE,
->>>>>>> devAA
      ':atom_symbol:': '',
      ':automobile:': '',
      ':avocado:': '',
@@ -3359,11 +3348,7 @@ EMOJI_TO_CATEGORY = {
      ':battery:': '',
      ':beach_with_umbrella:': '',
      ':bear_face:': '',
-<<<<<<< HEAD
-     ':beating_heart:': Emotions.EMOT_LOVE,
-=======
      ':beating_heart:': Emotions_positive.EMOT_LOVE,
->>>>>>> devAA
      ':bed:': '',
      ':beer_mug:': '',
      ':bell:': '',
@@ -3406,11 +3391,7 @@ EMOJI_TO_CATEGORY = {
      ':blowfish:': '',
      ':blue_book:': '',
      ':blue_circle:': '',
-<<<<<<< HEAD
-     ':blue_heart:': Emotions.EMOT_LOVE,
-=======
      ':blue_heart:': Emotions_positive.EMOT_LOVE,
->>>>>>> devAA
      ':boar:': '',
      ':bomb:': '',
      ':bookmark:': '',
@@ -3470,11 +3451,7 @@ EMOJI_TO_CATEGORY = {
      ':castle:': '',
      ':cat:': '',
      ':cat_face:': '',
-<<<<<<< HEAD
-     ':cat_face_with_tears_of_joy:': Emotions.EMOT_LAUGH,
-=======
      ':cat_face_with_tears_of_joy:': Emotions_positive.EMOT_JOY,
->>>>>>> devAA
      ':cat_face_with_wry_smile:': '',
      ':chains:': '',
      ':chart_decreasing:': '',
@@ -3529,11 +3506,7 @@ EMOJI_TO_CATEGORY = {
      ':computer_mouse:': '',
      ':confetti_ball:': '',
      ':confounded_face:': '', # TODO
-<<<<<<< HEAD
-     ':confused_face:': '',
-=======
      ':confused_face:': Emotions_negative.EMOT_SADNESS,
->>>>>>> devAA
      ':construction:': '',
      ':construction_worker:': '',
      ':construction_worker_dark_skin_tone:': '',
@@ -3548,17 +3521,10 @@ EMOJI_TO_CATEGORY = {
      ':cooking:': '',
      ':copyright:': '',
      ':couch_and_lamp:': '',
-<<<<<<< HEAD
-     ':couple_with_heart:': '',
-     ':couple_with_heart_man_man:': '',
-     ':couple_with_heart_woman_man:': '',
-     ':couple_with_heart_woman_woman:': '',
-=======
      ':couple_with_heart:': Emotions_positive.EMOT_LOVE,
      ':couple_with_heart_man_man:': Emotions_positive.EMOT_LOVE,
      ':couple_with_heart_woman_man:': Emotions_positive.EMOT_LOVE,
      ':couple_with_heart_woman_woman:': Emotions_positive.EMOT_LOVE,
->>>>>>> devAA
      ':cow:': '',
      ':cow_face:': '',
      ':cowboy_hat_face:': '',
@@ -3580,13 +3546,8 @@ EMOJI_TO_CATEGORY = {
      ':crossed_flags:': '',
      ':crossed_swords:': '',
      ':crown:': '',
-<<<<<<< HEAD
-     ':crying_cat_face:': Emotions.EMOT_CRY,
-     ':crying_face:' : Emotions.EMOT_CRY,
-=======
      ':crying_cat_face:': Emotions_negative.EMOT_SADNESS,
      ':crying_face:' : Emotions_negative.EMOT_SADNESS,
->>>>>>> devAA
      ':crystal_ball:': '',
      ':cucumber:': '',
      ':curly_loop:': '',
@@ -3617,17 +3578,10 @@ EMOJI_TO_CATEGORY = {
      ':diamond_with_a_dot:': '',
      ':dim_button:': '',
      ':direct_hit:': '',
-<<<<<<< HEAD
-     ':disappointed_but_relieved_face:': '',
-     ':disappointed_face:': '', # TODO
-     ':dizzy:': Emotions.EMOT_SURPRISED,
-     ':dizzy_face:': Emotions.EMOT_SURPRISED,
-=======
      ':disappointed_but_relieved_face:': Emotions_negative.EMOT_SADNESS,
      ':disappointed_face:': Emotions_negative.EMOT_SADNESS,
      ':dizzy:': Emotions_positive.EMOT_SURPRISE,
      ':dizzy_face:': Emotions_positive.EMOT_SURPRISE,
->>>>>>> devAA
      ':dog:': '',
      ':dog_face:': '',
      ':dollar_banknote:': '',
@@ -3680,22 +3634,6 @@ EMOJI_TO_CATEGORY = {
      ':eye:': '',
      ':eye_in_speech_bubble:': '',
      ':eyes:': '',
-<<<<<<< HEAD
-     ':face_blowing_a_kiss:': Emotions.EMOT_LOVE,
-     ':face_savouring_delicious_food:': '', # TODO
-     ':face_screaming_in_fear:': '',
-     ':face_with_cold_sweat:': '', # TODO
-     ':face_with_head-bandage:': '',
-     ':face_with_medical_mask:': '',
-     ':face_with_open_mouth:': Emotions.EMOT_SURPRISED,
-     ':face_with_open_mouth_&_cold_sweat:': '',
-     ':face_with_rolling_eyes:': '',
-     ':face_with_steam_from_nose:': Emotions.EMOT_LOVE,
-     ':face_with_stuck-out_tongue:': '', #TODO
-     ':face_with_stuck-out_tongue_&_closed_eyes:': '',#TODO
-     ':face_with_stuck-out_tongue_&_winking_eye:': '', # TODO
-     ':face_with_tears_of_joy:': Emotions.EMOT_LAUGH,
-=======
      ':face_blowing_a_kiss:': Emotions_positive.EMOT_LOVE,
      ':face_savouring_delicious_food:': '', # TODO
      ':face_screaming_in_fear:': Emotions_positive.EMOT_SURPRISE+" "+Emotions_negative.EMOT_FEAR,
@@ -3710,7 +3648,6 @@ EMOJI_TO_CATEGORY = {
      ':face_with_stuck-out_tongue_&_closed_eyes:': '',#TODO
      ':face_with_stuck-out_tongue_&_winking_eye:': '', # TODO
      ':face_with_tears_of_joy:': Emotions_positive.EMOT_JOY,
->>>>>>> devAA
      ':face_with_thermometer:': '',
      ':face_without_mouth:': '',
      ':factory:': '',
@@ -3728,7 +3665,6 @@ EMOJI_TO_CATEGORY = {
      ':family_man_man_girl_girl:': '',
      ':family_man_woman_boy:': '',
      ':family_man_woman_boy_boy:': '',
-
      ':family_man_woman_girl:': '',
      ':family_man_woman_girl_boy:': '',
      ':family_man_woman_girl_girl:': '',
@@ -3747,11 +3683,7 @@ EMOJI_TO_CATEGORY = {
      ':fast_reverse_button:': '',
      ':fast_up_button:': '',
      ':fax_machine:': '',
-<<<<<<< HEAD
-     ':fearful_face:': '', # TODO
-=======
      ':fearful_face:': Emotions_negative.EMOT_FEAR,
->>>>>>> devAA
      ':female_sign:': '',
      ':ferris_wheel:': '',
      ':ferry:': '',
@@ -3781,11 +3713,7 @@ EMOJI_TO_CATEGORY = {
      ':flexed_biceps_medium_skin_tone:': '',
      ':floppy_disk:': '',
      ':flower_playing_cards:': '',
-<<<<<<< HEAD
-     ':flushed_face:': Emotions.EMOT_SURPRISED,
-=======
      ':flushed_face:': Emotions_negative.EMOT_SADNESS,
->>>>>>> devAA
      ':fog:': '',
      ':foggy:': '',
      ':folded_hands:': '',
@@ -3839,15 +3767,6 @@ EMOJI_TO_CATEGORY = {
      ':grapes:': '',
      ':green_apple:': '',
      ':green_book:': '',
-<<<<<<< HEAD
-     ':green_heart:': Emotions.EMOT_LOVE,
-     ':green_salad:': '',
-     ':grimacing_face:': '',
-     ':grinning_cat_face_with_smiling_eyes:': '',
-     ':grinning_face:': '',
-     ':grinning_face_with_smiling_eyes:': Emotions.EMOT_LAUGH,
-     ':growing_heart:': '',
-=======
      ':green_heart:': Emotions_positive.EMOT_LOVE,
      ':green_salad:': '',
      ':grimacing_face:': '',
@@ -3855,7 +3774,6 @@ EMOJI_TO_CATEGORY = {
      ':grinning_face:': Emotions_positive.EMOT_JOY,
      ':grinning_face_with_smiling_eyes:': Emotions_positive.EMOT_JOY,
      ':growing_heart:': Emotions_positive.EMOT_LOVE,
->>>>>>> devAA
      ':guard:': '',
      ':guard_dark_skin_tone:': '',
      ':guard_light_skin_tone:': '',
@@ -3873,13 +3791,8 @@ EMOJI_TO_CATEGORY = {
      ':hatching_chick:': '',
      ':headphone:': '',
      ':hear-no-evil_monkey:': '',
-<<<<<<< HEAD
-     ':heart_decoration:': '',
-     ':heart_suit:': '',
-=======
      ':heart_decoration:': Emotions_positive.EMOT_LOVE,
      ':heart_suit:': Emotions_positive.EMOT_LOVE,
->>>>>>> devAA
      ':heart_with_arrow:': '',
      ':heart_with_ribbon:': '',
      ':heavy_check_mark:': '',
@@ -3919,15 +3832,9 @@ EMOJI_TO_CATEGORY = {
      ':hourglass_with_flowing_sand:': '',
      ':house:': '',
      ':house_with_garden:': '',
-<<<<<<< HEAD
-     ':hugging_face:': Emotions.EMOT_LOVE,
-     ':hundred_points:': '',
-     ':hushed_face:': '',
-=======
      ':hugging_face:': Emotions_positive.EMOT_LOVE,
      ':hundred_points:': '',
      ':hushed_face:': Emotions_positive.EMOT_SURPRISE,
->>>>>>> devAA
      ':ice_cream:': '',
      ':ice_hockey:': '',
      ':ice_skate:': '',
@@ -3967,17 +3874,6 @@ EMOJI_TO_CATEGORY = {
      ':keycap_9:': '',
      ':kick_scooter:': '',
      ':kimono:': '',
-<<<<<<< HEAD
-     ':kiss:': Emotions.EMOT_LOVE,
-     ':kiss_man_man:': Emotions.EMOT_LOVE,
-     ':kiss_mark:': Emotions.EMOT_LOVE ,
-     ':kiss_woman_man:': Emotions.EMOT_LOVE,
-     ':kiss_woman_woman:': Emotions.EMOT_LOVE,
-     ':kissing_cat_face_with_closed_eyes:': Emotions.EMOT_LOVE,
-     ':kissing_face:': Emotions.EMOT_LOVE,
-     ':kissing_face_with_closed_eyes:': Emotions.EMOT_LOVE,
-     ':kissing_face_with_smiling_eyes:': Emotions.EMOT_LOVE,
-=======
      ':kiss:': Emotions_positive.EMOT_LOVE,
      ':kiss_man_man:': Emotions_positive.EMOT_LOVE,
      ':kiss_mark:': Emotions_positive.EMOT_LOVE ,
@@ -3987,7 +3883,6 @@ EMOJI_TO_CATEGORY = {
      ':kissing_face:': Emotions_positive.EMOT_LOVE,
      ':kissing_face_with_closed_eyes:': Emotions_positive.EMOT_LOVE,
      ':kissing_face_with_smiling_eyes:': Emotions_positive.EMOT_LOVE,
->>>>>>> devAA
      ':kitchen_knife:': '',
      ':kiwi_fruit:': '',
      ':koala:': '',
@@ -4031,11 +3926,7 @@ EMOJI_TO_CATEGORY = {
      ':locked_with_pen:': '',
      ':locomotive:': '',
      ':lollipop:': '',
-<<<<<<< HEAD
-     ':loudly_crying_face:': Emotions.EMOT_CRY,
-=======
      ':loudly_crying_face:': Emotions_negative.EMOT_SADNESS,
->>>>>>> devAA
      ':loudspeaker:': '',
      ':love_hotel:': '',
      ':love_letter:': '',
@@ -4283,7 +4174,6 @@ EMOJI_TO_CATEGORY = {
      ':man_scientist_medium-dark_skin_tone:': '',
      ':man_scientist_medium-light_skin_tone:': '',
      ':man_scientist_medium_skin_tone:': '',
-
      ':man_shrugging:': '',
      ':man_shrugging_dark_skin_tone:': '',
      ':man_shrugging_light_skin_tone:': '',
@@ -4417,11 +4307,7 @@ EMOJI_TO_CATEGORY = {
      ':nail_polish_medium_skin_tone:': '',
      ':name_badge:': '',
      ':national_park:': '',
-<<<<<<< HEAD
-     ':nauseated_face:': '',
-=======
      ':nauseated_face:': Emotions_negative.EMOT_FEAR,
->>>>>>> devAA
      ':necktie:': '',
      ':nerd_face:': '',
      ':neutral_face:': '',
@@ -4518,11 +4404,7 @@ EMOJI_TO_CATEGORY = {
      ':pen:': '',
      ':pencil:': '',
      ':penguin:': '',
-<<<<<<< HEAD
-     ':pensive_face:': '', # TODO
-=======
      ':pensive_face:': Emotions_negative.EMOT_SADNESS,
->>>>>>> devAA
      ':people_with_bunny_ears_partying:': '',
      ':people_wrestling:': '',
      ':performing_arts:': '',
@@ -4700,11 +4582,7 @@ EMOJI_TO_CATEGORY = {
      ':pig:': '',
      ':pig_face:': '',
      ':pig_nose:': '',
-<<<<<<< HEAD
-     ':pile_of_poo:': '',
-=======
      ':pile_of_poo:': Emotions_negative.EMOT_FEAR,
->>>>>>> devAA
      ':pill:': '',
      ':pine_decoration:': '',
      ':pineapple:': '',
@@ -4733,13 +4611,8 @@ EMOJI_TO_CATEGORY = {
      ':potato:': '',
      ':poultry_leg:': '',
      ':pound_banknote:': '',
-<<<<<<< HEAD
-     ':pouting_cat_face:': Emotions.EMOT_LOVE,
-     ':pouting_face:': Emotions.EMOT_LOVE,
-=======
      ':pouting_cat_face:': Emotions_negative.EMOT_ANGER,
      ':pouting_face:': Emotions_negative.EMOT_ANGER,
->>>>>>> devAA
      ':prayer_beads:': '',
      ':pregnant_woman:': '',
      ':pregnant_woman_dark_skin_tone:': '',
@@ -4761,11 +4634,7 @@ EMOJI_TO_CATEGORY = {
      ':princess_medium_skin_tone:': '',
      ':printer:': '',
      ':prohibited:': '',
-<<<<<<< HEAD
-     ':purple_heart:': Emotions.EMOT_LOVE,
-=======
      ':purple_heart:': Emotions_positive.EMOT_LOVE,
->>>>>>> devAA
      ':purse:': '',
      ':pushpin:': '',
      ':question_mark:': '',
@@ -4815,11 +4684,7 @@ EMOJI_TO_CATEGORY = {
      ':recycling_symbol:': '',
      ':red_apple:': '',
      ':red_circle:': '',
-<<<<<<< HEAD
-     ':red_heart:': Emotions.EMOT_LOVE,
-=======
      ':red_heart:': Emotions_positive.EMOT_LOVE,
->>>>>>> devAA
      ':red_paper_lantern:': '',
      ':red_triangle_pointed_down:': '',
      ':red_triangle_pointed_up:': '',
@@ -4831,11 +4696,7 @@ EMOJI_TO_CATEGORY = {
      ':rescue_worker’s_helmet:': '',
      ':restroom:': '',
      ':reverse_button:': '',
-<<<<<<< HEAD
-     ':revolving_hearts:': '',
-=======
      ':revolving_hearts:': Emotions_positive.EMOT_LOVE,
->>>>>>> devAA
      ':rhinoceros:': '',
      ':ribbon:': '',
      ':rice_ball:': '',
@@ -4858,11 +4719,7 @@ EMOJI_TO_CATEGORY = {
      ':rocket:': '',
      ':rolled-up_newspaper:': '',
      ':roller_coaster:': '',
-<<<<<<< HEAD
-     ':rolling_on_the_floor_laughing:': Emotions.EMOT_LAUGH,
-=======
      ':rolling_on_the_floor_laughing:': Emotions_positive.EMOT_JOY,
->>>>>>> devAA
      ':rooster:': '',
      ':rose:': '',
      ':rosette:': '',
@@ -4921,30 +4778,12 @@ EMOJI_TO_CATEGORY = {
      ':skull_and_crossbones:': '',
      ':sleeping_face:': '', # TODO
      ':sleepy_face:': '', # TODO
-<<<<<<< HEAD
-     ':slightly_frowning_face:': '',
-     ':slightly_smiling_face:': Emotions.EMOT_SMILE,
-=======
      ':slightly_frowning_face:': Emotions_negative.EMOT_SADNESS,
      ':slightly_smiling_face:': Emotions_positive.EMOT_JOY,
->>>>>>> devAA
      ':slot_machine:': '',
      ':small_airplane:': '',
      ':small_blue_diamond:': '',
      ':small_orange_diamond:': '',
-<<<<<<< HEAD
-     ':smiling_cat_face_with_heart-eyes:': Emotions.EMOT_LOVE,
-     ':smiling_cat_face_with_open_mouth:': Emotions.EMOT_SMILE,
-     ':smiling_face:': Emotions.EMOT_SMILE,
-     ':smiling_face_with_halo:': Emotions.EMOT_SMILE,
-     ':smiling_face_with_heart-eyes:': Emotions.EMOT_LOVE,
-     ':smiling_face_with_horns:': '',
-     ':smiling_face_with_open_mouth:': Emotions.EMOT_LAUGH,
-     ':smiling_face_with_open_mouth_&_closed_eyes:': Emotions.EMOT_LAUGH,
-     ':smiling_face_with_open_mouth_&_cold_sweat:': '', #TODO
-     ':smiling_face_with_open_mouth_&_smiling_eyes:': Emotions.EMOT_LAUGH,
-     ':smiling_face_with_smiling_eyes:': Emotions.EMOT_SMILE,
-=======
      ':smiling_cat_face_with_heart-eyes:': Emotions_positive.EMOT_LOVE,
      ':smiling_cat_face_with_open_mouth:': Emotions_positive.EMOT_JOY,
      ':smiling_face:': Emotions_positive.EMOT_JOY,
@@ -4956,7 +4795,6 @@ EMOJI_TO_CATEGORY = {
      ':smiling_face_with_open_mouth_&_cold_sweat:': '', #TODO
      ':smiling_face_with_open_mouth_&_smiling_eyes:': Emotions_positive.EMOT_JOY,
      ':smiling_face_with_smiling_eyes:': Emotions_positive.EMOT_JOY,
->>>>>>> devAA
      ':smiling_face_with_sunglasses:': '', # TODO
      ':smirking_face:': '',
      ':snail:': '',
@@ -4979,11 +4817,7 @@ EMOJI_TO_CATEGORY = {
      ':sparkle:': '',
      ':sparkler:': '',
      ':sparkles:': '',
-<<<<<<< HEAD
-     ':sparkling_heart:': '',
-=======
      ':sparkling_heart:': Emotions_positive.EMOT_LOVE,
->>>>>>> devAA
      ':speak-no-evil_monkey:': '',
      ':speaker_high_volume:': '',
      ':speaker_low_volume:': '',
@@ -5094,22 +4928,14 @@ EMOJI_TO_CATEGORY = {
      ':twelve_o’clock:': '',
      ':two-hump_camel:': '',
      ':two-thirty:': '',
-<<<<<<< HEAD
-     ':two_hearts:': Emotions.EMOT_LOVE,
-=======
      ':two_hearts:': Emotions_positive.EMOT_LOVE,
->>>>>>> devAA
      ':two_men_holding_hands:': '',
      ':two_o’clock:': '',
      ':two_women_holding_hands:': '',
      ':umbrella:': '',
      ':umbrella_on_ground:': '',
      ':umbrella_with_rain_drops:': '',
-<<<<<<< HEAD
-     ':unamused_face:': '', #TODO
-=======
      ':unamused_face:': Emotions_negative.EMOT_ANGER,
->>>>>>> devAA
      ':unicorn_face:': '',
      ':unlocked:': '',
      ':up-down_arrow:': '',
@@ -5117,11 +4943,7 @@ EMOJI_TO_CATEGORY = {
      ':up-right_arrow:': '',
      ':up_arrow:': '',
      ':up_button:': '',
-<<<<<<< HEAD
-     ':upside-down_face:': '',
-=======
      ':upside-down_face:': Emotions_positive.EMOT_JOY,
->>>>>>> devAA
      ':vertical_traffic_light:': '',
      ':vibration_mode:': '',
      ':victory_hand:': '',
@@ -5160,13 +4982,8 @@ EMOJI_TO_CATEGORY = {
      ':wavy_dash:': '',
      ':waxing_crescent_moon:': '',
      ':waxing_gibbous_moon:': '',
-<<<<<<< HEAD
-     ':weary_cat_face:': '',
-     ':weary_face:': '',
-=======
      ':weary_cat_face:': Emotions_negative.EMOT_SADNESS,
      ':weary_face:': Emotions_negative.EMOT_SADNESS,
->>>>>>> devAA
      ':wedding:': '',
      ':whale:': '',
      ':wheel_of_dharma:': '',
@@ -5187,11 +5004,7 @@ EMOJI_TO_CATEGORY = {
      ':wind_chime:': '',
      ':wind_face:': '',
      ':wine_glass:': '',
-<<<<<<< HEAD
-     ':winking_face:': Emotions.EMOT_WINK,
-=======
      ':winking_face:': '',
->>>>>>> devAA
      ':wolf_face:': '',
      ':woman:': '',
      ':woman_artist:': '',
@@ -5498,11 +5311,7 @@ EMOJI_TO_CATEGORY = {
      ':writing_hand_medium-dark_skin_tone:': '',
      ':writing_hand_medium-light_skin_tone:': '',
      ':writing_hand_medium_skin_tone:': '',
-<<<<<<< HEAD
-     ':yellow_heart:': Emotions.EMOT_LOVE,
-=======
      ':yellow_heart:': Emotions_positive.EMOT_LOVE,
->>>>>>> devAA
      ':yen_banknote:': '',
      ':yin_yang:': '',
      ':zipper-mouth_face:': '',

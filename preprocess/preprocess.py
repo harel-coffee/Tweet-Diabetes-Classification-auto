@@ -17,7 +17,7 @@ import nltk
 from nltk import word_tokenize
 from nltk.tokenize import TweetTokenizer
 from nltk.corpus import stopwords
-from nltk.stem import WordNetLemmatize
+from nltk.stem import WordNetLemmatizer
 
 
 from emotion_codes import UNICODE_EMOJI
