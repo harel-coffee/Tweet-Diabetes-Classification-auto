@@ -102,6 +102,17 @@ class ItemSelector(BaseEstimator, TransformerMixin):
         return data_dict[self.key]
 
 
+class ItemSelect(BaseEstimator, TransformerMixin):
+
+    def __init__(self, key):
+        self.key = key
+
+    def fit(self, x, y=None):
+        return self
+
+    def transform(self, data):
+        return np.asarray(data[self.key].values.tolist())
+
 
 class ArrayCaster(BaseEstimator, TransformerMixin):
     """ Transposes meta data matrix so it fits to the tweet matrix in the feature union (pipeline)"""

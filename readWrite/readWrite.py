@@ -34,7 +34,7 @@ def readFile(path, columns=None, sep=";"):
 
     print("Local mode: Read file..")
     if path.endswith(".csv"):
-        return pd.read_csv(path, sep=args.localCSVDelimiter)
+        return pd.read_csv(path)
 #    elif path.endswith(".parquet"):
     elif ".parquet" in path:
         if path.startswith("hdfs"):
