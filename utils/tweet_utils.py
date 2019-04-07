@@ -113,7 +113,8 @@ def tweet_vectorizer(tweet, model):
         except:
             print("no embedding for {} !!!!!!!!!!!!".format(w))
 
-    return np.asarray(tweet_vec) / numw
+    if tweet_vec == []: return np.zeros((model.vector_size, ))
+    else: return np.asarray(tweet_vec) / numw
 
 
 def get_meta_data_features(tweets_csv, manually_labelled_tweets):
