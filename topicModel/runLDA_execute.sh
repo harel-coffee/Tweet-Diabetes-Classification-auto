@@ -1,8 +1,7 @@
-#!/bin/sh
 
-/space/hadoop/lib/python/bin/python3 runLDA.py \
+python runLDA.py \
   --mode "local" \
-  --filename "hdfs://bgdta1-demy:8020/data/twitter/wdds/US/personalTweets_mergedAllLocations_US_geoCityCodeNotNull.parquet" \
+  --filename "/Users/Adrian/Desktop/WDDS/Models_Data/tweets_08042019/matching-tweets_diab_noRetweetsDupl_personal_noJokes_LocationUS_geoCityCodeNotNull.parquet" \
   --filenameColumns "id, created_at, text, user_screen_name" \
-  --saveResultPath "/space/tmp/LDA_results_13032019" \
-  --numberTopics "10, 20" 
+  --saveResultPath "/Users/Adrian/Desktop/WDDS/TopicModels/LDA_08042019" \
+  --numberTopics "30, 50, 100" 
