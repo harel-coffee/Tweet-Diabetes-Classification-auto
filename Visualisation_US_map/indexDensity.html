@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <script src="http://code.jquery.com/jquery-2.0.0.js"></script>
+    <style>
+    #countries, #states {   /* Define color light blue */
+      fill: none;
+      stroke: #fff;
+      stroke-linejoin: round;
+      stroke-linecap: round;
+    }
+    #countries .active, #states .active {
+      /*fill: #89a; *//* none;*/
+
+      stroke: "black"; /*#a9a9a9;*/
+  		stroke-width: 1;
+    }
+    #cities {
+      stroke-width: 0;
+    }
+    .state {
+      fill:none;
+    }
+    .city { /* Define city color and form */
+      fill: #345;
+      stroke: #fff;
+      fill: "red";
+    }
+
+    </style>
+  </head>
+  <body>
+<script>
+
+</script>
+<div id="map"></div>  <!--Draws rectangle -->
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://d3js.org/topojson.v1.min.js"></script>
+<script>
+var m_width = $("#map").width(),
+    width = 938/*938*/,
+    height = 500/*500*/,
+    country,
+    state;
+
+min_Ntweets = 80
+
+var tooltip = d3.select("body")
+    .append("div")
+    .style("position", "absolute")
+    .style("z-index", "100")
+    .style("visibility", "hidden")
+    .style("background", "#000")
+    .text("a simple tooltip");
+
+
+//var projection = d3.geo.mercator() /* converts points from latitude/longitude to 2d cartesian plane x/y values */
+var projection = d3.geo.albersUsa() /* converts points from latitude/longitude to 2d cartesian plane x/y values */
+    .scale(400)
+//		.translate([width / 2, height / 1.5]); // converts [long, lat] to [x, y] centered around [width/2, height/2]
+		.translate([width /6, height /5 ]); // converts [long, lat] to [x, y] centered around [width/2, height/2]
+
+var path = d3.geo.path() /*converts list of points into svg path string (svg has own "language" for paths) */
+    .projection(projection); /* converts easily from [long, lat] to pixel co-ordinates for svg*/
+
+console.log("width:"+width)
+console.log("height:"+height)
+console.log("m_width:"+m_width)
+
+var svgContainer = d3.select("#map").append("svg") /* Append image */
+    .attr("preserveAspectRatio", "xMidYMid") // how an element with a viewBox providing a given aspect ratio must fit into a viewport with a different aspect ratio.; xMidYMid (the default) - Force uniform scaling.
+		.attr("viewBox", "0 0 " + width/2 + " " + height)
+    .attr("width", m_width /0.8)
+    .attr("height", m_width * height / width *2);
+
+
+
+// create group object which will contain a group object state and one for cities
+var g = svgContainer.append("g");
+
+
+d3.json("states.topo.json", function(error, us) {
+
+  // append us states count and population information
+  d3.json("US_states_pop_count.json", function(count_pop_info) {
+
+    for (var i = 0; i < count_pop_info.length; i++) {
+      for (var j = 0; j < us.objects.states.geometries.length; j++)  {
+        //var jsonState = json.features[j].properties.name;
+        var state_pop = count_pop_info[i].geo_adm1_code;
+        var state = us.objects.states.geometries[j].properties.postal;
+        if (state_pop == state) {
+          us.objects.states.geometries[j].properties.count = count_pop_info[i].count
+          us.objects.states.geometries[j].properties.population = count_pop_info[i].population
+          us.objects.states.geometries[j].properties.color = d3.interpolate("#ffffcc", "#800026")((us.objects.states.geometries[j].properties.count / us.objects.states.geometries[j].properties.population)/0.001995 );
+          break
+        }
+      }
+    }
+    draw_states(us);
+  });
+
+});
+
+// create group containing the cities
+//d3.json("cities_usa_Scale8.topo.json", function(error, us) {
+d3.json("cities_usa_Scale8_CountPopul.topo.json", function(error, us) {
+    console.log("citiesUSA")
+    console.log(us)
+    draw_cities(us)
+
+});
+
+
+function draw_states(states) {
+   g.append("g")
+     .attr("id", "states")
+     .selectAll("path")
+     .data(topojson.feature(states, states.objects.states).features)
+     .enter()
+     .append("path")
+     .attr("id", function(d) { return d.id; })
+     .attr("class", "active")
+     .style("fill", function(d) {return d.properties.color} /*get_color*/ /*"#d7ae98"*/)
+     .attr("d", path)
+     .on("click", state_clicked);
+ }
+
+function draw_cities(cities) {
+
+  var maxRatio = cities.objects.citiesScale8.geometries
+                      .filter(value => value.properties.count > min_Ntweets)
+                      .map( value => value.properties.count / value.properties.population )
+                      .reduce(getMax)
+  console.log("Max:"+maxRatio)
+  g.append("g")
+ 		.attr("id", "cities")
+ 		.selectAll("path")
+ 		.data(topojson.feature(cities, cities.objects.citiesScale8) /* Convert TopoJSON to GeoJSON; (topology, object) -> Return FeatureCollection */
+ 									.features.filter(function(d) {
+                        return d.properties.count > min_Ntweets }))
+ 		.enter()
+ 		.append("path")
+ 		.attr("id", function(d) { return d.properties.name; }) // add city
+ 		.attr("class", "city")
+    .attr("d", function(d) {
+        //return path.pointRadius(0.001 *  d.properties.count )(d)
+        return path.pointRadius(900 *  (d.properties.count/d.properties.population) /*/ maxRatio*/ )(d)
+      })
+    .append("svg:title")
+    .text(function(d) {
+        var name = d.properties.NAME+"("+d.properties.ADM1NAME+")"+"\n Count:"+d.properties.count+"\n Population:"+d.properties.population+"\n("+d.properties.count/d.properties.population+")"
+        return name; });
+    // .on("mouseover", /*mouseOver*/ function(d){
+    //           console.log(d.properties.NAME)
+    //           tooltip.text(d.properties.NAME);
+    //           return tooltip.style("visibility", "visible");})
+    // .on("mousemove", function(){return tooltip.style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px");})
+  	// .on("mouseout", function(){return tooltip.style("visibility", "hidden");});
+
+    //.attr("d", path.pointRadius(50 /10 /*xyz[2]*/));
+}
+
+function mouseOver(d){
+  d3.select("#map").transition().duration(200).style("opacity", .9);
+
+  d3.select("#map").html(toolTip(d.properties.NAME))
+    .style("left", (d3.event.pageX) + "px")
+    .style("top", (d3.event.pageY - 28) + "px");
+    //tooltip.text(d.properties.NAME);
+    //return tooltip.style("visibility", "visible")
+}
+
+
+
+function state_clicked(d) {
+  // remove all cities
+  var xyz = get_xyz(d);
+  g.selectAll("#cities").remove();
+  console.log("state clicked:")
+  console.log(d.properties.name)
+  var state_name = d.properties.name;
+
+  d3.json("cities_usa_Scale8_CountPopul.topo.json", function(error, cities) {
+      var maxRatio = cities.objects.citiesScale8.geometries.filter(function(d) {return d.properties.ADM1NAME==state_name})
+                          .filter(value => value.properties.count > min_Ntweets)
+                          .map( value => value.properties.count / value.properties.population )
+                          .reduce(getMax)
+      console.log("State max:"+maxRatio)
+      g.append("g")
+     		.attr("id", "cities")
+     		.selectAll("path")
+     		.data(topojson.feature(cities, cities.objects.citiesScale8) /* Convert TopoJSON to GeoJSON; (topology, object) -> Return FeatureCollection */
+     									.features.filter(function(d) { /* Filter features (with cities) in FeatureCollection*/
+     						return state_name == d.properties.ADM1NAME; })
+                .filter(function(d) {
+                      return d.properties.count > min_Ntweets }))
+     		.enter()
+     		.append("path")
+     		.attr("id", function(d) { return d.properties.name; }) // add city
+     		.attr("class", "city")
+        .attr("d", function(d) {
+            return path.pointRadius(900 * /*maxRatio **/ (d.properties.count/d.properties.population))(d)
+          })
+        .append("svg:title")
+        .text(function(d) {
+              var name = d.properties.NAME+"("+d.properties.ADM1NAME+")"+"\n Count:"+d.properties.count+"\n Population:"+d.properties.population+"\n("+d.properties.count/d.properties.population+")"
+              return name; });
+     	});
+
+  zoom(xyz);
+};
+
+
+function zoom(xyz) {
+  g.transition()
+    .duration(750)
+    .attr("transform", "translate(" + projection.translate() + ")scale(" + xyz[2] + ")translate(-" + xyz[0] + ",-" + xyz[1] + ")")
+//    .attr("transform", "translate(-" + xyz[0] +",-"+ xyz[1]+ ")scale(" + xyz[2] + ")")
+    .selectAll(["#countries", "#states", "#cities"])
+    .style("stroke-width", 1.0 / xyz[2] + "px")
+    .selectAll(".city")
+    .attr("d", path.pointRadius(20.0 / xyz[2]));
+}
+
+function get_xyz(d) {                                // [[0,0], [0,1]] [[1,0], [1,1]]
+  var bounds = path.bounds(d); // returns bounding box: [[xmin, ymin], [xmax, ymax]] in pixel starting in top left corner
+	console.log("get_xyz d:")
+	console.log(d)
+	console.log("bounds:"+bounds)
+	var dx = bounds[1][0] - bounds[0][0];
+	var dy = bounds[1][1] - bounds[0][1];
+	var x = (bounds[0][0] + bounds[1][0]) / 2;
+	var y = (bounds[0][1] + bounds[1][1]) / 2;
+
+//  var scale = 0.3 /*.96*/ / Math.max(dx / width, dy / height);
+//  var x_translate = x + dx/10;
+//	var y_translate = y - (height / scale /15);
+  var scale = 0.3 /*.96*/ / Math.max(dx / width, dy / height);
+  var x_translate = x + dx/10;
+	var y_translate = (y - (height / scale /30))*1.05;
+return [x_translate, y_translate, scale];
+
+}
+
+function getMax(a, b){
+  if (a > b ) { return a;}
+  else {return b;}
+}
+
+$(window).resize(function() {
+  var w = $("#map").width();
+//  svgContainer.attr("width", w);
+//  svgContainer.attr("height", w * height / width);
+	svgContainer.attr("width", w/0.8);
+  svgContainer.attr("height", w * height / width*2);
+});
+</script>
+
+</body>
+</html>
