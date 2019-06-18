@@ -37,7 +37,7 @@ def preprocessTweetsAndSave(args, prep):
             # some tweets in the file reduced-tweets.parquet were None
             if tweet is not None:
     #        tweets.append(prep.tokenize(tweet))
-                tweet = prep.replace_hashtags_URL_USER(tweet, mode_URL="replace", mode_Mentions="replace")
+                #tweet = prep.replace_hashtags_URL_USER(tweet, mode_URL="replace", mode_Mentions="replace") 
                 f.write((" ".join(prep.tokenize(tweet)))+"\n")
 
     f.close()
@@ -70,8 +70,8 @@ if __name__ == '__main__':
     parser.add_argument("-lfd", "--filenameDelimiter", help="Delimiter used in file (default=',')", default=",")
     parser.add_argument("-lfc", "--filenameColumns", help="String with column names")
     parser.add_argument("-dcn", "--dataColumnName", help="If data stored in tabular form, gives the column of the desired text data (default='tweetText')", default="tweetText")
-    parser.add_argument("-tf", "--tempFile", help="Temporary file to write preprocessed tweets in and to read directly to FastText training", default="/space/Work/tmp/tmp.cor")
-    parser.add_argument("--vecDim", help="Vector dimension of the word embedding (default=200)", default=200, type=int)
+    parser.add_argument("-tf", "--tempFile", help="Temporary file to write preprocessed tweets in and to read directly to FastText training", default="/space/tmp/tmp.cor")
+    parser.add_argument("--vecDim", help="Vector dimension of the word embedding (default=300)", default=300, type=int)
     parser.add_argument("--window", help="Maximum distance between the current and predicted word within a sentence (default=5)", default=5, type=int)
     parser.add_argument("--minCount", help="The model ignores all words with total frequency lower than this (default=1)", default=1, type=int)
     parser.add_argument("--localWorkers", help="Number of worker threads to train the model (default=all possible cores of machine)", default=multiprocessing.cpu_count())
@@ -150,7 +150,9 @@ if __name__ == '__main__':
 
     print("Save model to disk...")
     #file_name = "Trained_FastText_{}.model".format(datetime.datetime.now().strftime(DATE_FORMAT))
+    if not os.path.isdir(os.path.dirname(args.savePath)):
+        os.makedirs(os.path.dirname(args.savePath))
     model_ft.save(args.savePath)
-
+    
     print("Delete temporary file {}".format(args.tempFile))
     os.remove(args.tempFile)

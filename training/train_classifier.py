@@ -23,11 +23,11 @@ import pandas as pd
 from sklearn.pipeline import Pipeline
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import GridSearchCV, cross_val_predict
+from sklearn.model_selection import GridSearchCV, cross_val_predict, train_test_split
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.svm import SVC, LinearSVC
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, accuracy_score, f1_score, precision_score, recall_score, roc_auc_score, classification_report
 from sklearn.feature_selection import SelectKBest, f_classif
 from sklearn.neural_network import MLPClassifier
 from sklearn.externals import joblib
@@ -218,13 +218,25 @@ if __name__ == '__main__':
     # Option 1) Grid search to find best model
     if args.type == "gridsearch":
         print("Start Grid search...")
-        grid = GridSearchCV(pipeline, parameters, cv=10, n_jobs=-1, verbose=2)
 
-        grid = grid.fit(V, labels.values.ravel())
+        X_train, X_test, y_train, y_test = train_test_split(V, labels.values.ravel(), test_size=0.3, random_state=0) 
 
-        #print(grid.cv_results_)
+        grid = GridSearchCV(pipeline, parameters, cv=10, n_jobs=-1, verbose=1)
+
+        #grid = grid.fit(V, labels.values.ravel())
+        grid = grid.fit(X_train, y_train)
+        
         print("\nBest: %f using %s" % (grid.best_score_, grid.best_params_))
     
+        y_pred = grid.best_estimator_.predict(X_test)
+        print("F1-Score:", f1_score(y_test, y_pred))
+        print("Precision: ",precision_score(y_test, y_pred))
+        print("Recall: ", recall_score(y_test, y_pred))    
+        print("Accuracy: ", accuracy_score(y_test, y_pred)) 
+        print("roc auc: ", roc_auc_score(y_test, y_pred))   
+        print("Performance overall: ")
+        print(classification_report(y_test, y_pred))
+
     elif args.type == "bestmodel":
 
         # Option 2) Train best model and save to disk

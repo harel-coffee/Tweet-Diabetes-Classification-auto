@@ -34,15 +34,21 @@ prep = Preprocess()
 
 
 def preprocess_tweet(tweet):
-    tweet = prep.replace_hashtags_URL_USER(tweet, mode_URL="replace", mode_Mentions="replace")
-    return prep.tokenize(tweet)
+    try:
+        tweet = prep.replace_hashtags_URL_USER(tweet, mode_URL="replace", mode_Mentions="replace")
+        tweet = prep.tokenize(tweet)
+        return tweet
+    except:
+        print("ERROR: can not preprocess tweet:", tweet)
+
+
 
 
 def text_to_embedding(tweets, wordEmbedding, textColumn, userDescriptionColumn):
     temp = pd.DataFrame()
     temp[textColumn] = tweets[textColumn].map(lambda tweet: tweet_vectorizer(preprocess_tweet(tweet), wordEmbedding))
     temp[userDescriptionColumn] = tweets[userDescriptionColumn].map(lambda userDesc: np.zeros((200, ))
-                                                if isinstance(userDesc, float) or userDesc == " "
+                                                if isinstance(userDesc, float) or userDesc == " " or userDesc is None
                                                 else tweet_vectorizer(preprocess_tweet(userDesc), wordEmbedding))
     return temp[[textColumn, userDescriptionColumn]]
 
@@ -85,7 +91,7 @@ if __name__ == '__main__':
     wordEmbedding = FastText.load(args.pathWordEmbedding)
 
     print("Load data..")
-    tweets = readFile(args.pathData, ",")
+    tweets = readFile(args.pathData)
     print("Number tweets:", len(tweets))
     print(tweets.head())
     print("Apply joke classifier and filter out jokes..")

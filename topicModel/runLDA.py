@@ -53,7 +53,7 @@ def to_date(twitter_date):
     return datetime.datetime.strptime(twitter_date, '%a %b %d %H:%M:%S +0000 %Y')
 
 def current_date():
-    return datetime.datetime.now().strftime("%Y-%m-%d_%H:%M")
+    return datetime.datetime.now().strftime("%Y-%m-%d_%H-%M")
 
 def preprocess_tweet(tweet):
     tweet = prep.replace_contractions(tweet)
@@ -303,8 +303,14 @@ if __name__ == '__main__':
 
 #    path_save_LDA = "D:\\A_AHNE1\\Tweet-Classification-Diabetes-Distress\\topicModel\\emotion_LDA_11-09-2018_excludedWords\\"
 #    path_save_dict = "D:\\A_AHNE1\\Tweet-Classification-Diabetes-Distress\\topicModel\\emotion_LDA_11-09-2018_excludedWords\\dictionary.dict"
-    path_save_LDA = op.join(args.saveResultPath, "LDA_"+current_date()+"\\")#"D:\\A_AHNE1\\Tweet-Classification-Diabetes-Distress\\topicModel\\emotion_LDA_11-09-2018_excludedWords\\"
+    path_save_LDA = op.join(args.saveResultPath, "LDA_"+current_date()+"/")#"D:\\A_AHNE1\\Tweet-Classification-Diabetes-Distress\\topicModel\\emotion_LDA_11-09-2018_excludedWords\\"
     path_save_dict = path_save_LDA+"dictionary.dict"
+
+    if not os.path.isdir(args.saveResultPath): os.mkdir(args.saveResultPath)
+    
+    if not os.path.isdir(path_save_LDA):
+        print("Create directory..:", path_save_LDA)
+        os.mkdir(path_save_LDA)
 
     print("Path to save LDA model to: ", path_save_LDA)
     print("Path to save LDA model to: ", path_save_dict)
@@ -322,7 +328,14 @@ if __name__ == '__main__':
             print("Local mode: Read file..")
 
             df = readFile(args.filename, columns=args.filenameColumns, sep=args.filenameDelimiter)
-
+    
+            print("Filter out animals..")
+            animal_list = [" dog", " Dog", " cat ", " Cat ", "cat's"]
+            df["temp"] = df["text"].map(lambda text: any(animal in text for animal in animal_list)) 
+            df = df[df["temp"] == False]
+            del df["temp"]
+            print("Number tweets without animals:", len(df))
+            
             print("Get distinct users...")
             unique_users = df.user_screen_name.unique().tolist()
             print("Number of distinct users:", len(unique_users))
