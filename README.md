@@ -1,12 +1,26 @@
 # Tweet-Classification-Diabetes-Distress
 
-This project aims to identify diabetes distress patterns from social networks. In our case we use Twitter as data source. In a second step a prediction model for the identified distress patterns will be created.
+This project aims to identify diabetes distress patterns based on social media data using artificial intelligence methods. We are working with twitter data. 
+
+In the following a small overview over the directories:
+- Tweets_extraction_Twitter : Extractions of tweets via Twitter API
+- WordEmbeddings : Calculating word embeddings (Word2Vec or FastText) via the gensim package
+- data : Trained models (not up-to-date)
+- db : Algorithms to filter tweets, remove duplicates (from chatbots) , clean database , ..
+- files : Only list with keywords to extract tweets
+- jupyter_notebooks : To experiment 
+- preprocess : Functions to preprocess tweets and textual data in general
+- readWrite : Read & Write files (parquet, csv, text)
+- tests : (not up-to-date)
+- topicModel : Extract topics with LDA method
+- training : Train classifiers for filtering or predicting
+- utils : utility functions
+
 
 More detailed information about the programs and algorithms used, you will find in the corresponding folders.
 
 Check the development branch 'devAA' for current programs.
 
 ## Prerequisites 
-- MongoDB (version >= v3.6.3) 
 - Python (version >= 3.5.5)
 
