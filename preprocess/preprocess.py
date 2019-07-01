@@ -18,7 +18,7 @@ from nltk import word_tokenize
 from nltk.tokenize import TweetTokenizer
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
-
+import numpy as np
 
 from emotion_codes import UNICODE_EMOJI
 from emotion_codes import EMOTICONS
@@ -26,6 +26,20 @@ from emotion_codes import EMOJI_TO_CATEGORY
 from defines import *
 from contractions_def import *
 
+
+# assume input matrix contains term frequencies
+def tfidf_transform(mat):
+
+    # convert matrix of counts to matrix of normalized frequencies
+    normalized_mat = mat / np.transpose(mat.sum(axis=1)[np.newaxis])
+
+    # compute IDF scores for each word given the corpus
+    docs_using_terms = np.count_nonzero(mat,axis=0)
+    idf_scores = np.log(mat.shape[1]/docs_using_terms)
+
+    # compuite tfidf scores
+    tfidf_mat = normalized_mat * idf_scores
+    return tfidf_mat
 
 class Preprocess:
 
@@ -201,13 +215,10 @@ class Preprocess:
 
             TODO: check if !,? may contain useful information
         """
-        cleaned_tweet = []
-        for word in tweet:
-            #if word not in string.punctuation and word != '...' and word != '…' and word != '..':
-            if word not in string.punctuation and word not in ['...', '…', '..', "\n", "\t", " ", ""] :
-                cleaned_tweet.append(word)
 
-        return cleaned_tweet
+        return [word if (word not in string.punctuation and \
+                         word not in ['...', '…', '..', "\n", "\t", " ", ""]) \
+                     for word in tweet ]
 
 
 
@@ -313,24 +324,16 @@ class Preprocess:
 
             Remark: Do it after emotion treatment, otherwise smiley :D -> :d
         """
-        new_words = []
-        for ind,word in enumerate(tweet):
-            # if word is not a constant like USER, URL, EMOT_SMILE, etc.
-            if word not in self.Constant_words:
-                tweet[ind] = word.lower()
 
-        return tweet
+        return [word.lower() if word not in self.Constant_words else word for word in tweet]
+
 
     def remove_non_ascii(self, tweet):
         """Remove non-ASCII characters from list of tokenized words"""
 
-        new_tweet = []
-        for word in tweet:
-            non_ascii_word = unicodedata.normalize('NFKD', word).encode('ascii', 'ignore').decode('utf-8', 'ignore')
-            if non_ascii_word is not '':
-                new_tweet.append(non_ascii_word)
+        return [unicodedata.normalize('NFKD', word).encode('ascii', 'ignore').decode('utf-8', 'ignore') \
+                for word in tweet if unicodedata.normalize('NFKD', word).encode('ascii', 'ignore').decode('utf-8', 'ignore') is not ""]
 
-        return new_tweet
 
     def replace_numbers(self, tweet, mode="replace"):
         """
@@ -346,14 +349,10 @@ class Preprocess:
 
         if mode == "replace":
             p = inflect.engine()
-            for ind, word in enumerate(tweet):
-                if word.isdigit():
-                    tweet[ind] = p.number_to_words(word)
+            return [p.number_to_words(word) if word.isdigit() else word for word in tweet]
 
         elif mode == "delete":
-            tweet = [word for word in tweet if not word.isdigit() ]
-
-        return tweet
+            return [word for word in tweet if not word.isdigit() ]
 
 
     def remove_stopwords(self, tweet, include_personal_words=False, include_negations=False, list_stopwords_manual=False):
@@ -384,10 +383,7 @@ class Preprocess:
 
         # manual list of stopwords provided
         if list_stopwords_manual != False:
-            for word in tweet:
-                if word not in list_stopwords_manual:
-                    new_tweet.append(word)
-            return new_tweet
+            return [word if word not in list_stopwords_manual for word in tweet]
 
         else:
             # english language
@@ -431,12 +427,20 @@ class Preprocess:
             >>> ['americans', 'stop', 'drink']
         """
 
+        # Lemmatization
+        def lookup_pos(pos):
+            pos_first_char = pos[0].lower()
+            if pos_first_char in 'nv':
+                return pos_first_char
+            else:
+                return 'n'
 
         if self.lang == "english":
-            for ind, word in enumerate(tweet):
-                #tweet[ind] = Grammar.LEMMATIZER.lemmatize(word, pos='v')
-                tweet[ind] = self.WN_Lemmatizer_EN.lemmatize(word, pos='v')
-            return tweet
+
+            # Part-of-speech tagging
+            pos_tags = nltk.pos_tag(tweet)
+
+            return [self.WN_Lemmatizer_EN.lemmatize(word,lookup_pos(pos)) for (word,pos) in pos_tags]
 
         else:
             return tweet
