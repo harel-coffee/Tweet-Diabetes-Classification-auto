@@ -216,9 +216,7 @@ class Preprocess:
             TODO: check if !,? may contain useful information
         """
 
-        return [word if (word not in string.punctuation and \
-                         word not in ['...', '…', '..', "\n", "\t", " ", ""]) \
-                     for word in tweet ]
+        return [word if (word not in string.punctuation and word not in ['...', '…', '..', "\n", "\t", " ", ""]) for word in tweet ]
 
 
 
