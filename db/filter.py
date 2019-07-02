@@ -263,16 +263,14 @@ def delete_similar_tweets(df, model_ft, textCol):
 
 
 
-def filter_dataframe(raw_tweets, filtered_tweets, configDict, language='en', withRetweets=False,
+def filter_dataframe(raw_tweets, configDict, language='en', withRetweets=False,
                      withOriginalTweetOfRetweet=True, deleteDuplicates=True):
     """
-        Only consider tweets with the given language and save them in
-        the collection filtered_tweets
+        Filters tweets in the provided dataframe
         ----------------------------------------------------------------------
 
         Parameters:
           - raw_tweets: pandas or dask dataframe with raw tweets
-          - filtered_tweets: dataframe in which to store the filtered tweets
           - lang : language to filter
           - withRetweets : - False : delete all retweets
                            - True: Keep all retweets
@@ -338,7 +336,16 @@ def filter_dataframe(raw_tweets, filtered_tweets, configDict, language='en', wit
         print("Number tweets without bots (very similar tweets):", len(tweets))
 
 
-    print("Number tweets cleaned total:", len(tweets))
+            df = readFile(args.filename, columns=args.filenameColumns, sep=args.filenameDelimiter)
+    print("Filter out tweets about animals..") # likely talking about dog's or cat's diabetes
+    animal_list = [" dog", " Dog", " cat ", " Cat ", "cat's"]
+    tweets["temp"] = tweets[textCol].map(lambda text: any(animal in text for animal in animal_list))
+    tweets = tweets[tweets["temp"] == False]
+    del tweets["temp"]
+    print("Number tweets without animals:", len(tweets))
+
+    print("----")
+    print("Number tweets cleaned total:", len(tweets), "\n")
     return tweets
 
 
@@ -469,9 +476,8 @@ if __name__ == '__main__':
         if args.filename is not None:
             print("Local mode: Read file..")
 
-
             filtered_df = filter_dataframe(readFile(args.filename, columns=args.filenameColumns, sep=args.filenameDelimiter),
-                                        args.saveResultPath, args.configDict, language=args.lang,
+                                        args.configDict, language=args.lang,
                                         withRetweets=args.withRetweets, withOriginalTweetOfRetweet=args.withOriginalTweetOfRetweet,
                                         deleteDuplicates=True)
 
@@ -514,7 +520,7 @@ if __name__ == '__main__':
         # TODO: Load data from cluster and tokenize
         raw_tweets = pd.read_parquet(args.clusterPathData, engine="pyarrow")
 
-        filtered_df = filter_dataframe(raw_tweets, args.saveResultPath, args.configDict, language=args.lang,
+        filtered_df = filter_dataframe(raw_tweets, args.configDict, language=args.lang,
                                     withRetweets=args.withRetweets, withOriginalTweetOfRetweet=args.withOriginalTweetOfRetweet,
                                     deleteDuplicates=True)
 
