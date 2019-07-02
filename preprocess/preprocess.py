@@ -215,9 +215,10 @@ class Preprocess:
 
             TODO: check if !,? may contain useful information
         """
+        def check_punctuation(word):
+            return word not in string.punctuation and word not in ['...', '…', '..', "\n", "\t", " ", ""] 
 
-        return [word if (word not in string.punctuation and word not in ['...', '…', '..', "\n", "\t", " ", ""]) for word in tweet ]
-
+        return [word for word in tweet if check_punctuation(word)]
 
 
     def preprocess_emojis(self, tweet, limit_nEmojis=False):
@@ -381,7 +382,7 @@ class Preprocess:
 
         # manual list of stopwords provided
         if list_stopwords_manual != False:
-            return [word if word not in list_stopwords_manual for word in tweet]
+            return [word for word in tweet if word not in list_stopwords_manual]
 
         else:
             # english language
