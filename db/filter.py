@@ -3,7 +3,7 @@
 Author: Adrian Ahne
 Date: 27-06-2018
 
-
+MONGO DB Only
 Creates a collection consisting only of english tweets
 Furthermore two fields are added to each tweet-document:
   - 'created_at_orig' : if tweet-document is no retweet -> insert date of the field 'created_at'
@@ -16,6 +16,9 @@ Furthermore two fields are added to each tweet-document:
 
 The field 'number_of_weeks' will allow more precise analysis in a later step
 
+Last modif: 2019-07-02
+Added bot detection and deletion of too similar tweets in the pandas case.
+
 """
 
 import argparse
@@ -23,9 +26,13 @@ from pprint import pprint
 import datetime
 import sys
 import json
+import numpy as np
+from numpy.linalg import norm
+import os
 import os.path as op
+import itertools
+from gensim.models import FastText
 import pandas as pd
-#from ..readWrite.readWrite import savePandasDFtoFile
 
 # add path to utils module to python path
 basename = op.split(op.dirname(op.realpath(__file__)))[0]
@@ -35,14 +42,20 @@ sys.path.insert(0, path_utils)
 from sys_utils import load_library, strInput2bool
 #from mongoDB_utils import connect_to_database
 
-# add path to utils module to python path
-basename = op.split(op.dirname(op.realpath(__file__)))[0]
 load_library(op.join(basename, 'preprocess'))
+load_library(op.join(basename, 'readWrite'))
+load_library(op.join(basename, 'tweet_utils'))
+os.environ["HADOOP_HOME"] = "/space/hadoop/hadoop_home"
+
 from defines import ColumnNames as cn
 from defines import Patterns
-
-load_library(op.join(basename, 'readWrite'))
 from readWrite import savePandasDFtoFile, readFile
+from tweet_utils import *
+from preprocess import Preprocess
+prep = Preprocess()
+
+
+# ----------------------------
 
 
 def add_field_to_collection(collection, URL_PATTERN=False, MENTION_PATTERN=False):
@@ -206,6 +219,50 @@ def filter_Mongo(raw_tweets, filtered_tweets, lang='en', withRetweets=False, wit
 
 
 
+def cosinus_similarity(a, b):
+    return np.inner(a,b)/(norm(a)*norm(b))
+    #return np.dot(a, b.T)/(norm(a)*norm(b))
+
+
+def delete_similar_tweets(df, model_ft, textCol):
+    if df.shape[0] == 1:
+        return df
+    else:
+        #print("shape :", df.shape)
+        all_indices = df.index.values.tolist()
+        all_combinations = itertools.combinations(all_indices, 2)
+        new_indices = []
+
+        while(len(all_indices) > 1):
+            first = all_indices[0]
+            rest = all_indices[1::]
+
+            vec1 = tweet_vectorizer(prep.tokenize(df.loc[first][textCol]), model_ft)#.reshape(1,-1)
+            for i in rest:
+                vec2 = tweet_vectorizer(prep.tokenize(df.loc[i][textCol]), model_ft)#.reshape(1,-1)
+
+                cos = cosinus_similarity(vec1, vec2)
+
+                if (cos > 0.98):
+                    print("1: ", df.loc[first][textCol])
+                    print("2: ", df.loc[i][textCol])
+                    print(cos)
+                    print("Remove", i, " :", df.loc[i][textCol])
+                    all_indices.remove(i)
+#            print("append", first, " : ", df.loc[first]["text"])
+            new_indices.append(first)
+            all_indices.remove(first)
+
+        else:
+            if len(all_indices) > 0:
+ #               print("Append last", all_indices[0], " : ", df.loc[all_indices[0]]["text"])
+                new_indices.append(all_indices[0])
+
+        print("\n New dataframe", df.ix[new_indices].shape)
+        return df.ix[new_indices]
+
+
+
 def filter_dataframe(raw_tweets, filtered_tweets, configDict, language='en', withRetweets=False,
                      withOriginalTweetOfRetweet=True, deleteDuplicates=True):
     """
@@ -227,6 +284,7 @@ def filter_dataframe(raw_tweets, filtered_tweets, configDict, language='en', wit
     print("Number raw tweets:", len(raw_tweets))
 
     lang = getTweetColumnName("lang", configDict)
+    textCol = getTweetColumnName("text", configDict)
 
     if withRetweets:
         tweets = raw_tweets.loc[raw_tweets[lang] == language] # filter by language
@@ -235,9 +293,12 @@ def filter_dataframe(raw_tweets, filtered_tweets, configDict, language='en', wit
     # filter out retweets
     else:
         retweeted_text = getTweetColumnName("retweeted_text", configDict)
+
         print("INFO: Get non-retweets..")
         tweets = raw_tweets.loc[(raw_tweets[lang].values == language) & (raw_tweets[retweeted_text].values == None)] # filter by language and retweet
         print("Number tweets (no retweets) filtered by language {}:".format(lang), len(tweets))
+        tweets = raw_tweets.loc[(raw_tweets[lang].values == language) & (raw_tweets[retweeted_text].values == None) & (raw_tweets[textCol].values.split(" ")[0] != "RT")] # filter by language and retweet
+        print("Number tweets (no retweets, without RT at beginning) filtered by language {}:".format(lang), len(tweets))
 
         # add original tweets of retweets
         if withOriginalTweetOfRetweet:
@@ -251,10 +312,13 @@ def filter_dataframe(raw_tweets, filtered_tweets, configDict, language='en', wit
 
 
     if deleteDuplicates:
+        # 1. Use pandas efficient function drop_duplicates
+        #-------------
         # add temporary column with url's and user mentions replaced by constants
         # to better detect duplicates
+
         print("INFO: Delete duplicates..")
-        tweets["tweet_URL_USER"] = [Patterns.MENTION_PATTERN.sub("USER", Patterns.URL_PATTERN.sub("URL", text)) for text in tweets["text"]]
+        tweets["tweet_URL_USER"] = [Patterns.MENTION_PATTERN.sub("USER", Patterns.URL_PATTERN.sub("URL", text)) for text in tweets[textCol]]
 
         # delete duplicates
         tweets.drop_duplicates(subset=["tweet_URL_USER"], keep='first', inplace=True)
@@ -262,6 +326,17 @@ def filter_dataframe(raw_tweets, filtered_tweets, configDict, language='en', wit
         # delete temporary created column
         tweets.drop("tweet_URL_USER", axis=1)
         print("Number tweets without duplicates:", len(tweets))
+
+
+        # 2. Use word embeddings to delete very close tweets (bots!)
+        # --------------------
+        print("Load word embeddings..")
+        model_ft = FastText.load(args.wordembeddingsPath)
+
+        print("Calculate similarities..")
+        tweets = tweets.groupby(by=args.groupByName).apply(lambda group: delete_similar_tweets(group, model_ft, textCol))
+        print("Number tweets without bots (very similar tweets):", len(tweets))
+
 
     print("Number tweets cleaned total:", len(tweets))
     return tweets
@@ -370,6 +445,8 @@ if __name__ == '__main__':
     parser.add_argument("-lf", "--filename", help="Path to the data file")
     parser.add_argument("-lfd", "--filenameDelimiter", help="Delimiter used in file (default=',')", default=",")
     parser.add_argument("-lfc", "--filenameColumns", help="String with column names")
+    parser.add_argument("-wep", "--wordembeddingsPath", help="Path to the word embeddings stored in gensim format", required=True)
+    parser.add_argument("-gb", "--groupByName", help= "Name of the groupBy column (Default: 'user_name')", default="user_name")
     parser.add_argument("-s", "--saveResultPath", help="Path name where result should be stored")
     parser.add_argument("-wr", "--withRetweets", help="Keep retweets or filter out", choices=(True,False), default=False, type=strInput2bool, nargs='?', const=True)
     parser.add_argument("-wo", "--withOriginalTweetOfRetweet", help="Add original tweets of retweets", choices=(True,False), default=True, type=strInput2bool, nargs='?', const=True)
