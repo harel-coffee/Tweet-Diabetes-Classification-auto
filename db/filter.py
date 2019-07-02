@@ -287,6 +287,7 @@ def filter_dataframe(raw_tweets, configDict, language='en', withRetweets=False,
     if withRetweets:
         tweets = raw_tweets.loc[raw_tweets[lang] == language] # filter by language
         print("Number tweets (with retweets) filtered by language {}:".format(lang), len(tweets))
+        print("\t {} MB".format(tweets.memory_usage(deep=True).sum() / (1024*1024)))
 
     # filter out retweets
     else:
@@ -295,8 +296,10 @@ def filter_dataframe(raw_tweets, configDict, language='en', withRetweets=False,
         print("INFO: Get non-retweets..")
         tweets = raw_tweets.loc[(raw_tweets[lang].values == language) & (raw_tweets[retweeted_text].values == None)] # filter by language and retweet
         print("Number tweets (no retweets) filtered by language {}:".format(lang), len(tweets))
+        print("\t {} MB".format(tweets.memory_usage(deep=True).sum() / (1024*1024)))
         tweets = raw_tweets.loc[(raw_tweets[lang].values == language) & (raw_tweets[retweeted_text].values == None) & (raw_tweets[textCol].values.split(" ")[0] != "RT")] # filter by language and retweet
         print("Number tweets (no retweets, without RT at beginning) filtered by language {}:".format(lang), len(tweets))
+        print("\t {} MB".format(tweets.memory_usage(deep=True).sum() / (1024*1024)))
 
         # add original tweets of retweets
         if withOriginalTweetOfRetweet:
@@ -307,6 +310,7 @@ def filter_dataframe(raw_tweets, configDict, language='en', withRetweets=False,
             print("INFO: Add original tweets of retweets..")
             tweets = addOriginalTweetsOfRetweets_df(retweets, tweets)
             print("Number of tweets (noRetweets + original tweets of retweets):", len(tweets))
+            print("\t {} MB".format(tweets.memory_usage(deep=True).sum() / (1024*1024)))
 
 
     if deleteDuplicates:
@@ -324,6 +328,7 @@ def filter_dataframe(raw_tweets, configDict, language='en', withRetweets=False,
         # delete temporary created column
         tweets.drop("tweet_URL_USER", axis=1)
         print("Number tweets without duplicates:", len(tweets))
+        print("\t {} MB".format(tweets.memory_usage(deep=True).sum() / (1024*1024)))
 
 
         # 2. Use word embeddings to delete very close tweets (bots!)
@@ -334,18 +339,21 @@ def filter_dataframe(raw_tweets, configDict, language='en', withRetweets=False,
         print("Calculate similarities..")
         tweets = tweets.groupby(by=args.groupByName).apply(lambda group: delete_similar_tweets(group, model_ft, textCol))
         print("Number tweets without bots (very similar tweets):", len(tweets))
+        print("\t {} MB".format(tweets.memory_usage(deep=True).sum() / (1024*1024)))
 
 
-            df = readFile(args.filename, columns=args.filenameColumns, sep=args.filenameDelimiter)
     print("Filter out tweets about animals..") # likely talking about dog's or cat's diabetes
     animal_list = [" dog", " Dog", " cat ", " Cat ", "cat's"]
     tweets["temp"] = tweets[textCol].map(lambda text: any(animal in text for animal in animal_list))
     tweets = tweets[tweets["temp"] == False]
     del tweets["temp"]
     print("Number tweets without animals:", len(tweets))
+    print("\t {} MB".format(tweets.memory_usage(deep=True).sum() / (1024*1024)))
 
     print("----")
-    print("Number tweets cleaned total:", len(tweets), "\n")
+    print("Number tweets cleaned total:", len(tweets))
+    print("\t {} MB".format(tweets.memory_usage(deep=True).sum() / (1024*1024)))
+    print("")
     return tweets
 
 
