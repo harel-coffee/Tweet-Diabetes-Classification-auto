@@ -33,10 +33,10 @@ from readWrite import savePandasDFtoFile, readFile
 def preprocessTweetsAndSave(args, prep):
 
     with open(args.tempFile, "w") as f:
-        for tweet in readFile(args.filename, columns=args.filenameColumns, sep=args.filenameDelimiter)[args.dataColumnName].values:
+        for i, line in readFile(args.filename, columns=args.filenameColumns, sep=args.filenameDelimiter).iterrows():
             # some tweets in the file reduced-tweets.parquet were None
-            if tweet is not None:
-    #        tweets.append(prep.tokenize(tweet))
+            if line[args.dataColumnName] is not None and line["lang"] == args.lang:
+                tweet = line[args.dataColumnName]
                 tweet = prep.replace_hashtags_URL_USER(tweet, mode_URL="replace", mode_Mentions="replace") 
                 f.write((" ".join(prep.tokenize(tweet)))+"\n")
 
@@ -70,6 +70,7 @@ if __name__ == '__main__':
     parser.add_argument("-lfd", "--filenameDelimiter", help="Delimiter used in file (default=',')", default=",")
     parser.add_argument("-lfc", "--filenameColumns", help="String with column names")
     parser.add_argument("-dcn", "--dataColumnName", help="If data stored in tabular form, gives the column of the desired text data (default='tweetText')", default="tweetText")
+    parser.add_argument("-l", "--lang", help="Language for which word vectors shall be trained", default="en")
     parser.add_argument("-tf", "--tempFile", help="Temporary file to write preprocessed tweets in and to read directly to FastText training", default="/space/tmp/tmp.cor")
     parser.add_argument("--vecDim", help="Vector dimension of the word embedding (default=300)", default=300, type=int)
     parser.add_argument("--window", help="Maximum distance between the current and predicted word within a sentence (default=5)", default=5, type=int)
