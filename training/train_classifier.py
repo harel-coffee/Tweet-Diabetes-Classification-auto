@@ -27,11 +27,7 @@ from sklearn.model_selection import GridSearchCV, cross_val_predict, train_test_
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.svm import SVC, LinearSVC
 from sklearn.ensemble import RandomForestClassifier
-<<<<<<< HEAD
 from sklearn.metrics import confusion_matrix, accuracy_score, f1_score, precision_score, recall_score, roc_auc_score, classification_report
-=======
-from sklearn.metrics import confusion_matrix, accuracy_score, f1_score, precision_score, recall_score, roc_auc_score
->>>>>>> 008dc0f1f1e7c21c202df1efcba94057e0276315
 from sklearn.feature_selection import SelectKBest, f_classif
 from sklearn.neural_network import MLPClassifier
 from sklearn.externals import joblib
@@ -226,7 +222,7 @@ if __name__ == '__main__':
 
         X_train, X_test, y_train, y_test = train_test_split(V, labels.values.ravel(), test_size=0.3, random_state=0)
 
-        grid = GridSearchCV(pipeline, parameters, cv=10, n_jobs=-1, verbose=2)
+        grid = GridSearchCV(pipeline, parameters, cv=10, n_jobs=-1, verbose=1)
 
         #grid = grid.fit(V, labels.values.ravel())
         grid = grid.fit(X_train, y_train)
@@ -273,72 +269,3 @@ if __name__ == '__main__':
 
 
 
-"""
-RESULTS FROM AUGUST 2018!!
-
-NEW ####################################################
-SVC full preprocessing embeddings
-Best: 0.883516 using
-{'model__C': 15.0, 'model__tol': 0.01, 'model__kernel': 'rbf'}
-
-
-SVC partial preprocessing embeddings
-Best: 0.896703 using
-{'model__tol': 0.1, 'model__kernel': 'rbf', 'model__C': 12.0}
-
-
-SVC no preprocessing embeddings
-Best: 0.901978 using
-{'model__C': 6.0, 'model__tol': 0.01, 'model__kernel': 'rbf'}
-
-
-SVC pretrained Wikipedia corpus
-Best: 0.865495 using
-{'model__tol': 0.1, 'model__C': 10.0, 'model__kernel': 'rbf'}
-------------------------------------------------------------------------
-
-Logistic Regression full preprocessing embeddings
-Best: 0.883956
-using {'model__tol': 1e-10, 'model__C': 0.1}
-
-Logistic Regression partial preprocessing embeddings
-Best: 0.891868 using
-{'model__tol': 1e-10, 'model__C': 0.8}
-
-Logistic Regression no preprocessing embeddings
-Best: 0.894505 using
-{'model__tol': 1e-10, 'model__C': 0.8}
-
-Logistic Regression pretrained Wikipedia corpus
-Best: 0.870330 using {'model__C': 3, 'model__tol': 1e-10}
----------------------------------------------------------------------------
-
-RandomForest full preprocessing
-Best: 0.876484 using
-{'model__criterion': 'entropy', 'model__max_features': 'auto',
- 'model__max_depth': 40, 'model__n_estimators': 60}
-
-RandomForest partial preprocessing
-Best: 0.886154
-{'model__n_estimators': 80, 'model__max_depth': 8, 'model__max_features': 'auto',
- 'model__criterion': 'entropy'}
-
-RandomForest noPreprocessing
-Best: 0.884835 using
-{'model__n_estimators': 120, 'model__criterion': 'gini', 'm
-odel__max_features': 'log2', 'model__max_depth': 10}
-
-RandomForest pretrained Wikipedia corpus
-Best: 0.845714 using
-{'model__max_features': 'auto', 'model__max_depth': 8, 'mod
-el__criterion': 'entropy', 'model__n_estimators': 70}
---------------------------------------------------------
-
-
-MultiLayerPerceptron no preprocessing
-Best: 0.894505 using
- {'model__tol': 0.01, 'model__activation': 'relu', 'model__learning_rate': 'constant',
-  'model__hidden_layer_sizes': (64, 64), 'model__solver': 'adam'}
-
-
-"""
