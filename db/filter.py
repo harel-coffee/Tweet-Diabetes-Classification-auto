@@ -282,6 +282,8 @@ def filter_dataframe(raw_tweets, configDict, language='en', withRetweets=False,
                                - False : keep duplicates
     """
     print("Number raw tweets:", len(raw_tweets))
+    print("\t {} MB".format(raw_tweets.memory_usage(deep=True).sum() / (1024*1024)))
+#    print("Info: Column names:", raw_tweets.columns)
 
     lang = getTweetColumnName("lang", configDict)
     textCol = getTweetColumnName("text", configDict)
@@ -296,10 +298,10 @@ def filter_dataframe(raw_tweets, configDict, language='en', withRetweets=False,
         retweeted_text = getTweetColumnName("retweeted_text", configDict)
 
         print("INFO: Get non-retweets..")
-        tweets = raw_tweets.loc[(raw_tweets[lang].values == language) & (raw_tweets[retweeted_text].values == None)] # filter by language and retweet
-        print("Number tweets (no retweets) filtered by language {}:".format(lang), len(tweets))
-        print("\t {} MB".format(tweets.memory_usage(deep=True).sum() / (1024*1024)))
-        tweets = raw_tweets.loc[(raw_tweets[lang].values == language) & (raw_tweets[retweeted_text].values == None) & (raw_tweets[textCol].values.split(" ")[0] != "RT")] # filter by language and retweet
+#        tweets = raw_tweets.loc[(raw_tweets[lang].values == language) & (raw_tweets[retweeted_text].values == None)] # filter by language and retweet
+#        print("Number tweets (no retweets) filtered by language {}:".format(lang), len(tweets))
+#        print("\t {} MB".format(tweets.memory_usage(deep=True).sum() / (1024*1024)))
+        tweets = raw_tweets.loc[(raw_tweets[lang].values == language) & (raw_tweets[retweeted_text].values == None) & (raw_tweets.apply(lambda x: x[textCol].split(" ")[0] != "RT", axis=1))] # filter by language and retweet
         print("Number tweets (no retweets, without RT at beginning) filtered by language {}:".format(lang), len(tweets))
         print("\t {} MB".format(tweets.memory_usage(deep=True).sum() / (1024*1024)))
 
@@ -335,20 +337,22 @@ def filter_dataframe(raw_tweets, configDict, language='en', withRetweets=False,
 
         # 2. Use word embeddings to delete very close tweets (bots!)
         # --------------------
-        print("Load word embeddings..")
-        model_ft = FastText.load(args.wordembeddingsPath)
+#        print("Load word embeddings..")
+#        model_ft = FastText.load(args.wordembeddingsPath)
 
-        print("Calculate similarities..")
-        tweets = tweets.groupby(by=args.groupByName).apply(lambda group: delete_similar_tweets(group, model_ft, textCol))
-        print("Number tweets without bots (very similar tweets):", len(tweets))
-        print("\t {} MB".format(tweets.memory_usage(deep=True).sum() / (1024*1024)))
-
+#        print("Calculate similarities..")
+#        tweets = tweets.groupby(by=args.groupByName).apply(lambda group: delete_similar_tweets(group, model_ft, textCol))
+#        print("Number tweets without bots (very similar tweets):", len(tweets))
+#        print("\t {} MB".format(tweets.memory_usage(deep=True).sum() / (1024*1024)))
 
     print("Filter out tweets about animals..") # likely talking about dog's or cat's diabetes
     animal_list = [" dog", " Dog", " cat ", " Cat ", "cat's"]
-    tweets["temp"] = tweets[textCol].map(lambda text: any(animal in text for animal in animal_list))
-    tweets = tweets[tweets["temp"] == False]
-    del tweets["temp"]
+    tweets = tweets[~tweets.apply(lambda x: any(animal in x[textCol] for animal in animal_list), axis=1)]
+
+#    tweets["temp"] = tweets[textCol].map(lambda text: any(animal in text for animal in animal_list))
+#    tweets = tweets[tweets["temp"] == False]
+#    del tweets["temp"]
+    
     print("Number tweets without animals:", len(tweets))
     print("\t {} MB".format(tweets.memory_usage(deep=True).sum() / (1024*1024)))
 
@@ -435,7 +439,7 @@ def getTweetColumnName(columnName, configDict):
 
 
 if __name__ == '__main__':
-
+    
     parser = argparse.ArgumentParser(description="Filter tweets by language ",
                                      epilog='Example usage in local mode : \
                                              python filter.py -m "local" -lf "hdfs://bgdta1-demy:8020/data/twitter/track-analyse/matching-tweets.parquet/Project=Diabetes" \
@@ -475,8 +479,6 @@ if __name__ == '__main__':
                                                      retweeted_place_place_type, retweeted_created_at, retweeted_tweet_longitude, retweeted_tweet_latitude, \
                                                      retweeted_text)", type=json.loads, default={})
     args = parser.parse_args()
-
-
 
 
     if args.mode == "local":

@@ -53,10 +53,12 @@ def delete_similar_tweets(df):
         while(len(all_indices) > 1):
             first = all_indices[0]
             rest = all_indices[1::]
-     
-            vec1 = tweet_vectorizer(prep.tokenize(df.loc[first]["text"]), model_ft)#.reshape(1,-1)
+    
+            tweet1 = prep.replace_hashtags_URL_USER(df.loc[first]["text"], mode_URL="replace", mode_Mentions="replace")
+            vec1 = tweet_vectorizer(prep.tokenize(tweet1), model_ft)#.reshape(1,-1)
             for i in rest:
-                vec2 = tweet_vectorizer(prep.tokenize(df.loc[i]["text"]), model_ft)#.reshape(1,-1)
+                tweet2 = prep.replace_hashtags_URL_USER(df.loc[i]["text"], mode_URL="replace", mode_Mentions="replace")
+                vec2 = tweet_vectorizer(prep.tokenize(tweet2), model_ft)#.reshape(1,-1)
 
                 cos = cosinus_similarity(vec1, vec2)
            
