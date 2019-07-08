@@ -283,7 +283,6 @@ def filter_dataframe(raw_tweets, configDict, language='en', withRetweets=False,
     """
     print("Number raw tweets:", len(raw_tweets))
     print("\t {} MB".format(raw_tweets.memory_usage(deep=True).sum() / (1024*1024)))
-#    print("Info: Column names:", raw_tweets.columns)
 
     lang = getTweetColumnName("lang", configDict)
     textCol = getTweetColumnName("text", configDict)
@@ -298,9 +297,6 @@ def filter_dataframe(raw_tweets, configDict, language='en', withRetweets=False,
         retweeted_text = getTweetColumnName("retweeted_text", configDict)
 
         print("INFO: Get non-retweets..")
-#        tweets = raw_tweets.loc[(raw_tweets[lang].values == language) & (raw_tweets[retweeted_text].values == None)] # filter by language and retweet
-#        print("Number tweets (no retweets) filtered by language {}:".format(lang), len(tweets))
-#        print("\t {} MB".format(tweets.memory_usage(deep=True).sum() / (1024*1024)))
         tweets = raw_tweets.loc[(raw_tweets[lang].values == language) & (raw_tweets[retweeted_text].values == None) & (raw_tweets.apply(lambda x: x[textCol].split(" ")[0] != "RT", axis=1))] # filter by language and retweet
         print("Number tweets (no retweets, without RT at beginning) filtered by language {}:".format(lang), len(tweets))
         print("\t {} MB".format(tweets.memory_usage(deep=True).sum() / (1024*1024)))
@@ -349,10 +345,6 @@ def filter_dataframe(raw_tweets, configDict, language='en', withRetweets=False,
     animal_list = [" dog", " Dog", " cat ", " Cat ", "cat's"]
     tweets = tweets[~tweets.apply(lambda x: any(animal in x[textCol] for animal in animal_list), axis=1)]
 
-#    tweets["temp"] = tweets[textCol].map(lambda text: any(animal in text for animal in animal_list))
-#    tweets = tweets[tweets["temp"] == False]
-#    del tweets["temp"]
-    
     print("Number tweets without animals:", len(tweets))
     print("\t {} MB".format(tweets.memory_usage(deep=True).sum() / (1024*1024)))
 

@@ -47,7 +47,7 @@ def preprocess_tweet(tweet):
 def text_to_embedding(tweets, wordEmbedding, textColumn, userDescriptionColumn):
     temp = pd.DataFrame()
     temp[textColumn] = tweets[textColumn].map(lambda tweet: tweet_vectorizer(preprocess_tweet(tweet), wordEmbedding))
-    temp[userDescriptionColumn] = tweets[userDescriptionColumn].map(lambda userDesc: np.zeros((200, ))
+    temp[userDescriptionColumn] = tweets[userDescriptionColumn].map(lambda userDesc: np.zeros((wordEmbedding.vector_size, ))
                                                 if isinstance(userDesc, float) or userDesc == " " or userDesc is None
                                                 else tweet_vectorizer(preprocess_tweet(userDesc), wordEmbedding))
     return temp[[textColumn, userDescriptionColumn]]
@@ -84,7 +84,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     print("Load joke classifier..")
-    #loaded_model = joblib.load(filename)
     model_joke_classif = joblib.load(args.pathJokeClassifier)
 
     print("Load word embedding..")

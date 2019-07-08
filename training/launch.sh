@@ -2,18 +2,19 @@
 
 /space/hadoop/lib/python/bin/python3 train_classifier.py \
   --mode "local" \
-  --pathWordEmbedding "/space/Work/spark/FastText_model/ft_wordembeddings_09112018.model" \
+  --pathWordEmbedding "/space/tmp/FastText_embedding_20190703/ft_wordembeddings_dim300_minCount5_URL-User-toConstant_iter10_20190703" \
   --typeWordEmbedding "ft" \
-  --pathTrainingSet "/space/Work/spark/manually_labeled_tweets_instVSpers_25072018.csv" \
+  --pathTrainingSet "/space/Work/spark/manually_labeled_users_instVSpers_MoreInstTweets_30072018.csv" \
   --columnNameLabel "personal (0=no, 1=yes)" \
   --columnNameTextData "tweet" \
-  --parameterGrid '{"model__C":10.0, "model__tol":1e-1, "model__gamma":0.1, "model__kernel":"poly"}' \
   --modelAlgo "SVC" \
-  --type "bestmodel"
+  --parameterGrid '{"model__C":5.0, "model__tol":1.0, "model__gamma":0.1, "model__kernel":"poly"}' \
+  --type "bestmodel" \
+  --savePathTrainedModel "/space/tmp/bestmodel_personalUsers_20190703.model" 
 
-#  --parameterGrid '{"model__kernel" : ["linear", "poly", "rbf"], "model__C" : [ 12.0, 10.0, 5.0, 1.0, 0.1], "model__tol" : [1e-0, 1e-1, 1e-2], "model__gamma" : ["auto", 0.01, 0.1, 1.0]}' \
+#  --parameterGrid '{"model__C":[20.0, 15.0, 10.0, 5.0, 1.0], "model__tol":[1e-0, 1e-1, 1e-2], "model__gamma":["auto", 0.01, 0.1, 1.0], "model__kernel":["linear", "poly", "rbf"]}' \
+
 #  --modelAlgo "SVC" \
-
 #  --parameterGrid '{"model__C":[10.0, 1.0, 0.1, 0.01], "model__tol":[1e-10, 1e-9, 1e-8, 1e-7, 1e-6], "model__solver":["liblinear"]}' \
 #  --modelAlgo "logReg"
  

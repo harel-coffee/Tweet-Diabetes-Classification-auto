@@ -11,7 +11,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import confusion_matrix, accuracy_score, f1_score, precision_score, recall_score, roc_auc_score, classification_report
 from sklearn.neural_network import MLPClassifier
 from sklearn.externals import joblib
-from xgboost import XGBClassifier
+#from xgboost import XGBClassifier
 import datetime
 import gensim
 from gensim.models import FastText
@@ -20,7 +20,7 @@ from gensim.scripts.glove2word2vec import glove2word2vec
 import os.path as op
 import json
 from imblearn.pipeline import Pipeline
-
+from imblearn.over_sampling import SMOTE
 
 # add path to utils module to python path
 basename = op.split(op.dirname(op.realpath(__file__)))[0]
@@ -85,6 +85,7 @@ def get_model(modelAlgo):
 
 
 def get_pipeline():
+    from imblearn.pipeline import Pipeline
     pipeline  = Pipeline([
                     ('union', FeatureUnion(
                                 transformer_list = [
@@ -130,7 +131,7 @@ if __name__ == '__main__':
 
     print("Read training set ..")
     path_tweets = args.pathTrainingSet
-    tweets_csv = pd.read_csv(path_tweets, sep=";")
+    trainingData = pd.read_csv(path_tweets)
 
     print("Load word vectors..")
     model_we = load_wordembeddings(args.pathWordEmbedding, args.typeWordEmbedding)
@@ -161,7 +162,7 @@ if __name__ == '__main__':
 
 
     print("Start Grid search...")
-    grid = GridSearchCV(pipeline, parameters, cv=10, n_jobs=-1, verbose=1, scoring=args.scoring)
+    grid = GridSearchCV(pipeline, args.parameterGrid, cv=10, n_jobs=-1, verbose=1, scoring=args.scoring)
     grid.fit(X_train_pd, y_train)
     print("\nBest: %f using %s" % (grid.best_score_, grid.best_params_))
 
