@@ -45,7 +45,7 @@ def delete_similar_tweets(df):
     if df.shape[0] == 1:
         return df
     else:
-        print("shape :", df.shape)
+        
         all_indices = df.index.values.tolist()
         all_combinations = itertools.combinations(all_indices, 2)
         new_indices = []
@@ -63,10 +63,10 @@ def delete_similar_tweets(df):
                 cos = cosinus_similarity(vec1, vec2)
            
                 if (cos > 0.98):
-                    print("1: ", df.loc[first]["text"])
-                    print("2: ", df.loc[i]["text"])
-                    print(cos)
-                    print("Remove", i, " :", df.loc[i]["text"])
+                    #print("1: ", df.loc[first]["text"])
+                    #print("2: ", df.loc[i]["text"])
+                    #print(cos)
+                    #print("Remove", i, " :", df.loc[i]["text"])
                     all_indices.remove(i)
 #            print("append", first, " : ", df.loc[first]["text"])
             new_indices.append(first)
@@ -77,7 +77,7 @@ def delete_similar_tweets(df):
  #               print("Append last", all_indices[0], " : ", df.loc[all_indices[0]]["text"])
                 new_indices.append(all_indices[0])
  
-        print("\n New dataframe", df.ix[new_indices].shape)
+        #print("\n New dataframe", df.ix[new_indices].shape)
         return df.ix[new_indices]
 
 
