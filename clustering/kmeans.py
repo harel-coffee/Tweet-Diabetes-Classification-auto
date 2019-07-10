@@ -2,19 +2,25 @@ from numpy.linalg import norm
 from gensim.models import FastText
 import sys
 import os.path as op
+import os
 import random
 import pandas as pd
 import numpy as np
 import argparse
+from sklearn.metrics import silhouette_score
 
 
 
-basename = "/home/adrian/PhD/Tweet-Classification-Diabetes-Distress/"
+#basename = "/home/adrian/PhD/Tweet-Classification-Diabetes-Distress/"
+basename = op.split(op.dirname(op.realpath(__file__)))[0]
 path_utils = op.join(basename , "utils")
 sys.path.insert(0, path_utils)
 
 from sys_utils import load_library
 from tweet_utils import tweet_vectorizer
+load_library(op.join(basename, 'readWrite'))
+load_library(op.join(basename, 'preprocess'))
+from readWrite import savePandasDFtoFile, readFile
 
 from preprocess import Preprocess
 prep = Preprocess()
@@ -109,33 +115,48 @@ def preprocess_tweet(tweet):
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser(description="Run kmeans clustering \
+    parser = argparse.ArgumentParser(description="Run kmeans clustering",
                                      epilog='Example usage in local mode : \
-                                             python kmeans.py -fn "..." ... \
+                                             python kmeans.py -fn "..."  \
+                                    ')
     parser.add_argument("-fn", "--filename", help="Path to the data file")
     parser.add_argument("-we", "--wordEmbedding", help="Path to word embeddings")
     parser.add_argument("-lfd", "--filenameDelimiter", help="Delimiter used in file (default=',')", default=",")
     parser.add_argument("-lfc", "--filenameColumns", help="String with column names")
     parser.add_argument("-dcn", "--dataColumnName", help="If data stored in tabular form, gives the column of the desired text data (default='tweetText')", default="text")
-    parser.add_argument("-maxIt", "--maxIterations", help="Maximum number of iterations of kmeans", default=150)
-    parser.add_argument("-N", "--Ncluster", help="Number of clusters", required=True)
+    parser.add_argument("-maxIt", "--maxIterations", help="Maximum number of iterations of kmeans", default=150, type=int)
+    parser.add_argument("-N", "--Ncluster", help="Number of clusters", required=True, type=int)
     parser.add_argument("-dist", "--distance", help="distance measure", default="cosinus")
     parser.add_argument("-s", "--savePath", help="Path where to save model to", required=True)
 
     args = parser.parse_args()
 
     print("Load data..")
-    data = readFile(args.filename, columns=args.filenameColumns, sep=args.filenameDelimiter)
-
+#    data = readFile(args.filename, columns=args.filenameColumns, sep=args.filenameDelimiter)
+    data = pd.read_parquet(args.filename, columns=["id", "text", "user_name"], engine="pyarrow")
+ 
     print("Load word embeddings..")
     model_ft = FastText.load(args.wordEmbedding)
 
     print("Preprocess data..")
-    data["text_vec"] = data[args.dataColumnName].map(lambda tweet: tweet_vectorizer(preprocess(tweet), model))
-    data["prep"] = data[args.dataColumnName].map(lambda tweet: preprocess(tweet))
+    data["text_vec"] = data[args.dataColumnName].map(lambda tweet: tweet_vectorizer(preprocess_tweet(tweet), model_ft))
+    data["prep"] = data[args.dataColumnName].map(lambda tweet: preprocess_tweet(tweet))
 
 
-    Nclusters = [20, 30]
 
+    Nclusters =  [10, 20, 30]
+    scores = []
     for N in Nclusters:
-        res=kmeans(data, Ncluster, args.maxIterations, distance=args.distance, vectorColumn="text_vec")
+        res=kmeans(data, N, args.maxIterations, distance=args.distance, vectorColumn="text_vec")
+        score = silhouette_score(np.asarray(data["text_vec"].values.tolist()), res["label"].values)
+        print(score)
+        print()
+        scores.append(score)
+                        
+        print("Clusters:", Nclusters)
+        print("Silhouette scores:", scores)
+
+    if not os.path.isdir(os.path.dirname(args.savePath)):
+        os.makedirs(os.path.dirname(args.savePath))
+    savePandasDFtoFile(res, args.savePath)
+
