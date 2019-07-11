@@ -83,7 +83,8 @@ var g = svgContainer.append("g");
 d3.json("states.topo.json", function(error, us) {
 
   // append us states count and population information
-  d3.json("US_states_pop_count.json", function(count_pop_info) {
+//  d3.json("US_states_pop_count.json", function(count_pop_info) {
+  d3.json("US_States20190708.json", function(count_pop_info) {
 
     for (var i = 0; i < count_pop_info.length; i++) {
       for (var j = 0; j < us.objects.states.geometries.length; j++)  {
@@ -93,7 +94,7 @@ d3.json("states.topo.json", function(error, us) {
         if (state_pop == state) {
           us.objects.states.geometries[j].properties.count = count_pop_info[i].count
           us.objects.states.geometries[j].properties.population = count_pop_info[i].population
-          us.objects.states.geometries[j].properties.color = d3.interpolate("#ffffcc", "#800026")((us.objects.states.geometries[j].properties.count / us.objects.states.geometries[j].properties.population)/0.001995 );
+          us.objects.states.geometries[j].properties.color = d3.interpolate("#ffffcc", "#800026")((us.objects.states.geometries[j].properties.count / us.objects.states.geometries[j].properties.population)/0.0009995 );
           break
         }
       }
@@ -105,7 +106,8 @@ d3.json("states.topo.json", function(error, us) {
 
 // create group containing the cities
 //d3.json("cities_usa_Scale8.topo.json", function(error, us) {
-d3.json("cities_usa_Scale8_CountPopul.topo.json", function(error, us) {
+//d3.json("cities_usa_Scale8_CountPopul.topo.json", function(error, us) {
+d3.json("cities_usa_Scale8_CountPopul_20190708.topo.json", function(error, us) {
     console.log("citiesUSA")
     console.log(us)
     draw_cities(us)
@@ -182,7 +184,9 @@ function state_clicked(d) {
   console.log(d.properties.name)
   var state_name = d.properties.name;
 
-  d3.json("cities_usa_Scale8_CountPopul.topo.json", function(error, cities) {
+//  d3.json("cities_usa_Scale8_CountPopul.topo.json", function(error, cities) {
+  d3.json("cities_usa_Scale8_CountPopul_20190708.topo.json", function(error, cities) {
+
       var maxRatio = cities.objects.citiesScale8.geometries.filter(function(d) {return d.properties.ADM1NAME==state_name})
                           .filter(value => value.properties.count > min_Ntweets)
                           .map( value => value.properties.count / value.properties.population )

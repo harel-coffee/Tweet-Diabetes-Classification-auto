@@ -2910,7 +2910,6 @@ emotion_key_words_fulllist = [
     'dismay',
     'rhapsodic',
     'gladsomeness',
-    'Continental',
     'revel',
     'frightful',
     'shocked',
