@@ -94,7 +94,7 @@ d3.json("states.topo.json", function(error, us) {
         if (state_pop == state) {
           us.objects.states.geometries[j].properties.count = count_pop_info[i].count
           us.objects.states.geometries[j].properties.population = count_pop_info[i].population
-          us.objects.states.geometries[j].properties.color = d3.interpolate("#ffffcc", "#800026")((us.objects.states.geometries[j].properties.count / us.objects.states.geometries[j].properties.population)/0.0009995 );
+          us.objects.states.geometries[j].properties.color = d3.interpolate("#F8EBBA", "#972F41")((us.objects.states.geometries[j].properties.count / us.objects.states.geometries[j].properties.population)/0.0009995 );
           break
         }
       }
