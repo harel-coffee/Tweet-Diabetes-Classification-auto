@@ -84,7 +84,8 @@ d3.json("states.topo.json", function(error, us) {
 
   // append us states count and population information
 //  d3.json("US_states_pop_count.json", function(count_pop_info) {
-  d3.json("US_States20190708.json", function(count_pop_info) {
+//d3.json("US_States20190708.json", function(count_pop_info) {
+  d3.json("US_States20190708_manuallyCorrectedSomeMisclassifications.json", function(count_pop_info) {
 
     for (var i = 0; i < count_pop_info.length; i++) {
       for (var j = 0; j < us.objects.states.geometries.length; j++)  {
