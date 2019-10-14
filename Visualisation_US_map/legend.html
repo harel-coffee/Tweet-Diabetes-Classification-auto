@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <style>
+    html *
+    {
+       font-size: 1em !important;
+       color: #000 !important;
+       font-family: "Times New Roman" !important;
+    }
+  </style>
+</head>
+<body>
+
+<div id="map"></div>  <!--Draws rectangle -->
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://d3js.org/topojson.v1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/1.13.0/d3-legend.min.js"></script>
+
+<body>
+<svg height=300px  face = "Times New Roman"></svg>
+<div id="legend">
+<script>
+
+
+  var linear = d3.scale.linear()
+    .domain([0, 1247, 5226, 7614, 18000])
+    .range(["#f8ebba", "#edd6ac", "#ca9281", "#b56966", "#590000"]) // division per 11000
+//    .range(["#F8EBBA", "#e0bc9c", "#93273c", "#650002", "#000000"]) // division per 5000
+//    .range(["rgb(46, 73, 123)", "rgb(71, 187, 94)"]);
+
+  var svg = d3.select("svg");
+
+  svg.append("g")
+    .attr("class", "legendLinear")
+    .attr("transform", "translate(20,20)");
+
+  var legendLinear = d3.legend.color()
+    .shapeWidth(40)
+    //.cells(10)
+//    .cells([0, 500, 1000, 2000, 3000, 4000, 5000, 7500, 10000, 12500, 15000, 18000])
+    .cells([0, 0.375, 750, 1500, 2500, 3500, 4500, 6250, 8750, 12000, 16000])
+    .labels(["0 - 250", "251 - 500", "501 - 1000", "1001 - 2000", "2001 - 3000", "3001 - 4000", "4001 - 5000", "5001 - 7500", "7501 - 10000", "10001 - 14000", "14001 - 18000"])
+    .orient('vertical')
+    .title("Number of tweets per state")
+    //.labelFormat(d3.format(".00f"))
+    .scale(linear);
+
+  svg.select(".legendLinear")
+    .call(legendLinear);
+
+</script>
+</div>
+<!-- Create a div where the graph will take place -->
+<div id="my_dataviz"></div>
+<script>
+
+// append the svg object to the body of the page
+var height = 460
+var width = 460
+var svg = d3.select("#my_dataviz")
+  .append("svg")
+    .attr("width", width)
+    .attr("height", height)
+
+// The scale you use for bubble size
+var size = d3.scale.sqrt()
+  .domain([100, 5000])  // What's in the data, let's say it is percentage
+  .range([1, 50])  // Size in pixel
+
+// Add legend: circles
+var valuesToShow = [500, 2000, 5000]
+var xCircle = 230
+var xLabel = 380
+var yCircle = 310
+svg
+  .selectAll("legend")
+  .data(valuesToShow)
+  .enter()
+  .append("circle")
+    .attr("cx", xCircle)
+    .attr("cy", function(d){ return yCircle - size(d) } )
+    .attr("r", function(d){ return size(d) })
+    .style("fill", "none")
+    .attr("stroke", "black")
+
+// Add legend: segments
+svg
+  .selectAll("legend")
+  .data(valuesToShow)
+  .enter()
+  .append("line")
+    .attr('x1', function(d){ return xCircle + size(d) } )
+    .attr('x2', xLabel)
+    .attr('y1', function(d){ return yCircle - size(d) } )
+    .attr('y2', function(d){ return yCircle - size(d) } )
+    .attr('stroke', 'black')
+    .style('stroke-dasharray', ('2,2'))
+
+// Add legend: labels
+svg
+  .selectAll("legend")
+  .data(valuesToShow)
+  .enter()
+  .append("text")
+    .attr('x', xLabel)
+    .attr('y', function(d){ return yCircle - size(d) } )
+    .text( function(d){ return d } )
+    .style("font-size", 10)
+    .attr('alignment-baseline', 'middle')
+</script>
+
+</body>
+</html>

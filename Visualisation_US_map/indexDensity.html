@@ -136,7 +136,6 @@ function draw_cities(cities) {
                       .filter(value => value.properties.count > min_Ntweets)
                       .map( value => value.properties.count / value.properties.population )
                       .reduce(getMax)
-  console.log("Max:"+maxRatio)
   g.append("g")
  		.attr("id", "cities")
  		.selectAll("path")
@@ -231,9 +230,7 @@ function zoom(xyz) {
 
 function get_xyz(d) {                                // [[0,0], [0,1]] [[1,0], [1,1]]
   var bounds = path.bounds(d); // returns bounding box: [[xmin, ymin], [xmax, ymax]] in pixel starting in top left corner
-	console.log("get_xyz d:")
-	console.log(d)
-	console.log("bounds:"+bounds)
+
 	var dx = bounds[1][0] - bounds[0][0];
 	var dy = bounds[1][1] - bounds[0][1];
 	var x = (bounds[0][0] + bounds[1][0]) / 2;

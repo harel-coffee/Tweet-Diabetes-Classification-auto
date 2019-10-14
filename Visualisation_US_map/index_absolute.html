@@ -37,6 +37,7 @@
 <div id="map"></div>  <!--Draws rectangle -->
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="http://d3js.org/topojson.v1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/1.13.0/d3-legend.min.js"></script>
 <script>
 var m_width = $("#map").width(),
     width = 938/*938*/,
@@ -44,7 +45,7 @@ var m_width = $("#map").width(),
     country,
     state;
 
-min_Ntweets = 50
+min_Ntweets = 40
 
 var tooltip = d3.select("body")
     .append("div")
@@ -71,16 +72,10 @@ console.log("m_width:"+m_width)
 var svgContainer = d3.select("#map").append("svg") /* Append image */
     .attr("preserveAspectRatio", "xMidYMid") // how an element with a viewBox providing a given aspect ratio must fit into a viewport with a different aspect ratio.; xMidYMid (the default) - Force uniform scaling.
 		.attr("viewBox", "0 0 " + width/2 + " " + height)
-//		.attr("viewBox", "70 50 " + width/2 + " " + height)
     .attr("width", m_width /0.8)
     .attr("height", m_width * height / width *2);
 
-/*
-svgContainer.append("rect")
-    .attr("class", "background")
-    .attr("width", width)
-    .attr("height", height);
-*/
+
 
 // create group object which will contain a group object state and one for cities
 var g = svgContainer.append("g");
@@ -90,7 +85,9 @@ d3.json("states.topo.json", function(error, us) {
 
   // append us states count and population information
 //  d3.json("US_states_pop_count.json", function(count_pop_info) {
-  d3.json("US_States20190708.json", function(count_pop_info) {
+//  d3.json("US_States20190708.json", function(count_pop_info) {
+d3.json("US_States20190708_manuallyCorrectedSomeMisclassifications.json", function(count_pop_info) {
+
 
     for (var i = 0; i < count_pop_info.length; i++) {
       for (var j = 0; j < us.objects.states.geometries.length; j++)  {
@@ -98,10 +95,12 @@ d3.json("states.topo.json", function(error, us) {
         var state_pop = count_pop_info[i].geo_adm1_code;
         var state = us.objects.states.geometries[j].properties.postal;
         if (state_pop == state) {
-          //console.log("Found:"+state)
           us.objects.states.geometries[j].properties.count = count_pop_info[i].count
           us.objects.states.geometries[j].properties.population = count_pop_info[i].population
-          us.objects.states.geometries[j].properties.color = d3.interpolate("#ffffcc", "#800026")((us.objects.states.geometries[j].properties.count / us.objects.states.geometries[j].properties.population)/0.0009995 );
+//          us.objects.states.geometries[j].properties.color = d3.interpolate("#ffffcc", "#800026")((us.objects.states.geometries[j].properties.count / us.objects.states.geometries[j].properties.population)/0.0009995 );
+
+          //if (us.objects.states.geometries[j].properties.count < )
+          us.objects.states.geometries[j].properties.color = d3.interpolate("#F8EBBA", "#972F41")(us.objects.states.geometries[j].properties.count / 11000 );
           break
         }
       }
@@ -109,15 +108,12 @@ d3.json("states.topo.json", function(error, us) {
     draw_states(us);
   });
 
-  //g.selectAll("#" + d.id).style('display', 'none');
-
 });
 
 // create group containing the cities
 //d3.json("cities_usa_Scale8.topo.json", function(error, us) {
 //d3.json("cities_usa_Scale8_CountPopul.topo.json", function(error, us) {
 d3.json("cities_usa_Scale8_CountPopul_20190708.topo.json", function(error, us) {
-
     console.log("citiesUSA")
     console.log(us)
     draw_cities(us)
@@ -149,7 +145,6 @@ function draw_cities(cities) {
                        .reduce(getMax)
   }
 
-  console.log("Max:"+maxRatio)
   g.append("g")
  		.attr("id", "cities")
  		.selectAll("path")
@@ -163,7 +158,9 @@ function draw_cities(cities) {
     .attr("d", function(d) {
         return path.pointRadius(0.0015 *  d.properties.count /*/maxRatio*/ )(d)
       //return path.pointRadius(500 *  (d.properties.count/d.properties.population) / maxRatio )(d)
-      })
+    })
+  //  .style("fill", "rgb(68,2,5)")
+    .style("fill", "rgb(34,0,6)")
     .append("svg:title")
     .text(function(d) {
         var name = d.properties.NAME+"("+d.properties.ADM1NAME+")"+"\n Count:"+d.properties.count+"\n Population:"+d.properties.population+"\n("+d.properties.count/d.properties.population+")"
@@ -225,6 +222,7 @@ function state_clicked(d) {
         .attr("d", function(d) {
             return path.pointRadius( 0.0025 * d.properties.count /*/ maxRatio*/)(d)
           })
+        //.attr("fill", "#5fa5ec")
         .append("svg:title")
         .text(function(d) {
               var name = d.properties.NAME+"("+d.properties.ADM1NAME+")"+"\n Count:"+d.properties.count+"\n Population:"+d.properties.population+"\n("+d.properties.count/d.properties.population+")"
@@ -273,7 +271,10 @@ $(window).resize(function() {
 	svgContainer.attr("width", w/0.8);
   svgContainer.attr("height", w * height / width*2);
 });
+
 </script>
+
+
 
 </body>
 </html>
