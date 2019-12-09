@@ -1,4 +1,4 @@
-# Tweet-Classification-Diabetes-Distress
+# Tweet-Diabetes-Classification
 
 This project aims to identify diabetes distress patterns based on social media data using artificial intelligence methods. We are working with twitter data. 
 
