@@ -3,6 +3,7 @@
 This project aims to identify diabetes distress patterns based on social media data using artificial intelligence methods. We are working with twitter data. 
 
 In the following a small overview over the directories:
+- Visualisation_US_map: D3 visualisation of tweets occurrence over the USA after our geolocation algorithm
 - Tweets_extraction_Twitter : Extractions of tweets via Twitter API
 - WordEmbeddings : Calculating word embeddings (Word2Vec or FastText) via the gensim package
 - data : Trained models (not up-to-date)
